@@ -22,7 +22,26 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 
 public class TestUtils {
 
-    public static ContentValues createLocationValues() {
+    public static ContentValues createLocationLeipzig() {
         return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103", "", "");
+    }
+
+    public static ContentValues createBreweryBayrischerBahnhof() {
+        return DatabaseHelper.buildBreweryValues("1", "Bayerischer Bahnhof", "2000",
+                "http://www.bayerischer-bahnhof.de", "1");
+    }
+
+    public static ContentValues createBeerGose() {
+        return DatabaseHelper.buildBeerValues("1", "Gose", "4.5", "", "10.8", "Gose", "", "1");
+    }
+
+    public static ContentValues createUserFrank() {
+        return DatabaseHelper.buildUserValues("1", "fbartnitzek", "Frank Bartnitzek",
+                "frank_bartnitzek@test.de", "");
+    }
+
+    public static ContentValues createReview1() {
+        return DatabaseHelper.buildReviewValues("1", "++", "lecker", "obergärig", "",
+                "leicht säuerlich", "20151211T160000", "1", "1", "");
     }
 }
