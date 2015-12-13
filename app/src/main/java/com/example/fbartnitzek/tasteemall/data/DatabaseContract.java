@@ -26,9 +26,12 @@ public class DatabaseContract {
 
     public static final String PATH_LOCATION = "location";
     public static final String PATH_BREWERY = "brewery";
+    public static final String PATH_BEER = "beer";
+    public static final String PATH_USER = "user";
+    public static final String PATH_REVIEW = "review";
 //    public static final String PATH_SCORE_WITH_TEAMS = "scores_with_teams";
 
-    //URI data
+//    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
@@ -36,18 +39,13 @@ public class DatabaseContract {
     public static final class LocationEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "location";
-//        public static final String ALIAS_HOME = " team_home";
-//        public static final String ALIAS_AWAY = " team_away";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"
-                        + PATH_LOCATION;
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"
-                        + PATH_LOCATION;
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
 
         public static final String LOCATION_ID = "location_id";
         public static final String NAME = "location_name";
@@ -56,9 +54,9 @@ public class DatabaseContract {
         public static final String LOCATION_LATITUDE = "location_latitude";
         public static final String POSTAL_CODE = "location_postal_code";
 
-//        public static Uri buildTeamUri(long id) {
-//            return ContentUris.withAppendedId(CONTENT_URI, id);
-//        }
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
     }
 
     public static final class BreweryEntry implements BaseColumns {
@@ -66,8 +64,10 @@ public class DatabaseContract {
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_BREWERY).build();
-
-        //TODO other stuff
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BREWERY;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BREWERY;
 
         public static final String BREWERY_ID = "brewery_id";
         public static final String NAME = "brewery_name";
@@ -75,12 +75,21 @@ public class DatabaseContract {
         public static final String WEBSITE = "brewery_website";
 
         public static final String LOCATION_ID = "brewery_location_id";
+
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
     }
 
     public static final class BeerEntry implements BaseColumns {
         public static final String TABLE_NAME = "beer";
 
-        // TODO other stuff
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_BEER).build();
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BEER;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_BEER;
 
         public static final String BEER_ID = "beer_id";
         public static final String NAME = "beer_name";
@@ -93,22 +102,42 @@ public class DatabaseContract {
         public static final String STYLE = "beer_style";
         public static final String IBU = "beer_ibu";    // international bitterness unit
         public static final String BREWERY_ID = "beer_brewery_id";
-    }
 
-    // TODO reviews and users
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+    }
 
     public static final class UserEntry implements BaseColumns {
         public static final String TABLE_NAME = "user";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
 
         public static final String USER_ID = "user_id";
         public static final String LOGIN = "user_login";
         public static final String NAME = "user_name";
         public static final String EMAIL = "user_eamil";
         public static final String HOME_LOCATION_ID = "user_home_location_id";
+
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
     }
 
     public static final class ReviewEntry implements BaseColumns {
         public static final String TABLE_NAME = "reviews";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
         public static final String REVIEW_ID = "review_id";
         public static final String RATING = "review_rating";
@@ -122,7 +151,9 @@ public class DatabaseContract {
         public static final String BEER_ID = "review_beer_id";
         public static final String LOCATION_ID = "review_location_id";
 
-
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
     }
 
 }

@@ -1,12 +1,9 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
