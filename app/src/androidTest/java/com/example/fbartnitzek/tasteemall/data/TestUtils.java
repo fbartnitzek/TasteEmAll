@@ -29,7 +29,8 @@ public class TestUtils {
     private static final String LOG_TAG = TestUtils.class.getName();
 
     public static ContentValues createLocationLeipzig() {
-        return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103", "", "");
+        return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103",
+                "Bayrischer Platz 1", "", "");
     }
 
     public static ContentValues createBreweryBayrischerBahnhof() {
