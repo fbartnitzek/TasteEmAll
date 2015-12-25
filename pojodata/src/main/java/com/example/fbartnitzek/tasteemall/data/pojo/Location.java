@@ -18,27 +18,33 @@ package com.example.fbartnitzek.tasteemall.data.pojo;
 
 public class Location {
     public static final String LOCATION_ID = "location_id";
-    public static final String NAME = "location_name";
+    public static final String LOCALITY = "location_locality";
     public static final String COUNTRY = "location_country";
     public static final String POSTAL_CODE = "location_postal_code";
     public static final String STREET = "location_street";
-    public static final String LOCATION_LONGITUDE = "location_longitude";
-    public static final String LOCATION_LATITUDE = "location_latitude";
+    public static final String LONGITUDE = "location_longitude";
+    public static final String LATITUDE = "location_latitude";
+    public static final String FORMATTED_ADDRESS = "location_formatted_address";
 
     private String locationId;
-    private String name;
+    private String locality;
     private String country;
+    private String postalCode;
     private String street;
     private String longitude;
     private String latitude;
+    private String formattedAddress;
 
-    public Location(String country, String latitude, String locationId, String longitude, String name, String street) {
+    public Location(String country, String latitude, String locationId, String longitude, String postalCode, String locality, String street,
+                    String formattedAddress) {
         this.country = country;
         this.latitude = latitude;
         this.locationId = locationId;
         this.longitude = longitude;
-        this.name = name;
+        this.postalCode = postalCode;
+        this.locality = locality;
         this.street = street;
+        this.formattedAddress = formattedAddress;
     }
 
     @Override
@@ -46,58 +52,76 @@ public class Location {
         return "Location{" +
                 "country='" + country + '\'' +
                 ", locationId='" + locationId + '\'' +
-                ", name='" + name + '\'' +
+                ", locality='" + locality+ '\'' +
+                ", postalCode='" + postalCode+ '\'' +
                 ", street='" + street + '\'' +
                 ", longitude='" + longitude + '\'' +
                 ", latitude='" + latitude + '\'' +
+                ", formattedAddress='" + formattedAddress + '\'' +
                 '}';
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
     }
 
     public String getCountry() {
         return country;
     }
 
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getFormattedAddress() {
+        return formattedAddress;
+    }
+
+    public void setFormattedAddress(String formattedAddress) {
+        this.formattedAddress = formattedAddress;
+    }
+
     public String getLatitude() {
         return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
     }
 
     public String getLocationId() {
         return locationId;
     }
 
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
     public String getLongitude() {
         return longitude;
     }
 
-    public String getName() {
-        return name;
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     public String getStreet() {
         return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
     }
 }

@@ -30,7 +30,7 @@ public class TestUtils {
 
     public static ContentValues createLocationLeipzig() {
         return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103",
-                "Bayrischer Platz 1", "", "");
+                "Bayrischer Platz 1", "", "", "");
     }
 
     public static ContentValues createBreweryBayrischerBahnhof() {

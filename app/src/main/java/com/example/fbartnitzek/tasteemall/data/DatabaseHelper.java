@@ -53,12 +53,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + LocationEntry._ID + " INTEGER PRIMARY KEY,"
                 + Location.LOCATION_ID + " INTEGER PRIMARY KEY,"
                 + Location.LOCATION_ID + " TEXT NOT NULL,"
-                + Location.NAME + " TEXT NOT NULL,"
+                + Location.LOCALITY + " TEXT NOT NULL,"
                 + Location.COUNTRY + " TEXT NOT NULL,"
                 + Location.POSTAL_CODE + " TEXT,"
                 + Location.STREET + " TEXT,"
-                + Location.LOCATION_LONGITUDE + " TEXT,"
-                + Location.LOCATION_LATITUDE + " TEXT, "
+                + Location.LONGITUDE + " TEXT,"
+                + Location.LATITUDE + " TEXT,"
+                + Location.FORMATTED_ADDRESS + " TEXT,"
                 //primary key
                 + "UNIQUE (" + Location.LOCATION_ID + ") ON CONFLICT REPLACE" //obviously wrong...
                 + " );";
@@ -143,17 +144,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         throw new UnsupportedOperationException("db upgrade not yet supported...");
     }
 
-    public static ContentValues buildLocationValues(String locationId, String name,
+    public static ContentValues buildLocationValues(String locationId, String locality,
                                                     String country, String plz, String street,
-                                                    String longitude, String latitude) {
+                                                    String longitude, String latitude,
+                                                    String formattedAddress) {
         ContentValues cv = new ContentValues();
         cv.put(Location.LOCATION_ID, locationId);
-        cv.put(Location.NAME, name);
+        cv.put(Location.LOCALITY, locality);
         cv.put(Location.COUNTRY, country);
         cv.put(Location.POSTAL_CODE, plz);
         cv.put(Location.STREET, street);
-        cv.put(Location.LOCATION_LONGITUDE, longitude);
-        cv.put(Location.LOCATION_LATITUDE, latitude);
+        cv.put(Location.LONGITUDE, longitude);
+        cv.put(Location.LATITUDE, latitude);
+        cv.put(Location.FORMATTED_ADDRESS, formattedAddress);
         return cv;
     }
 

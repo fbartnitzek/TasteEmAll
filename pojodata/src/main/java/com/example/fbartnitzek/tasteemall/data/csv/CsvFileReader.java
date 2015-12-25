@@ -85,17 +85,22 @@ public class CsvFileReader {
                     String breweryLocString = record.get(BREWERY_LOCATION);
                     Location breweryLocation = null;
                     if (breweryLocString!= null && !breweryLocString.isEmpty()) {
-                        breweryLocation = Util.queryLocation(breweryLocString);
                         if (!locations.containsKey(breweryLocString)) {
+                            breweryLocation = Util.queryLocation(breweryLocString);
                             locations.put(breweryLocString, breweryLocation);
+                        } else {
+                            breweryLocation = locations.get(breweryLocString);
                         }
                     }
                     String reviewLocString = record.get(REVIEW_LOCATION);
                     Location reviewLocation = null;
                     if (reviewLocString != null && !reviewLocString.isEmpty()) {
-                        reviewLocation = Util.queryLocation(reviewLocString);
+
                         if (!locations.containsKey(reviewLocString)) {
+                            reviewLocation = Util.queryLocation(reviewLocString);
                             locations.put(reviewLocString, reviewLocation);
+                        } else {
+                            reviewLocation = locations.get(reviewLocString);
                         }
                     }
 
