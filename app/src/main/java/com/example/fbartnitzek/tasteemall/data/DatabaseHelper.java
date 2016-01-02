@@ -51,7 +51,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         final String createLocationTable = "CREATE TABLE " + LocationEntry.TABLE_NAME + " ("
                 + LocationEntry._ID + " INTEGER PRIMARY KEY,"
-                + Location.LOCATION_ID + " INTEGER PRIMARY KEY,"
                 + Location.LOCATION_ID + " TEXT NOT NULL,"
                 + Location.LOCALITY + " TEXT NOT NULL,"
                 + Location.COUNTRY + " TEXT NOT NULL,"
