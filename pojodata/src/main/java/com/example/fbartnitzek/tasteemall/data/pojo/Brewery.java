@@ -17,6 +17,7 @@ package com.example.fbartnitzek.tasteemall.data.pojo;
  */
 
 public class Brewery {
+    // TODO: better generalization for all sorts of drinks (beer, wine, whisky, ...) - producer?
 
     public static final String BREWERY_ID = "brewery_id";
     public static final String NAME = "brewery_name";

@@ -3,6 +3,7 @@ package com.example.fbartnitzek.tasteemall.data;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -26,6 +27,7 @@ public class DatabaseContract {
 
     public static final String PATH_LOCATION = "location";
     public static final String PATH_BREWERY = "brewery";
+    public static final String PATH_BREWERY_WITH_LOCATION = "brewery_with_location";
     public static final String PATH_BEER = "beer";
     public static final String PATH_USER = "user";
     public static final String PATH_REVIEW = "review";
@@ -35,6 +37,7 @@ public class DatabaseContract {
 //    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
 
     // Locations
     public static final class LocationEntry implements BaseColumns {
@@ -55,6 +58,7 @@ public class DatabaseContract {
 
     public static final class BreweryEntry implements BaseColumns {
         public static final String TABLE_NAME = "brewery";
+        public static final String PATH_PATTERN = "pattern";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_BREWERY).build();
@@ -65,6 +69,25 @@ public class DatabaseContract {
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+        public static Uri buildBreweryLocationWithName(String searchString) {
+            Log.v(LOG_TAG, "buildBreweryLocationWithName, " + "searchString = [" + searchString + "]");
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_BREWERY_WITH_LOCATION).
+                    appendPath(searchString).build();
+//            return CONTENT_URI.buildUpon().
+////                    appendQueryParameter("pattern", searchString).build();
+//                    appendPath(PATH_PATTERN).
+//                    appendPath(searchString).build();
+        }
+
+        public static String getSearchString(Uri uri) {
+            // may also be empty
+            if (uri.getPathSegments().size()>1){
+                return uri.getPathSegments().get(1);
+            } else {
+                return "";
+            }
         }
     }
 

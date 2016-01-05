@@ -6,11 +6,14 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.example.fbartnitzek.tasteemall.data.pojo.Brewery;
+import com.example.fbartnitzek.tasteemall.data.pojo.Location;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -35,11 +38,26 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final int LOCATIONS = 100;
     private static final int BREWERIES = 200;
+    private static final int BREWERIES_WITH_LOCATION_BY_NAME = 201;
     private static final int BEERS = 300;
     private static final int USERS = 400;
     private static final int REVIEWS = 500;
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
+    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
+
+    static {
+        sBreweryByNameQueryBuilder = new SQLiteQueryBuilder();
+        sBreweryByNameQueryBuilder.setTables(
+                BreweryEntry.TABLE_NAME + " INNER JOIN " +
+                        LocationEntry.TABLE_NAME +
+                        " ON " + BreweryEntry.TABLE_NAME + "." + Brewery.LOCATION_ID +
+                        " = " + LocationEntry.TABLE_NAME + "." + Location.LOCATION_ID);
+    }
+
+    private static final String sBreweryLocationSelection = //both seem to work
+//            BreweryEntry.TABLE_NAME + "." + Brewery.NAME + " LIKE ?";
+            BreweryEntry.TABLE_NAME + "." + Brewery.NAME + " LIKE '%' || ? || '%'";
 
     private UriMatcher buildUriMatcher() {
         Log.v(LOG_TAG, "buildUriMatcher, " + "");
@@ -51,6 +69,9 @@ public class DatabaseProvider extends ContentProvider {
 
         // all breweries
         matcher.addURI(authority, DatabaseContract.PATH_BREWERY, BREWERIES);
+            // needed for empty string ...
+        matcher.addURI(authority, DatabaseContract.PATH_BREWERY_WITH_LOCATION + "/" , BREWERIES_WITH_LOCATION_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_BREWERY_WITH_LOCATION + "/*", BREWERIES_WITH_LOCATION_BY_NAME);
         //TODO: all breweries in certain location - even better in area (center, radius)
 
         // all beers
@@ -88,8 +109,23 @@ public class DatabaseProvider extends ContentProvider {
                         null, null, sortOrder);
                 break;
             case BREWERIES:
+                Log.v(LOG_TAG, "query - BREWERIES, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
                 cursor = db.query(BreweryEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
+                break;
+            case BREWERIES_WITH_LOCATION_BY_NAME:
+                String pattern = BreweryEntry.getSearchString(uri);
+                String[] mySelectionArgs = {pattern + "%"};
+                Log.v(LOG_TAG, "query - BREWERIES_WITH_LOCATION_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+
+                cursor = sBreweryByNameQueryBuilder.query(mHelper.getReadableDatabase(),
+                        projection,
+                        sBreweryLocationSelection,
+                        mySelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+
                 break;
             case BEERS:
                 cursor = db.query(BeerEntry.TABLE_NAME, projection, selection, selectionArgs,
@@ -120,6 +156,8 @@ public class DatabaseProvider extends ContentProvider {
             case LOCATIONS:
                 return LocationEntry.CONTENT_TYPE;
             case BREWERIES:
+                return BreweryEntry.CONTENT_TYPE;
+            case BREWERIES_WITH_LOCATION_BY_NAME:
                 return BreweryEntry.CONTENT_TYPE;
             case BEERS:
                 return BeerEntry.CONTENT_TYPE;

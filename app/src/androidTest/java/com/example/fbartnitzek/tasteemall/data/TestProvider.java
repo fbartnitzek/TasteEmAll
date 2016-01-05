@@ -136,6 +136,18 @@ public class TestProvider extends AndroidTestCase {
 //        TestUtils.printAllCursorEntries(cursor, "1 brewery should be inserted");
         cursor.close();
 
+        cursor = mContext.getContentResolver().query(
+//                BreweryEntry.buildBreweryLocationWithName(""),
+                BreweryEntry.buildBreweryLocationWithName("Bay"),
+                null,
+                null,
+                null,
+                null);
+        assertTrue("joined brewery-location-query did not work as expected... ",
+                cursor.getCount() > 0);
+        TestUtils.printAllCursorEntries(cursor, "joined brewery-location-query");
+        cursor.close();
+
         // beer
         tco = TestUtils.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(BeerEntry.CONTENT_URI, true, tco);
