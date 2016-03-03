@@ -25,11 +25,9 @@ public class DatabaseContract {
 
     private static final String LOG_TAG = DatabaseContract.class.getName();
 
-    public static final String PATH_LOCATION = "location";
-    public static final String PATH_BREWERY = "brewery";
-    public static final String PATH_BREWERY_WITH_LOCATION = "brewery_with_location";
-    public static final String PATH_BEER = "beer";
-    public static final String PATH_USER = "user";
+    public static final String PATH_PRODUCER = "producer";
+    public static final String PATH_PRODUCER_WITH_LOCATION = "producer_with_location";
+    public static final String PATH_DRINK = "drink";
     public static final String PATH_REVIEW = "review";
 
 //    public static final String PATH_SCORE_WITH_TEAMS = "scores_with_teams";
@@ -39,41 +37,24 @@ public class DatabaseContract {
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
 
-    // Locations
-    public static final class LocationEntry implements BaseColumns {
-
-        public static final String TABLE_NAME = "location";
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
-
-        public static Uri buildUri(long id) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
-        }
-    }
-
-    public static final class BreweryEntry implements BaseColumns {
-        public static final String TABLE_NAME = "brewery";
+    public static final class ProducerEntry implements BaseColumns {
+        public static final String TABLE_NAME = "producer";
         public static final String PATH_PATTERN = "pattern";
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_BREWERY).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER).build();
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_BREWERY;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_PRODUCER;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_BREWERY;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_PRODUCER;
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
 
-        public static Uri buildBreweryLocationWithName(String searchString) {
-            Log.v(LOG_TAG, "buildBreweryLocationWithName, " + "searchString = [" + searchString + "]");
-            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_BREWERY_WITH_LOCATION).
+        public static Uri buildProducerWithName(String searchString) {
+            Log.v(LOG_TAG, "buildProducerWithName, " + "searchString = [" + searchString + "]");
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER_WITH_LOCATION).
                     appendPath(searchString).build();
 //            return CONTENT_URI.buildUpon().
 ////                    appendQueryParameter("pattern", searchString).build();
@@ -91,32 +72,17 @@ public class DatabaseContract {
         }
     }
 
-    public static final class BeerEntry implements BaseColumns {
-        public static final String TABLE_NAME = "beer";
+    public static final class DrinkEntry implements BaseColumns {
+        public static final String TABLE_NAME = "drink";
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_BEER).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK).build();
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_BEER;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_DRINK;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_BEER;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_DRINK;
 
 
-
-        public static Uri buildUri(long id) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
-        }
-    }
-
-    public static final class UserEntry implements BaseColumns {
-        public static final String TABLE_NAME = "user";
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();

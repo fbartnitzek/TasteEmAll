@@ -8,11 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.BeerEntry;
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.BreweryEntry;
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.UserEntry;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -38,26 +36,26 @@ public class TestProvider extends AndroidTestCase {
                 null, null, null, null);
         assertEquals("Error: Records not deleted from Review table during delete", 0, cursor.getCount());
         cursor.close();
-        mContext.getContentResolver().delete(UserEntry.CONTENT_URI, null, null);
-        cursor = mContext.getContentResolver().query(UserEntry.CONTENT_URI,
+//        mContext.getContentResolver().delete(UserEntry.CONTENT_URI, null, null);
+//        cursor = mContext.getContentResolver().query(UserEntry.CONTENT_URI,
+//                null, null, null, null);
+//        assertEquals("Error: Records not deleted from User table during delete", 0, cursor.getCount());
+//        cursor.close();
+        mContext.getContentResolver().delete(DrinkEntry.CONTENT_URI, null, null);
+        cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
                 null, null, null, null);
-        assertEquals("Error: Records not deleted from User table during delete", 0, cursor.getCount());
+        assertEquals("Error: Records not deleted from Drink table during delete", 0, cursor.getCount());
         cursor.close();
-        mContext.getContentResolver().delete(BeerEntry.CONTENT_URI, null, null);
-        cursor = mContext.getContentResolver().query(BeerEntry.CONTENT_URI,
+        mContext.getContentResolver().delete(ProducerEntry.CONTENT_URI, null, null);
+        cursor = mContext.getContentResolver().query(ProducerEntry.CONTENT_URI,
                 null, null, null, null);
-        assertEquals("Error: Records not deleted from Beer table during delete", 0, cursor.getCount());
+        assertEquals("Error: Records not deleted from Producer table during delete", 0, cursor.getCount());
         cursor.close();
-        mContext.getContentResolver().delete(BreweryEntry.CONTENT_URI, null, null);
-        cursor = mContext.getContentResolver().query(BreweryEntry.CONTENT_URI,
-                null, null, null, null);
-        assertEquals("Error: Records not deleted from Brewery table during delete", 0, cursor.getCount());
-        cursor.close();
-        mContext.getContentResolver().delete(LocationEntry.CONTENT_URI, null, null);
-        cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI,
-                null, null, null, null);
-        assertEquals("Error: Records not deleted from Location table during delete", 0, cursor.getCount());
-        cursor.close();
+//        mContext.getContentResolver().delete(LocationEntry.CONTENT_URI, null, null);
+//        cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI,
+//                null, null, null, null);
+//        assertEquals("Error: Records not deleted from Location table during delete", 0, cursor.getCount());
+//        cursor.close();
     }
 
     private void deleteAllRecordsThroughDb() {
@@ -65,10 +63,10 @@ public class TestProvider extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         db.delete(ReviewEntry.TABLE_NAME, null, null);
-        db.delete(UserEntry.TABLE_NAME, null, null);
-        db.delete(BeerEntry.TABLE_NAME, null, null);
-        db.delete(BreweryEntry.TABLE_NAME, null, null);
-        db.delete(LocationEntry.TABLE_NAME, null, null);
+//        db.delete(UserEntry.TABLE_NAME, null, null);
+        db.delete(DrinkEntry.TABLE_NAME, null, null);
+        db.delete(ProducerEntry.TABLE_NAME, null, null);
+//        db.delete(LocationEntry.TABLE_NAME, null, null);
     }
 
     @Override
@@ -103,84 +101,87 @@ public class TestProvider extends AndroidTestCase {
     public void testInserReadProvider() {
 
         TestUtils.TestContentObserver tco = TestUtils.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
-
-        // location
-        Uri insertUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI,
-                TestUtils.createLocationLeipzig());
-        assertTrue(insertUri != null);
-
-        tco.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(tco);
-
-        Cursor cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI,
-                null, null, null, null);
-        assertTrue("missing location after insert", cursor.getCount() == 1);
-//        TestUtils.printAllCursorEntries(cursor, " 1 location should be inserted");
-        cursor.close();
+//        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
+//
+//        // location
+//        Uri insertUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI,
+//                TestUtils.createLocationLeipzig());
+//        assertTrue(insertUri != null);
+//
+//        tco.waitForNotificationOrFail();
+//        mContext.getContentResolver().unregisterContentObserver(tco);
+//
+//        Cursor cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI,
+//                null, null, null, null);
+//        assertTrue("missing location after insert", cursor.getCount() == 1);
+////        TestUtils.printAllCursorEntries(cursor, " 1 location should be inserted");
+//        cursor.close();
+//
+//        cursor = mContext.getContentResolver().query()
 
         // brewery
         tco = TestUtils.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(BreweryEntry.CONTENT_URI, true, tco);
+        mContext.getContentResolver().registerContentObserver(ProducerEntry.CONTENT_URI, true, tco);
 
-        insertUri = mContext.getContentResolver().insert(BreweryEntry.CONTENT_URI,
+        Uri insertUri = mContext.getContentResolver().insert(ProducerEntry.CONTENT_URI,
                 TestUtils.createBreweryBayrischerBahnhof());
         assertTrue(insertUri != null);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
-        cursor = mContext.getContentResolver().query(BreweryEntry.CONTENT_URI,
+        Cursor cursor = mContext.getContentResolver().query(ProducerEntry.CONTENT_URI,
                 null, null, null, null);
         assertTrue("missing brewery after insert", cursor.getCount() > 0);
 //        TestUtils.printAllCursorEntries(cursor, "1 brewery should be inserted");
         cursor.close();
 
-        cursor = mContext.getContentResolver().query(
-//                BreweryEntry.buildBreweryLocationWithName(""),
-                BreweryEntry.buildBreweryLocationWithName("Bay"),
-                null,
-                null,
-                null,
-                null);
-        assertTrue("joined brewery-location-query did not work as expected... ",
-                cursor.getCount() > 0);
-        TestUtils.printAllCursorEntries(cursor, "joined brewery-location-query");
-        cursor.close();
+        // TODO: search by location
+//        cursor = mContext.getContentResolver().query(
+////                ProducerEntry.buildBreweryLocationWithName(""),
+//                ProducerEntry.buildBreweryLocationWithName("Bay"),
+//                null,
+//                null,
+//                null,
+//                null);
+//        assertTrue("joined brewery-location-query did not work as expected... ",
+//                cursor.getCount() > 0);
+//        TestUtils.printAllCursorEntries(cursor, "joined brewery-location-query");
+//        cursor.close();
 
         // beer
         tco = TestUtils.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(BeerEntry.CONTENT_URI, true, tco);
+        mContext.getContentResolver().registerContentObserver(DrinkEntry.CONTENT_URI, true, tco);
 
-        insertUri = mContext.getContentResolver().insert(BeerEntry.CONTENT_URI,
+        insertUri = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
                 TestUtils.createBeerGose());
         assertTrue(insertUri != null);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
-        cursor = mContext.getContentResolver().query(BeerEntry.CONTENT_URI,
+        cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
                 null, null, null, null);
         assertTrue("missing beer after insert", cursor.getCount() > 0);
 //        TestUtils.printAllCursorEntries(cursor, "1 beer should be inserted");
         cursor.close();
 
-        // user
-        tco = TestUtils.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(UserEntry.CONTENT_URI, true, tco);
-
-        insertUri = mContext.getContentResolver().insert(UserEntry.CONTENT_URI,
-                TestUtils.createUserFrank());
-        assertTrue(insertUri != null);
-
-        tco.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(tco);
-
-        cursor = mContext.getContentResolver().query(UserEntry.CONTENT_URI,
-                null, null, null, null);
-        assertTrue("missing user after insert", cursor.getCount() > 0);
-//        TestUtils.printAllCursorEntries(cursor, "1 user should be inserted");
-        cursor.close();
+//        // user
+//        tco = TestUtils.getTestContentObserver();
+//        mContext.getContentResolver().registerContentObserver(UserEntry.CONTENT_URI, true, tco);
+//
+//        insertUri = mContext.getContentResolver().insert(UserEntry.CONTENT_URI,
+//                TestUtils.createUserFrank());
+//        assertTrue(insertUri != null);
+//
+//        tco.waitForNotificationOrFail();
+//        mContext.getContentResolver().unregisterContentObserver(tco);
+//
+//        cursor = mContext.getContentResolver().query(UserEntry.CONTENT_URI,
+//                null, null, null, null);
+//        assertTrue("missing user after insert", cursor.getCount() > 0);
+////        TestUtils.printAllCursorEntries(cursor, "1 user should be inserted");
+//        cursor.close();
 
         // review
         tco = TestUtils.getTestContentObserver();

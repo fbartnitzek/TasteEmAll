@@ -28,28 +28,28 @@ public class TestUtils {
 
     private static final String LOG_TAG = TestUtils.class.getName();
 
-    public static ContentValues createLocationLeipzig() {
-        return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103",
-                "Bayrischer Platz 1", "", "", "");
-    }
+//    public static ContentValues createLocationLeipzig() {
+//        return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103",
+//                "Bayrischer Platz 1", "", "", "");
+//    }
 
     public static ContentValues createBreweryBayrischerBahnhof() {
-        return DatabaseHelper.buildBreweryValues("1", "Bayerischer Bahnhof", "2000",
-                "http://www.bayerischer-bahnhof.de", "1");
+        return DatabaseHelper.buildProducerValues("1", "Bayerischer Bahnhof", "Brauerei im ehemaligen Bahnhof",
+                "http://www.bayerischer-bahnhof.de", "Leipzig, Bayrischer Platz 1");
     }
 
     public static ContentValues createBeerGose() {
-        return DatabaseHelper.buildBeerValues("1", "Gose", "4.5", "", "10.8", "Gose", "", "1");
+        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", "1");
     }
 
-    public static ContentValues createUserFrank() {
-        return DatabaseHelper.buildUserValues("1", "fbartnitzek", "Frank Bartnitzek",
-                "frank_bartnitzek@test.de", "");
-    }
+//    public static ContentValues createUserFrank() {
+//        return DatabaseHelper.buildUserValues("1", "fbartnitzek", "Frank Bartnitzek",
+//                "frank_bartnitzek@test.de", "");
+//    }
 
     public static ContentValues createReview1() {
-        return DatabaseHelper.buildReviewValues("1", "++", "lecker", "obergärig", "",
-                "leicht säuerlich", "20151211T160000", "1", "1", "");
+        return DatabaseHelper.buildReviewValues("1", "++", "lecker", "20151211T160000", "1",
+                "Leipzig, Bayrischer Platz 1");
     }
 
     public static ContentValues[] createBulkReviews(int n) {
@@ -57,9 +57,8 @@ public class TestUtils {
         for (int i = 0; i < n; ++i) {
             cvs[i] = DatabaseHelper.buildReviewValues(
                     "bulk_" + i, String.valueOf(i), "desc_" + i,
-                    "look_"+i, "smell_" + i, "taste_"+i,
                     String.valueOf(System.currentTimeMillis()),
-                    "1", "1", "");
+                    "1", "Leipzig, Bayrischer Platz " + i);
         }
         return cvs;
     }

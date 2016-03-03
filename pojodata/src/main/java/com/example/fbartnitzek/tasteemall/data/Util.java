@@ -1,11 +1,8 @@
 package com.example.fbartnitzek.tasteemall.data;
 
 
-import com.example.fbartnitzek.tasteemall.data.pojo.Location;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
-import com.google.maps.model.AddressComponent;
-import com.google.maps.model.AddressComponentType;
 import com.google.maps.model.GeocodingResult;
 
 import org.apache.commons.csv.CSVRecord;
@@ -42,7 +39,7 @@ public class Util {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String value = properties.getProperty("TasteEmAll_Geocode_Key");
+        String value = properties.getProperty("TasteEmAllGoogleMapsGeocodeApiKey");
         return unquote(value);
     }
 
@@ -54,7 +51,7 @@ public class Util {
         return s;
     }
 
-    public static Location queryLocation(String locationString) {
+    public static String queryLocation(String locationString) {
         // use google maps api
         // https://maps.googleapis.com/maps/api/geocode/json?address=Toronto%20%28Canada%29,%20275%20Yonge%20Street
 
@@ -67,32 +64,35 @@ public class Util {
         }
         String formattedAddress = results[0].formattedAddress;
 //        System.out.println(formattedAddress);
-        double latitude = results[0].geometry.location.lat;
-        double longitude = results[0].geometry.location.lng;
-        String route = null;
-        String country= null;
-        String postalCode = null;
-        String locality = null;
-        // country, street_number, route, postal_code, long, lat, locality
-        // "location": {
-        // "lat": ​43.6555326,
-        // "lng": ​-79.3802037 },
-        AddressComponent[] addressComponents = results[0].addressComponents;
-        for (AddressComponent a: addressComponents){
-            for (AddressComponentType type : a.types) {
-                if ("postal_code".equals(type.name().toLowerCase())) {
-                    postalCode = a.longName;
-                } else if ("route".equals(type.name().toLowerCase())) {
-                    route = a.longName;
-                } else if ("country".equals(type.name().toLowerCase())) {
-                    country = a.longName;
-                } else if ("locality".equals(type.name().toLowerCase())) {
-                    locality = a.longName;
-                }
-            }
-        }
 
-        return new Location(country, Double.toString(latitude), "location_" + locationString, Double.toString(longitude), postalCode, locality, route, formattedAddress);
+        // might be useful later - recreate location entry...
+//        double latitude = results[0].geometry.location.lat;
+//        double longitude = results[0].geometry.location.lng;
+//        String route = null;
+//        String country= null;
+//        String postalCode = null;
+//        String locality = null;
+//        // country, street_number, route, postal_code, long, lat, locality
+//        // "location": {
+//        // "lat": ​43.6555326,
+//        // "lng": ​-79.3802037 },
+//        AddressComponent[] addressComponents = results[0].addressComponents;
+//        for (AddressComponent a: addressComponents){
+//            for (AddressComponentType type : a.types) {
+//                if ("postal_code".equals(type.name().toLowerCase())) {
+//                    postalCode = a.longName;
+//                } else if ("route".equals(type.name().toLowerCase())) {
+//                    route = a.longName;
+//                } else if ("country".equals(type.name().toLowerCase())) {
+//                    country = a.longName;
+//                } else if ("locality".equals(type.name().toLowerCase())) {
+//                    locality = a.longName;
+//                }
+//            }
+//        }
+
+        return formattedAddress;
+//                new Location(country, Double.toString(latitude), "location_" + locationString, Double.toString(longitude), postalCode, locality, route, formattedAddress);
     }
 
     public static String getRecord(CSVRecord record, String attribute) {

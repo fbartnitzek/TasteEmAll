@@ -19,42 +19,33 @@ import java.util.List;
  */
 
 public class Data {
-    List<Location> locations;
-    List<Brewery> breweries;
-    List<Beer> beers;
+
+    List<Producer> producers;
+    List<Drink> drinks;
     List<Review> reviews;
-    User user;
+    // String user;
 
-    public Data(List<Beer> beers, List<Brewery> breweries, List<Location> locations, List<Review> reviews, User user) {
-        this.beers = beers;
-        this.breweries = breweries;
-        this.locations = locations;
+    public Data(List<Drink> drinks, List<Producer> producers, List<Review> reviews) {
+        this.producers = producers;
+        this.drinks = drinks;
         this.reviews = reviews;
-        this.user = user;
+//        this.user = user;
     }
 
-    public List<Beer> getBeers() {
-        return beers;
+    public List<Drink> getDrinks() {
+        return drinks;
     }
 
-    public void setBeers(List<Beer> beers) {
-        this.beers = beers;
+    public void setDrinks(List<Drink> drinks) {
+        this.drinks = drinks;
     }
 
-    public List<Brewery> getBreweries() {
-        return breweries;
+    public List<Producer> getProducers() {
+        return producers;
     }
 
-    public void setBreweries(List<Brewery> breweries) {
-        this.breweries = breweries;
-    }
-
-    public List<Location> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<Location> locations) {
-        this.locations = locations;
+    public void setProducers(List<Producer> producers) {
+        this.producers = producers;
     }
 
     public List<Review> getReviews() {
@@ -63,13 +54,5 @@ public class Data {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

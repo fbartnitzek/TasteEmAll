@@ -17,10 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.BreweryEntry;
-import com.example.fbartnitzek.tasteemall.data.pojo.Brewery;
-import com.example.fbartnitzek.tasteemall.data.pojo.Location;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,23 +32,24 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private int mBreweryPosition = ListView.INVALID_POSITION;
     private ListView mBreweryListView;
 
-    private static final String[] BREWERY_QUERY_COLUMNS = {
-            BreweryEntry.TABLE_NAME + "." +  BreweryEntry._ID,  // without the CursurAdapter doesn't work
-            Brewery.NAME,
-            Brewery.INTRODUCED,
-            Location.LOCALITY,
-            Location.COUNTRY};
+    private static final String[] PRODUCER_QUERY_COLUMNS = {
+            ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,  // without the CursurAdapter doesn't work
+            Producer.NAME,
+            Producer.DESCRIPTION,
+            Producer.LOCATION};
 
-//    static final int COL_QUERY_BREWERY__ID = 0;
-    static final int COL_QUERY_BREWERY_NAME = 1;
-    static final int COL_QUERY_BREWERY_INTRODUCED = 2;
-    static final int COL_QUERY_BREWERY_LOCALITY = 3;
-    static final int COL_QUERY_BREWERY_COUNTRY = 4;
+    static final int COL_QUERY_PRODUCER__ID = 0;
+    static final int COL_QUERY_PRODUCER_NAME = 1;
+    static final int COL_QUERY_PRODUCER_DESCRIPTION = 2;
+    static final int COL_QUERY_PRODUCER_LOCATION = 3;
     private String mSearchString;
 
+    public MainFragment() {}
 
-    public MainFragment() {
-        // TODO: something with mSearchString;
+    public interface Callback {
+        void onBrewerySelected(Uri uri);
+
+        void onNewBrewery(CharSequence pattern);
     }
 
     @Override
@@ -84,8 +83,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onClick(View v) {
                 //TODO: new fragment to create brewery
-                Toast.makeText(getActivity(),
-                        "create new brewery " + searchView.getQuery(), Toast.LENGTH_SHORT).show();
+                ((Callback)getActivity()).onNewBrewery(searchView.getQuery());
+//                        Toast.makeText(getActivity(),
+//                                "create new brewery " + searchView.getQuery(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -100,8 +100,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
 
                 if (cursor != null) {
-                    Toast.makeText(getActivity(), cursor.getString(COL_QUERY_BREWERY_NAME),
-                            Toast.LENGTH_SHORT).show();
+                    // open brewery fragment from main activity
+                    ((Callback)getActivity()).onBrewerySelected(
+                            ProducerEntry.buildUri(cursor.getLong(COL_QUERY_PRODUCER__ID))
+                    );
+//                    Toast.makeText(getActivity(), cursor.getString(COL_QUERY_PRODUCER_NAME),
+//                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -119,11 +123,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, " + "id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - insertDate?
-        Uri searchUri = DatabaseContract.BreweryEntry.buildBreweryLocationWithName(
+        Uri searchUri = ProducerEntry.buildProducerWithName(
                 mSearchString == null ? "" : mSearchString);
-        String sortOrder = DatabaseContract.BreweryEntry.TABLE_NAME + "." + Brewery.NAME + " ASC";
+        String sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC";
 
-        return new CursorLoader(getActivity(), searchUri, BREWERY_QUERY_COLUMNS, null, null, sortOrder);
+        return new CursorLoader(getActivity(), searchUri, PRODUCER_QUERY_COLUMNS, null, null, sortOrder);
     }
 
     @Override

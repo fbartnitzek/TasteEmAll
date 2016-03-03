@@ -21,62 +21,58 @@ public class Review {
     public static final String REVIEW_ID = "review_id";
     public static final String RATING = "review_rating";
     public static final String DESCRIPTION = "review_description";
-    public static final String LOOK = "review_look";    // bottle-design, color, foam, ...
-    public static final String SMELL = "review_smell";  // ipa :-)
-    public static final String TASTE = "review_taste";  // taste = antrunk, frische, abgang - bitter/malzig/...
-    public static final String TIMESTAMP = "review_timestamp";
+    public static final String DATE = "review_date";
+    public static final String LOCATION = "review_location";
 
-    public static final String USER_ID = "review_user_id";
-    public static final String BEER_ID = "review_beer_id";
-    public static final String LOCATION_ID = "review_location_id";
+    //TODO: more description, recommended sides, user?
+
+    //    public static final String LOOK = "review_look";    // bottle-design, color, foam, ...
+//    public static final String SMELL = "review_smell";  // ipa :-)
+//    public static final String TASTE = "review_taste";  // taste = antrunk, frische, abgang - bitter/malzig/...
+
+//    public static final String USER_ID = "review_user_id";
+    public static final String DRINK_ID = "review_drink_id";
+
 
 
     private String reviewId;
     private String rating;
     private String description;
-    private String look;
-    private String smell;
-    private String taste;
-    private String timestamp;
-    private String userId;
-    private String beerId;
-    private String locationId;
+//    private String look;
+//    private String smell;
+//    private String taste;
+    private String date;
+//    private String userId;
+    private String drinkId;
+    private String location;
 
-    public Review(Beer beer, String description, Location location, String look, String rating, String reviewId, String smell, String taste, String timestamp, User user) {
-        this.beerId = beer.getBeerId();
+    public Review(Drink drink, String description, String location, String rating, String reviewId, String date) {
+        this.drinkId = drink.getDrinkId();
         this.description = description;
-        this.locationId = location == null ? null : location.getLocationId();
-        this.look = look;
+        this.location = location;
         this.rating = rating;
         this.reviewId = reviewId;
-        this.smell = smell;
-        this.taste = taste;
-        this.timestamp = timestamp;
-        this.userId = user.getUserId();
+        this.date = date;
     }
 
     @Override
     public String toString() {
         return "Review{" +
-                "beerId=" + beerId +
+                "date='" + date + '\'' +
                 ", reviewId='" + reviewId + '\'' +
                 ", rating='" + rating + '\'' +
                 ", description='" + description + '\'' +
-                ", look='" + look + '\'' +
-                ", smell='" + smell + '\'' +
-                ", taste='" + taste + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                ", userId=" + userId +
-                ", locationId=" + locationId +
+                ", drinkId='" + drinkId + '\'' +
+                ", location='" + location + '\'' +
                 '}';
     }
 
-    public String getBeerId() {
-        return beerId;
+    public String getDate() {
+        return date;
     }
 
-    public void setBeerId(String beerId) {
-        this.beerId = beerId;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getDescription() {
@@ -87,20 +83,20 @@ public class Review {
         this.description = description;
     }
 
-    public String getLocationId() {
-        return locationId;
+    public String getDrinkId() {
+        return drinkId;
     }
 
-    public void setLocationId(String locationId) {
-        this.locationId = locationId;
+    public void setDrinkId(String drinkId) {
+        this.drinkId = drinkId;
     }
 
-    public String getLook() {
-        return look;
+    public String getLocation() {
+        return location;
     }
 
-    public void setLook(String look) {
-        this.look = look;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getRating() {
@@ -117,37 +113,5 @@ public class Review {
 
     public void setReviewId(String reviewId) {
         this.reviewId = reviewId;
-    }
-
-    public String getSmell() {
-        return smell;
-    }
-
-    public void setSmell(String smell) {
-        this.smell = smell;
-    }
-
-    public String getTaste() {
-        return taste;
-    }
-
-    public void setTaste(String taste) {
-        this.taste = taste;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 }

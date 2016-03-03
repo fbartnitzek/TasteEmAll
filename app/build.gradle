@@ -18,6 +18,10 @@ android {
         }
     }
 
+    buildTypes.each {
+        it.buildConfigField 'String', 'GOOGLE_MAPS_GEOCODE_KEY', TasteEmAllGoogleMapsGeocodeApiKey
+    }
+
     packagingOptions {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/NOTICE'

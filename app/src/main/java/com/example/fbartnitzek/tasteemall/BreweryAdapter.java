@@ -50,13 +50,13 @@ public class BreweryAdapter extends CursorAdapter{
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         //DONE: pimp my cursor => query for brewery with joined location!
-        String name = cursor.getString(MainFragment.COL_QUERY_BREWERY_NAME);
-        String introduced = cursor.getString(MainFragment.COL_QUERY_BREWERY_INTRODUCED);
+        String name = cursor.getString(MainFragment.COL_QUERY_PRODUCER_NAME);
+        String introduced = cursor.getString(MainFragment.COL_QUERY_PRODUCER_DESCRIPTION);
 
-        String locality = cursor.getString(MainFragment.COL_QUERY_BREWERY_LOCALITY);
-        String country = cursor.getString(MainFragment.COL_QUERY_BREWERY_COUNTRY);
+        String locality = cursor.getString(MainFragment.COL_QUERY_PRODUCER_LOCATION);
+//        String country = cursor.getString(MainFragment.COL_QUERY_BREWERY_COUNTRY);
 
-        viewHolder.countryView.setText(country);    //TODO later a flag :-)
+//        viewHolder.countryView.setText(country);    //TODO later a flag :-)
         viewHolder.localityView.setText(locality);
         viewHolder.introducedView.setText(introduced);
         viewHolder.nameView.setText(name);

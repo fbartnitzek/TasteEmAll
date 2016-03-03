@@ -2,12 +2,10 @@ package com.example.fbartnitzek.tasteemall.data.csv;
 
 
 import com.example.fbartnitzek.tasteemall.data.Util;
-import com.example.fbartnitzek.tasteemall.data.pojo.Beer;
-import com.example.fbartnitzek.tasteemall.data.pojo.Brewery;
 import com.example.fbartnitzek.tasteemall.data.pojo.Data;
-import com.example.fbartnitzek.tasteemall.data.pojo.Location;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.example.fbartnitzek.tasteemall.data.pojo.Review;
-import com.example.fbartnitzek.tasteemall.data.pojo.User;
 import com.google.gson.Gson;
 
 import org.apache.commons.csv.CSVFormat;
@@ -40,7 +38,7 @@ import java.util.List;
 
 public class CsvFileReader {
 
-    private static final String BREWERY_LOCATION = "brewery_location";
+    private static final String PRODUCER_LOCATION = "producer_location";
     private static final String REVIEW_LOCATION = "review_location";
 
     /**
@@ -57,12 +55,12 @@ public class CsvFileReader {
         CSVParser csvParser = null;
 
         try {
-            HashMap<String, Location> locations = new HashMap<>();
-            HashMap<String, Brewery> breweries = new HashMap<>();
-            HashMap<String, Beer> beers = new HashMap<>();
+            HashMap<String, String> locations = new HashMap<>();
+            HashMap<String, Producer> producers = new HashMap<>();
+            HashMap<String, Drink> drinks = new HashMap<>();
             List <Review> reviews = new ArrayList<>();
             Data data;
-            User user = new User("", null, userName, userName, "user_" + userName);
+//            User user = new User("", null, userName, userName, "user_" + userName);
 
             int empty = 0;
 
@@ -75,15 +73,15 @@ public class CsvFileReader {
 
             int reviewId = 0;
             for (CSVRecord record : csvParser) {
-                String breweryName = record.get(Brewery.NAME);
-                String beerName = record.get(Beer.NAME);
-                if (breweryName != null && !breweryName.isEmpty()
-                        && beerName != null && !beerName.isEmpty()) {
+                String producerName = record.get(Producer.NAME);
+                String drinkName = record.get(Drink.NAME);
+                if (producerName != null && !producerName.isEmpty()
+                        && drinkName != null && !drinkName.isEmpty()) {
 //                    System.out.println("brewery: " + breweryName + ", beer: " + beerName);
 
                     // build all objects ...
-                    String breweryLocString = record.get(BREWERY_LOCATION);
-                    Location breweryLocation = null;
+                    String breweryLocString = record.get(PRODUCER_LOCATION);
+                    String breweryLocation = null;
                     if (breweryLocString!= null && !breweryLocString.isEmpty()) {
                         if (!locations.containsKey(breweryLocString)) {
                             breweryLocation = Util.queryLocation(breweryLocString);
@@ -93,9 +91,8 @@ public class CsvFileReader {
                         }
                     }
                     String reviewLocString = record.get(REVIEW_LOCATION);
-                    Location reviewLocation = null;
+                    String reviewLocation = null;
                     if (reviewLocString != null && !reviewLocString.isEmpty()) {
-
                         if (!locations.containsKey(reviewLocString)) {
                             reviewLocation = Util.queryLocation(reviewLocString);
                             locations.put(reviewLocString, reviewLocation);
@@ -104,49 +101,45 @@ public class CsvFileReader {
                         }
                     }
 
-                    Brewery brewery = null;
-                    if (breweries.containsKey(breweryName)) {
+                    Producer producer = null;
+                    if (producers.containsKey(producerName)) {
                         // TODO: try update
-                        brewery = breweries.get(breweryName);
+                        producer = producers.get(producerName);
                     } else {
-                        brewery = new Brewery(
-                                "brewery_" + breweryName,
-                                Util.getRecord(record, Brewery.INTRODUCED),
+                        producer = new Producer(
+                                "producer_" + producerName,
+                                Util.getRecord(record, Producer.DESCRIPTION),
                                         breweryLocation,
-                                        breweryName,
-                                Util.getRecord(record, Brewery.WEBSITE));
-                        breweries.put(breweryName, brewery);
+                                        producerName,
+                                Util.getRecord(record, Producer.WEBSITE));
+                        producers.put(producerName, producer);
                     }
 
-                    Beer beer = null;
-                    String beerFullName = breweryName + "/" + beerName;
-                    if (beers.containsKey(beerFullName)) {
+                    Drink drink = null;
+                    String drinkFullName = producerName + "/" + drinkName;
+                    if (drinks.containsKey(drinkFullName)) {
                         // TODO: try update
-                        beer = beers.get(beerFullName);
+                        drink = drinks.get(drinkFullName);
                     } else {
-                        beer = new Beer(
-                                Util.getRecord(record, Beer.ABV),
-                                beerFullName,
-                                brewery,
-                                Util.getRecord(record, Beer.DEGREES_PLATO),
-                                Util.getRecord(record, Beer.IBU),
-                                beerName,
-                                Util.getRecord(record, Beer.STAMMWUERZE),
-                                Util.getRecord(record, Beer.STYLE));
-                        beers.put(beerFullName, beer);
+                        drink = new Drink(
+                                drinkFullName,
+                                producer,
+                                drinkName,
+                                Util.getRecord(record, Drink.STYLE),
+                                Util.getRecord(record, Drink.SPECIFICS),
+                                Util.getRecord(record, Drink.TYPE));
+                        drinks.put(drinkFullName, drink);
                     }
 
                     reviews.add(new Review(
-                            beer,
+                            drink,
                             Util.getRecord(record, Review.DESCRIPTION),
                             reviewLocation,
-                            Util.getRecord(record, Review.LOOK),
                             Util.getRecord(record, Review.RATING),
-                            "Review_" + userName + "_" + ++reviewId,
-                            Util.getRecord(record, Review.SMELL),
-                            Util.getRecord(record, Review.TASTE),
-                            Util.readTimestamp(Util.getRecord(record, Review.TIMESTAMP)),
-                            user
+                            //TODO: locally at first...
+//                            "Review_" + userName + "_" + ++reviewId,
+                            "Review_" + ++reviewId,
+                            Util.readTimestamp(Util.getRecord(record, Review.DATE))
                     ));
 
                 } else {
@@ -160,10 +153,9 @@ public class CsvFileReader {
 //            System.out.println("reviews: " + reviews.size());
             String result = "";
             data = new Data(
-                    Util.map2List(beers),
-                    Util.map2List(breweries),
-                    Util.map2List(locations),
-                    reviews, user);
+                    Util.map2List(drinks),
+                    Util.map2List(producers),
+                    reviews);
 
             Gson gson = new Gson();
 
@@ -190,6 +182,7 @@ public class CsvFileReader {
             }
 
             for (Review review: reviews) {
+                //TODO: resolve lineSeparator...!
                 result += System.lineSeparator() + review.toString();
 //                System.out.println(review.toString());
             }
