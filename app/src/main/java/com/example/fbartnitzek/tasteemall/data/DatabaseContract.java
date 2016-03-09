@@ -26,7 +26,7 @@ public class DatabaseContract {
     private static final String LOG_TAG = DatabaseContract.class.getName();
 
     public static final String PATH_PRODUCER = "producer";
-    public static final String PATH_PRODUCER_WITH_LOCATION = "producer_with_location";
+    public static final String PATH_PRODUCER_BY_NAME = "producer_by_name";
     public static final String PATH_DRINK = "drink";
     public static final String PATH_REVIEW = "review";
 
@@ -52,9 +52,9 @@ public class DatabaseContract {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
 
-        public static Uri buildProducerWithName(String searchString) {
-            Log.v(LOG_TAG, "buildProducerWithName, " + "searchString = [" + searchString + "]");
-            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER_WITH_LOCATION).
+        public static Uri buildUriWithName(String searchString) {
+            Log.v(LOG_TAG, "buildUriWithName, " + "searchString = [" + searchString + "]");
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER_BY_NAME).
                     appendPath(searchString).build();
 //            return CONTENT_URI.buildUpon().
 ////                    appendQueryParameter("pattern", searchString).build();

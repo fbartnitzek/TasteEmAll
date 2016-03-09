@@ -2,7 +2,7 @@
 <manifest package="com.example.fbartnitzek.tasteemall"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -26,13 +26,15 @@
             android:authorities="fbartnitzek.tasteemall"/>
 
         <activity
-            android:name=".BreweryActivity"
-            android:label="@string/title_activity_brewery"
+            android:name=".ProducerActivity"
+            android:label="@string/title_activity_producer"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+        </activity>
+        <activity android:name=".AddActivity">
         </activity>
     </application>
 

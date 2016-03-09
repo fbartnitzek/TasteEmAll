@@ -5,16 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-public class BreweryActivity extends AppCompatActivity {
+public class ProducerActivity extends AppCompatActivity {
 // TODO: other name
     private static final String FRAGMENT_TAG = "Brewery_Tag";
-    private static final String LOG_TAG = BreweryActivity.class.getName();
+    private static final String LOG_TAG = ProducerActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
-        setContentView(R.layout.activity_brewery);
+        setContentView(R.layout.activity_producer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -29,16 +29,16 @@ public class BreweryActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle args = new Bundle();
-        if (getIntent().hasExtra(BreweryActivityFragment.PATTERN_NAME)) {
+        if (getIntent().hasExtra(ProducerActivityFragment.PATTERN_NAME)) {
             //new: forward pattern from MainActivity
             Log.v(LOG_TAG, "onCreate, " + "with extra PATTERN_NAME");
-            args.putCharSequence(BreweryActivityFragment.PATTERN_NAME,
-                    getIntent().getCharSequenceExtra(BreweryActivityFragment.PATTERN_NAME));
+            args.putCharSequence(ProducerActivityFragment.PATTERN_NAME,
+                    getIntent().getCharSequenceExtra(ProducerActivityFragment.PATTERN_NAME));
         } else {    // load existing
             Log.v(LOG_TAG, "onCreate, " + "with extra BREWERY_URI");
-            args.putParcelable(BreweryActivityFragment.BREWERY_URI, getIntent().getData());
+            args.putParcelable(ProducerActivityFragment.BREWERY_URI, getIntent().getData());
         }
-        BreweryActivityFragment fragment = new BreweryActivityFragment();
+        ProducerActivityFragment fragment = new ProducerActivityFragment();
         fragment.setArguments(args);
 
         if (savedInstanceState == null) {

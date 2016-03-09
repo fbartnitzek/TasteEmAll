@@ -9,11 +9,6 @@
                 tools:context=".MainFragment"
                 tools:showIn="@layout/activity_main">
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Hello World!"/>-->
-
     <android.support.v7.widget.SearchView
         android:id="@+id/search_all"
         android:queryHint="search for brewery or beer"
@@ -21,17 +16,17 @@
         android:layout_height="wrap_content"/>
 
     <Button
-        android:id="@+id/button_new_brewery"
-        android:text="new brewery"
+        android:id="@+id/button_refresh"
+        android:text="refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/search_all"/>
 
-    <ListView
-        android:id="@+id/listview_brewery"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_producer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/button_new_brewery">
-    </ListView>
+        android:layout_below="@id/button_refresh">
+    </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>

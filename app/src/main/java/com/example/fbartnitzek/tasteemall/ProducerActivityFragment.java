@@ -13,25 +13,25 @@ import android.widget.TextView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class BreweryActivityFragment extends Fragment {
+public class ProducerActivityFragment extends Fragment {
 
     public static final String PATTERN_NAME = "pattern";
     public static final String BREWERY_URI = "brewery_uri";
-    private static final String LOG_TAG = BreweryActivityFragment.class.getName();
+    private static final String LOG_TAG = ProducerActivityFragment.class.getName();
 
     static final int COL_QUERY_LOCATION__ID = 0;
     static final int COL_QUERY_LOCATION_ID = 1;
     static final int COL_QUERY_FORMATTED_ADDRESS = 2;
 
-    public BreweryActivityFragment() {
-        Log.v(LOG_TAG, "BreweryActivityFragment, " + "");
+    public ProducerActivityFragment() {
+        Log.v(LOG_TAG, "ProducerActivityFragment, " + "");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreateView, " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-        View rootView = inflater.inflate(R.layout.fragment_brewery, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_producer, container, false);
         final TextView breweryNameView = (TextView) rootView.findViewById(R.id.brewery_name);
         Bundle args = getArguments();
         if (args == null){

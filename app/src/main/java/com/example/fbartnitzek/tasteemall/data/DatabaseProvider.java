@@ -39,6 +39,7 @@ public class DatabaseProvider extends ContentProvider {
 //    private static final int LOCATIONS = 100;
 
     private static final int PRODUCERS = 200;
+    private static final int PRODUCERS_BY_NAME = 201;
 
     private static final int DRINKS = 300;
 //    private static final int USERS = 400;
@@ -46,6 +47,7 @@ public class DatabaseProvider extends ContentProvider {
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 //    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
+
 
     static {
 //        sBreweryByNameQueryBuilder = new SQLiteQueryBuilder();
@@ -56,7 +58,7 @@ public class DatabaseProvider extends ContentProvider {
 //                        " = " + LocationEntry.TABLE_NAME + "." + Location.LOCATION_ID);
     }
 
-    private static final String sBreweryLocationSelection = //both seem to work
+    private static final String PRODUCERS_BY_NAME_SELECTION = //both seem to work
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
 
@@ -71,8 +73,8 @@ public class DatabaseProvider extends ContentProvider {
         // all breweries
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER, PRODUCERS);
             // needed for empty string ...
-//        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_WITH_LOCATION + "/" , PRODUCERS_WITH_LOCATION_BY_NAME);
-//        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_WITH_LOCATION+ "/*", PRODUCERS_WITH_LOCATION_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/" , PRODUCERS_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME+ "/*", PRODUCERS_BY_NAME);
         //TODO: all breweries in certain location - even better in area (center, radius)
 
         // all beers
@@ -110,20 +112,14 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-//            case PRODUCERS_WITH_LOCATION_BY_NAME:
-//                String pattern = ProducerEntry.getSearchString(uri);
-//                String[] mySelectionArgs = {pattern + "%"};
-//                Log.v(LOG_TAG, "query - PRODUCERS_WITH_LOCATION_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
-//
-//                cursor = sBreweryByNameQueryBuilder.query(mHelper.getReadableDatabase(),
-//                        projection,
-//                        sBreweryLocationSelection,
-//                        mySelectionArgs,
-//                        null,
-//                        null,
-//                        sortOrder);
-//
-//                break;
+            case PRODUCERS_BY_NAME:
+                String pattern = ProducerEntry.getSearchString(uri);
+                String[] mySelectionArgs = {pattern + "%"};
+                Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_BY_NAME_SELECTION,
+                        mySelectionArgs, null, null, sortOrder);
+                break;
             case DRINKS:
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);

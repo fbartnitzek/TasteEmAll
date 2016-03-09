@@ -1,16 +1,16 @@
 package com.example.fbartnitzek.tasteemall;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String LOG_TAG = MainActivity.class.getName();
 
@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        fab.setOnClickListener(this);
     }
 
     @Override
@@ -46,24 +48,35 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBrewerySelected(Uri uri) {
-        // tablet with same fragment in mainActivity
-        Toast.makeText(this, uri.toString(), Toast.LENGTH_SHORT).show();
-    }
+
+
+//    @Override
+//    public void onProducerSelected(Uri uri) {
+//        // tablet with same fragment in mainActivity
+//        Toast.makeText(this, uri.toString(), Toast.LENGTH_SHORT).show();
+//    }
+//
+//    // should not be used?
+//    @Override
+//    public void onNewBrewery(CharSequence pattern) {
+//        // tablet with same fragment in mainActivity
+//        boolean twoPane = false;
+//        if (twoPane){
+//            // TODO
+//        } else {
+//            Intent intent = new Intent(this, ProducerActivity.class)
+//                    .putExtra(ProducerActivityFragment.PATTERN_NAME, pattern);
+//            startActivity(intent);
+//        }
+//
+//        Toast.makeText(this, "create new brewery " + pattern, Toast.LENGTH_SHORT).show();
+//    }
 
     @Override
-    public void onNewBrewery(CharSequence pattern) {
-        // tablet with same fragment in mainActivity
-        boolean twoPane = false;
-        if (twoPane){
-            // TODO
-        } else {
-            Intent intent = new Intent(this, BreweryActivity.class)
-                    .putExtra(BreweryActivityFragment.PATTERN_NAME, pattern);
-            startActivity(intent);
-        }
-        
-        Toast.makeText(this, "create new brewery " + pattern, Toast.LENGTH_SHORT).show();
+    public void onClick(View v) {
+
+        // TODO: twoPane-mode and maybe some other stuff
+        Intent intent = new Intent(this, AddActivity.class);
+        startActivity(intent);
     }
 }
