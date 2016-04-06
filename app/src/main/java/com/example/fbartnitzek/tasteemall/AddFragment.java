@@ -40,7 +40,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
      * this fragment using the provided parameters.
      * @return A new instance of fragment AddFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static AddFragment newInstance() {
         return new AddFragment();
     }
