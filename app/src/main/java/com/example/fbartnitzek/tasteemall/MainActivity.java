@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         // TODO: twoPane-mode and maybe some other stuff
-        Intent intent = new Intent(this, AddActivity.class);
+        Intent intent = new Intent(this, AddProducerActivity.class);
         startActivity(intent);
     }
 }

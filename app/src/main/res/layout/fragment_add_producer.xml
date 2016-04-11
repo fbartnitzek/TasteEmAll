@@ -2,10 +2,9 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.example.fbartnitzek.tasteemall.AddFragment">
+             tools:context=".AddProducerFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <include layout="@layout/fragment_add_detail"/>
+    <include layout="@layout/fragment_add_producer_detail"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_save"

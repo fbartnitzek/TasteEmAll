@@ -34,7 +34,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
-        <activity android:name=".AddActivity">
+        <activity android:name=".AddProducerActivity">
         </activity>
     </application>
 

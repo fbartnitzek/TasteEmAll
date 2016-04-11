@@ -18,31 +18,33 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 /**
  * A simple {@link Fragment} subclass.
  * to handle interaction events.
- * Use the {@link AddFragment#newInstance} factory method to
+ * Use the {@link AddProducerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddFragment extends Fragment implements View.OnClickListener {
+public class AddProducerFragment extends Fragment implements View.OnClickListener {
 
     private static EditText mEditProducerName;
     private static EditText mEditProducerLocation;
+    private static EditText mEditProducerWebsite;
+    private static EditText mEditProducerDescription;
     private static View mRootView;
 
-    //TODO: remaining drink / review attributes...
+    //TODO: remaining attributes...
 
-    private static final String LOG_TAG = AddFragment.class.getName();
+    private static final String LOG_TAG = AddProducerFragment.class.getName();
 
-    public AddFragment() {
+    public AddProducerFragment() {
         // Required empty public constructor
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     * @return A new instance of fragment AddFragment.
+     * @return A new instance of fragment AddProducerFragment.
      */
 
-    public static AddFragment newInstance() {
-        return new AddFragment();
+    public static AddProducerFragment newInstance() {
+        return new AddProducerFragment();
     }
 
     @Override
@@ -56,11 +58,13 @@ public class AddFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-        mRootView = inflater.inflate(R.layout.fragment_add, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_add_producer, container, false);
 
         mRootView.findViewById(R.id.fab_save).setOnClickListener(this);
         mEditProducerName = (EditText) mRootView.findViewById(R.id.producer_name);
         mEditProducerLocation = (EditText) mRootView.findViewById(R.id.producer_location);
+        mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
+        mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
 
         return mRootView;
     }
@@ -91,8 +95,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
                 DatabaseHelper.buildProducerValues(
                         "producer_" + mEditProducerName.getText().toString(),
                         mEditProducerName.getText().toString(),
-                        "some description",
-                        "some website",
+                        mEditProducerDescription.getText().toString(),
+                        mEditProducerWebsite.getText().toString(),
                         mEditProducerLocation.getText().toString())
         );
 

@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
+import static android.support.design.widget.Snackbar.LENGTH_SHORT;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -29,7 +31,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final String LOG_TAG = MainFragment.class.getName();
     private static final int PRODUCER_LOADER_ID = 123;
 
-    private RecyclerView mBreweryRecyclerView;
+    private RecyclerView mProducerRecyclerView;
     private int mProducerPosition = ListView.INVALID_POSITION;
     private ProducerAdapter mProducerAdapter;
 
@@ -80,7 +82,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         rootView.findViewById(R.id.button_refresh).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(rootView, "refreshing producers... ", Snackbar.LENGTH_SHORT)
+                Snackbar.make(rootView, "refreshing producers... ", LENGTH_SHORT)
 //                        .setAction("Action, null")
                         .show();
                 getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, MainFragment.this);
@@ -91,46 +93,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // if empty: create? -> new Fragment
         // for now just an extra button...
 
-//        final Button newBreweryButton = (Button) rootView.findViewById(R.id.button_new_brewery);
-//        newBreweryButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ((Callback)getActivity()).onNewBrewery(searchView.getQuery());
-//                        Toast.makeText(getActivity(),
-//                                "create new brewery " + searchView.getQuery(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
             public void onClick(String name, ProducerAdapter.ViewHolder viewHolder) {
                 Log.v(LOG_TAG, "PACH.onClick, hashCode=" + this.hashCode() + ", " + "name = [" + name + "], viewHolder = [" + viewHolder + "]");
+                Snackbar.make(rootView, name + " clicked ...", LENGTH_SHORT).show();
             }
         });
 
-        mBreweryRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_producer);
-        mBreweryRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mProducerRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_producer);
+        mProducerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mBreweryRecyclerView.setAdapter(mProducerAdapter);
-
-//        mBreweryListView = (ListView) rootView.findViewById(R.id.listview_brewery);
-//        mBreweryListView.setAdapter(mProducerAdapter);
-//
-//        mBreweryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-//
-//                if (cursor != null) {
-//                    // open brewery fragment from main activity
-//                    ((Callback)getActivity()).onProducerSelected(
-//                            ProducerEntry.buildUri(cursor.getLong(COL_QUERY_PRODUCER__ID))
-//                    );
-////                    Toast.makeText(getActivity(), cursor.getString(COL_QUERY_PRODUCER_NAME),
-////                            Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
+        mProducerRecyclerView.setAdapter(mProducerAdapter);
 
         return rootView;
     }
