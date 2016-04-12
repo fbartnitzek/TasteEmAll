@@ -79,15 +79,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         });
 
-        rootView.findViewById(R.id.button_refresh).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(rootView, "refreshing producers... ", LENGTH_SHORT)
-//                        .setAction("Action, null")
-                        .show();
-                getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, MainFragment.this);
-            }
-        });
+//        rootView.findViewById(R.id.button_refresh).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Snackbar.make(rootView, "refreshing producers... ", LENGTH_SHORT)
+////                        .setAction("Action, null")
+//                        .show();
+//                getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, MainFragment.this);
+//            }
+//        });
 
         // start Task for each -> result either something or empty
         // if empty: create? -> new Fragment
@@ -98,6 +98,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onClick(String name, ProducerAdapter.ViewHolder viewHolder) {
                 Log.v(LOG_TAG, "PACH.onClick, hashCode=" + this.hashCode() + ", " + "name = [" + name + "], viewHolder = [" + viewHolder + "]");
                 Snackbar.make(rootView, name + " clicked ...", LENGTH_SHORT).show();
+//                Intent intent = new Intent(getActivity(), ProducerActivity.class);
+                // TODO: add id/name as option and show Details for Producer
+//                startActivity(intent);
             }
         });
 

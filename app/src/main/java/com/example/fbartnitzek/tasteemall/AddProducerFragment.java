@@ -66,6 +66,10 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
 
+//        android.app.ActionBar actionBar = getActivity().getActionBar();
+//        actionBar.setHomeButtonEnabled(true);
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+
         return mRootView;
     }
 
@@ -87,7 +91,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             insertData();
         }
     }
-
+// TODO: on save: close keyboard and go to parent activity/fragment
     private void insertData() {
         //TODO: remaining producer attributes
         Uri insertProducerUri = getActivity().getContentResolver().insert(

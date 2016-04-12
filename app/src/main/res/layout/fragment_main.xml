@@ -15,18 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/button_refresh"
-        android:text="refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/search_all"/>
+    <!--<Button-->
+        <!--android:id="@+id/button_refresh"-->
+        <!--android:text="refresh"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/search_all"/>-->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_producer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/button_refresh">
+        android:layout_below="@id/search_all">
     </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>
