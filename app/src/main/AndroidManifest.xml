@@ -26,7 +26,7 @@
             android:authorities="fbartnitzek.tasteemall"/>
 
         <activity
-            android:name=".ProducerActivity"
+            android:name=".ShowProducerActivity"
             android:label="@string/title_activity_producer"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

@@ -1,6 +1,7 @@
 package com.example.fbartnitzek.tasteemall.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -40,6 +41,7 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final int PRODUCERS = 200;
     private static final int PRODUCERS_BY_NAME = 201;
+    private static final int PRODUCER_BY_ID = 202;
 
     private static final int DRINKS = 300;
 //    private static final int USERS = 400;
@@ -62,6 +64,9 @@ public class DatabaseProvider extends ContentProvider {
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
 
+    private static final String PRODUCER_BY_ID_SELECTION =
+            ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
+
     private UriMatcher buildUriMatcher() {
         Log.v(LOG_TAG, "buildUriMatcher, " + "");
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -70,8 +75,9 @@ public class DatabaseProvider extends ContentProvider {
         // all locations
 //        matcher.addURI(authority, DatabaseContract.PATH_LOCATION, LOCATIONS);
 
-        // all breweries
+        // all producers
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER, PRODUCERS);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER + "/#", PRODUCER_BY_ID);
             // needed for empty string ...
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/" , PRODUCERS_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME+ "/*", PRODUCERS_BY_NAME);
@@ -106,6 +112,7 @@ public class DatabaseProvider extends ContentProvider {
         Cursor cursor;
         final SQLiteDatabase db = mHelper.getReadableDatabase();
 //        final int match = mUriMatcher.match(uri);
+        String[] mySelectionArgs;
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:
                 Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
@@ -114,11 +121,17 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case PRODUCERS_BY_NAME:
                 String pattern = ProducerEntry.getSearchString(uri);
-                String[] mySelectionArgs = {pattern + "%"};
+                mySelectionArgs = new String[]{pattern + "%"};
                 Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
 
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCER_BY_ID:
+                Log.v(LOG_TAG, "query - PRODUCER_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection,
+                        ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
                 break;
             case DRINKS:
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
@@ -128,7 +141,7 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-            // TODO: more complicated stuff later...
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -140,10 +153,14 @@ public class DatabaseProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
-//        final int match = mUriMatcher.match(uri);
+
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:
                 return ProducerEntry.CONTENT_TYPE;
+            case PRODUCERS_BY_NAME:
+                return ProducerEntry.CONTENT_TYPE;
+            case PRODUCER_BY_ID:
+                return ProducerEntry.CONTENT_ITEM_TYPE;
             case DRINKS:
                 return DrinkEntry.CONTENT_TYPE;
             case REVIEWS:

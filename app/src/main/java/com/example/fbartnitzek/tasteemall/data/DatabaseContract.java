@@ -1,6 +1,7 @@
 package com.example.fbartnitzek.tasteemall.data;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -30,8 +31,6 @@ public class DatabaseContract {
     public static final String PATH_DRINK = "drink";
     public static final String PATH_REVIEW = "review";
 
-//    public static final String PATH_SCORE_WITH_TEAMS = "scores_with_teams";
-
 //    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
@@ -49,7 +48,8 @@ public class DatabaseContract {
                 + "/" + CONTENT_AUTHORITY + "/" + PATH_PRODUCER;
 
         public static Uri buildUri(long id) {
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+//            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
         public static Uri buildUriWithName(String searchString) {
@@ -103,6 +103,10 @@ public class DatabaseContract {
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
+    }
+
+    public static int getIdFromUri(Uri uri) {
+        return Integer.parseInt(uri.getPathSegments().get(1));
     }
 
 }

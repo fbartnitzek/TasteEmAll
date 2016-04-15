@@ -112,6 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + Review.DRINK_ID + " TEXT NOT NULL,"
                 + Review.LOCATION + " TEXT,"
+                // TODO: USER!
 
                 + "FOREIGN KEY (" + Review.DRINK_ID + ") REFERENCES "
                 + DrinkEntry.TABLE_NAME + " (" + Drink.DRINK_ID + "),"

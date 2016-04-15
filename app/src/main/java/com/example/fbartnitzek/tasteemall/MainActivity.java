@@ -48,35 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-
-
-//    @Override
-//    public void onProducerSelected(Uri uri) {
-//        // tablet with same fragment in mainActivity
-//        Toast.makeText(this, uri.toString(), Toast.LENGTH_SHORT).show();
-//    }
-//
-//    // should not be used?
-//    @Override
-//    public void onNewBrewery(CharSequence pattern) {
-//        // tablet with same fragment in mainActivity
-//        boolean twoPane = false;
-//        if (twoPane){
-//            // TODO
-//        } else {
-//            Intent intent = new Intent(this, ProducerActivity.class)
-//                    .putExtra(ProducerActivityFragment.PATTERN_NAME, pattern);
-//            startActivity(intent);
-//        }
-//
-//        Toast.makeText(this, "create new brewery " + pattern, Toast.LENGTH_SHORT).show();
-//    }
-
     @Override
     public void onClick(View v) {
 
-        // TODO: twoPane-mode and maybe some other stuff
-        Intent intent = new Intent(this, AddProducerActivity.class);
-        startActivity(intent);
+        if (v.getId() == R.id.fab_add){
+            // TODO: twoPane-mode and maybe some other stuff
+            Intent intent = new Intent(this, AddProducerActivity.class);
+            startActivity(intent);
+        }
+
     }
 }

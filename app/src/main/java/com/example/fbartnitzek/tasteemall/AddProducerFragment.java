@@ -29,8 +29,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     private static EditText mEditProducerDescription;
     private static View mRootView;
 
-    //TODO: remaining attributes...
-
     private static final String LOG_TAG = AddProducerFragment.class.getName();
 
     public AddProducerFragment() {
@@ -66,10 +64,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
 
-//        android.app.ActionBar actionBar = getActivity().getActionBar();
-//        actionBar.setHomeButtonEnabled(true);
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-
         return mRootView;
     }
 
@@ -93,7 +87,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     }
 // TODO: on save: close keyboard and go to parent activity/fragment
     private void insertData() {
-        //TODO: remaining producer attributes
+
         Uri insertProducerUri = getActivity().getContentResolver().insert(
                 DatabaseContract.ProducerEntry.CONTENT_URI,
                 DatabaseHelper.buildProducerValues(

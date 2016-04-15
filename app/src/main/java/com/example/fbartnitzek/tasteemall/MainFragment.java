@@ -1,5 +1,6 @@
 package com.example.fbartnitzek.tasteemall;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -49,11 +49,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     public MainFragment() {}
 
-//    public interface Callback {
-//        void onProducerSelected(Uri uri);
-//
-//        void onNewBrewery(CharSequence pattern);
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,40 +62,32 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getActivity(), "submitted: " + query, Toast.LENGTH_SHORT).show();
-                return false;
+                mSearchString = query;
+//                Toast.makeText(getActivity(), "submitted: " + query, Toast.LENGTH_SHORT).show();
+                restartLoader();    // producers and drinks
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Toast.makeText(getActivity(), "on change: " + newText, Toast.LENGTH_SHORT).show();
+                mSearchString = newText;
+//                Toast.makeText(getActivity(), "on change: " + newText, Toast.LENGTH_SHORT).show();
+                restartLoader();    // just producers
                 return false;
             }
 
         });
 
-//        rootView.findViewById(R.id.button_refresh).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Snackbar.make(rootView, "refreshing producers... ", LENGTH_SHORT)
-////                        .setAction("Action, null")
-//                        .show();
-//                getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, MainFragment.this);
-//            }
-//        });
-
-        // start Task for each -> result either something or empty
-        // if empty: create? -> new Fragment
-        // for now just an extra button...
 
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
-            public void onClick(String name, ProducerAdapter.ViewHolder viewHolder) {
-                Log.v(LOG_TAG, "PACH.onClick, hashCode=" + this.hashCode() + ", " + "name = [" + name + "], viewHolder = [" + viewHolder + "]");
-                Snackbar.make(rootView, name + " clicked ...", LENGTH_SHORT).show();
-//                Intent intent = new Intent(getActivity(), ProducerActivity.class);
-                // TODO: add id/name as option and show Details for Producer
-//                startActivity(intent);
+            public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
+                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
+                Snackbar.make(rootView, producerName + " clicked ...", LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getActivity(), ShowProducerActivity.class)
+                        .setData(contentUri);
+                startActivity(intent);
             }
         });
 
@@ -112,6 +99,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return rootView;
     }
 
+    private void restartLoader() {
+        getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, this);
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(PRODUCER_LOADER_ID, null, this);
@@ -119,15 +110,17 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        restartLoader();
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "onCreateLoader, " + "id = [" + id + "], args = [" + args + "]");
+        Log.v(LOG_TAG, "onCreateLoader, mSearchString=" + mSearchString + ", id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - insertDate?
 
-        // TODO: use search string better ...
-//        Uri searchUri = ProducerEntry.buildUriWithName(
-//                mSearchString == null ? "" : mSearchString);
-
-        Uri searchUri = ProducerEntry.buildUriWithName("");
+        Uri searchUri = ProducerEntry.buildUriWithName(mSearchString == null ? "" : mSearchString);
         String sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC";
 
         return new CursorLoader(getActivity(),

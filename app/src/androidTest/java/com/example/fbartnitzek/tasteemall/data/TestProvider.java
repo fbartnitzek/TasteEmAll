@@ -119,7 +119,7 @@ public class TestProvider extends AndroidTestCase {
 //
 //        cursor = mContext.getContentResolver().query()
 
-        // brewery
+        // producer
         tco = TestUtils.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(ProducerEntry.CONTENT_URI, true, tco);
 

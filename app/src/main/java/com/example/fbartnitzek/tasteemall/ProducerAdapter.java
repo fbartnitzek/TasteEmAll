@@ -1,6 +1,7 @@
 package com.example.fbartnitzek.tasteemall;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 
 
 /**
@@ -40,7 +41,7 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
 
 
     public interface ProducerAdapterClickHandler {
-        void onClick(String name, ViewHolder viewHolder);
+        void onClick(String producerName, Uri contentUri, ViewHolder viewHolder);
     }
 
     @Override
@@ -71,8 +72,6 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         viewHolder.descriptionView.setText(
                 mCursor.getString(MainFragment.COL_QUERY_PRODUCER_DESCRIPTION)
         );
-
-        // TODO: website
 
     }
 
@@ -107,8 +106,12 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         public void onClick(View view) {
             mCursor.moveToPosition(getAdapterPosition());
             Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+            int producerId = mCursor.getInt(MainFragment.COL_QUERY_PRODUCER__ID);
+            Uri contentUri = DatabaseContract.ProducerEntry.buildUri(producerId);
+            Log.v(LOG_TAG, "onClick, producerId=" + producerId + ", contentUri= " +  contentUri + ", hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
             mClickHandler.onClick(
-                    mCursor.getString(mCursor.getColumnIndex(Producer.NAME)),
+                    mCursor.getString(MainFragment.COL_QUERY_PRODUCER_NAME),
+                    contentUri,
                     this
             );
         }
