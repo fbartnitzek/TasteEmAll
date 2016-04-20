@@ -20,10 +20,10 @@ public class Drink {
 
     public static final String DRINK_ID = "drink_id";
     public static final String NAME = "drink_name";
-    public static final String SPECIFICS = "drink_specificcs"; //alcohol by volume, ...
-    public static final String STYLE = "beer_style";
-    public static final String TYPE = "drink_style";
-    // TODO: add ingredients...
+    public static final String SPECIFICS = "drink_specifics"; //alcohol by volume, ...
+    public static final String STYLE = "drink_style";
+    public static final String TYPE = "drink_type";
+    public static final String INGREDIENTS = "drink_ingredients";
 
     public static final String PRODUCER_ID = "drink_producer_id";
 
@@ -32,10 +32,11 @@ public class Drink {
     private String specifics;
     private String style;
     private String type;
+    private String ingredients;
 
     private String producerId;
 
-    public Drink(String drinkId, Producer producer, String name, String style, String specifics, String type) {
+    public Drink(String drinkId, Producer producer, String name, String style, String specifics, String type, String ingredients) {
 
         this.drinkId = drinkId;
         this.producerId = producer.getProducerId();
@@ -43,6 +44,7 @@ public class Drink {
         this.style = style;
         this.specifics = specifics;
         this.type = type;
+        this.ingredients = ingredients;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class Drink {
                 ", specifics='" + specifics + '\'' +
                 ", style='" + style + '\'' +
                 ", type='" + type + '\'' +
+                ", ingredients='" + ingredients + '\'' +
                 ", producerId='" + producerId + '\'' +
                 '}';
     }
@@ -103,5 +106,13 @@ public class Drink {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
     }
 }

@@ -60,7 +60,7 @@ public class DatabaseProvider extends ContentProvider {
 //                        " = " + LocationEntry.TABLE_NAME + "." + Location.LOCATION_ID);
     }
 
-    private static final String PRODUCERS_BY_NAME_SELECTION = //both seem to work
+    public static final String PRODUCERS_BY_NAME_SELECTION = //both seem to work
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
 

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">TasteEmAll</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_producer">ProducerActivity</string>
@@ -6,4 +6,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_add_producer_activity">add producer</string>
+    <string name="title_add_drink_activity">add drink</string>
+
+    <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
 </resources>

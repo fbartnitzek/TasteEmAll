@@ -72,13 +72,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " );";
         db.execSQL(createProducerTable);
 
-        final String createBeerTable = "CREATE TABLE " + DrinkEntry.TABLE_NAME + " ("
+        final String createDrinkTable = "CREATE TABLE " + DrinkEntry.TABLE_NAME + " ("
                 + DrinkEntry._ID + " INTEGER PRIMARY KEY,"
                 + Drink.DRINK_ID + " TEXT NOT NULL,"
                 + Drink.NAME + " TEXT NOT NULL,"
                 + Drink.SPECIFICS + " TEXT,"
                 + Drink.STYLE + " TEXT,"
                 + Drink.TYPE + " TEXT NOT NULL,"
+                + Drink.INGREDIENTS + " TEXT, "
                 + Drink.PRODUCER_ID + " TEXT NOT NULL,"
 
                 + "FOREIGN KEY (" + Drink.PRODUCER_ID + ") REFERENCES "
@@ -86,7 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + "UNIQUE (" + Drink.DRINK_ID + ") ON CONFLICT REPLACE"
                 + " );";
-        db.execSQL(createBeerTable);
+        db.execSQL(createDrinkTable);
 
 //        final String createUserTable = "CREATE TABLE " + UserEntry.TABLE_NAME + " ("
 //                + UserEntry._ID + " INTEGER PRIMARY KEY,"
@@ -157,7 +158,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public static ContentValues buildDrinkValues(String drinkId, String name, String specifics,
-                                                String style, String type,
+                                                String style, String type, String ingredients,
                                                 String producerId) {
         ContentValues cv = new ContentValues();
         cv.put(Drink.DRINK_ID, drinkId);
@@ -165,6 +166,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Drink.SPECIFICS, specifics);
         cv.put(Drink.STYLE, style);
         cv.put(Drink.TYPE, type);
+        cv.put(Drink.INGREDIENTS, ingredients);
         cv.put(Drink.PRODUCER_ID, producerId);
         return cv;
     }

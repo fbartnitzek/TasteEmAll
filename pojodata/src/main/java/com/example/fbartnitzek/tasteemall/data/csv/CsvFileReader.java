@@ -127,7 +127,8 @@ public class CsvFileReader {
                                 drinkName,
                                 Util.getRecord(record, Drink.STYLE),
                                 Util.getRecord(record, Drink.SPECIFICS),
-                                Util.getRecord(record, Drink.TYPE));
+                                Util.getRecord(record, Drink.TYPE),
+                                Util.getRecord(record, Drink.INGREDIENTS));
                         drinks.put(drinkFullName, drink);
                     }
 

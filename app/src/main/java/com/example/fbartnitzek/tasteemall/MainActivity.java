@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (v.getId() == R.id.fab_add){
             // TODO: twoPane-mode and maybe some other stuff
-            Intent intent = new Intent(this, AddProducerActivity.class);
+            Intent intent = new Intent(this, AddDrinkActivity.class);
             startActivity(intent);
         }
 

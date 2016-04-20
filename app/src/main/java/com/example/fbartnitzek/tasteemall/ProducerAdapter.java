@@ -48,7 +48,7 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_producer, parent, false);
+                    .inflate(R.layout.list_item_producer_recycler, parent, false);
             view.setFocusable(true);
             return new ViewHolder(view);
         } else {

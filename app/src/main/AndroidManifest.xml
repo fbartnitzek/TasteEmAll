@@ -37,8 +37,11 @@
         <activity
             android:name=".AddProducerActivity"
             android:label="@string/title_add_producer_activity"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".AddDrinkActivity"
+                  android:label="@string/title_add_drink_activity"
+                  android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

@@ -39,6 +39,15 @@ public class Utils {
 //        );
 //    }
 
+    // TODO: might use some hash-function later...
+    public static String calcProducerId(String producerName) {
+        return "producer_" + producerName;
+    }
+
+    public static String calcDrinkId(String drinkName, String producerName) {
+        return "producer_" + producerName + "_;drink_" + drinkName;
+    }
+
     public static ContentValues getContentValues(Producer producer) {
         return DatabaseHelper.buildProducerValues(
                 producer.getProducerId(), producer.getName(), producer.getDescription(),

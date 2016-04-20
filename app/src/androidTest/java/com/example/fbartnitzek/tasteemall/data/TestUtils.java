@@ -39,7 +39,7 @@ public class TestUtils {
     }
 
     public static ContentValues createBeerGose() {
-        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", "1");
+        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", "usual + salt + coriander", "1");
     }
 
 //    public static ContentValues createUserFrank() {
