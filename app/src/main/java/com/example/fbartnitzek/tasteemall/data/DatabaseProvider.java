@@ -14,6 +14,7 @@ import android.util.Log;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 /**
@@ -44,6 +45,7 @@ public class DatabaseProvider extends ContentProvider {
     private static final int PRODUCER_BY_ID = 202;
 
     private static final int DRINKS = 300;
+    private static final int DRINKS_BY_NAME = 301;
 //    private static final int USERS = 400;
     private static final int REVIEWS = 500;
 
@@ -63,6 +65,9 @@ public class DatabaseProvider extends ContentProvider {
     public static final String PRODUCERS_BY_NAME_SELECTION = //both seem to work
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
+
+    public static final String DRINKS_BY_NAME_SELECTION =
+            DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'";
 
     private static final String PRODUCER_BY_ID_SELECTION =
             ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
@@ -85,6 +90,8 @@ public class DatabaseProvider extends ContentProvider {
 
         // all beers
         matcher.addURI(authority, DatabaseContract.PATH_DRINK, DRINKS);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/", DRINKS_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/*", DRINKS_BY_NAME);
         // TODO: all beers of certain brewery, of breweries in certain location / area
 
         // all users
@@ -108,11 +115,12 @@ public class DatabaseProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.v(LOG_TAG, "query, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+//        Log.v(LOG_TAG, "query, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
         Cursor cursor;
         final SQLiteDatabase db = mHelper.getReadableDatabase();
 //        final int match = mUriMatcher.match(uri);
         String[] mySelectionArgs;
+        String pattern;
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:
                 Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
@@ -120,7 +128,7 @@ public class DatabaseProvider extends ContentProvider {
                         null, null, sortOrder);
                 break;
             case PRODUCERS_BY_NAME:
-                String pattern = ProducerEntry.getSearchString(uri);
+                pattern = ProducerEntry.getSearchString(uri);
                 mySelectionArgs = new String[]{pattern + "%"};
                 Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
 
@@ -137,6 +145,13 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case DRINKS_BY_NAME:
+                pattern = DrinkEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{pattern + "%"};
+                cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
+                        mySelectionArgs, null, null, sortOrder);
+                break;
+
             case REVIEWS:
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
@@ -162,6 +177,8 @@ public class DatabaseProvider extends ContentProvider {
             case PRODUCER_BY_ID:
                 return ProducerEntry.CONTENT_ITEM_TYPE;
             case DRINKS:
+                return DrinkEntry.CONTENT_TYPE;
+            case DRINKS_BY_NAME:
                 return DrinkEntry.CONTENT_TYPE;
             case REVIEWS:
                 return ReviewEntry.CONTENT_TYPE;

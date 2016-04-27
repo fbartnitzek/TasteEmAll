@@ -29,7 +29,7 @@
             android:paddingRight="40dp"
             android:text="Name"/>
 
-        <com.example.fbartnitzek.tasteemall.NonFilterableAutoCompleteTextView
+        <AutoCompleteTextView
             android:id="@+id/producer_name"
             android:layout_width="0dp"
             android:layout_weight="5"

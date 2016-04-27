@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -28,6 +27,7 @@ public class DatabaseContract {
 
     public static final String PATH_PRODUCER = "producer";
     public static final String PATH_PRODUCER_BY_NAME = "producer_by_name";
+    public static final String PATH_DRINK_BY_NAME = "drink_by_name";
     public static final String PATH_DRINK = "drink";
     public static final String PATH_REVIEW = "review";
 
@@ -53,7 +53,7 @@ public class DatabaseContract {
         }
 
         public static Uri buildUriWithName(String searchString) {
-            Log.v(LOG_TAG, "buildUriWithName, " + "searchString = [" + searchString + "]");
+//            Log.v(LOG_TAG, "buildUriWithName, " + "searchString = [" + searchString + "]");
             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER_BY_NAME).
                     appendPath(searchString).build();
 //            return CONTENT_URI.buildUpon().
@@ -82,10 +82,22 @@ public class DatabaseContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
                 + "/" + CONTENT_AUTHORITY + "/" + PATH_DRINK;
 
-
-
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+        public static Uri buildUriWithName(String searchString) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_BY_NAME).
+                    appendPath(searchString).build();
+        }
+
+        public static String getSearchString(Uri uri) {
+            // may also be empty
+            if (uri.getPathSegments().size()>1){
+                return uri.getPathSegments().get(1);
+            } else {
+                return "";
+            }
         }
     }
 

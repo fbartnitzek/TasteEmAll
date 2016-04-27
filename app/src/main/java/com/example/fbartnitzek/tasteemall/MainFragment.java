@@ -18,7 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.*;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
@@ -29,11 +31,14 @@ import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = MainFragment.class.getName();
-    private static final int PRODUCER_LOADER_ID = 123;
+    private static final int PRODUCER_LOADER_ID = 100;
+    private static final int DRINK_LOADER_ID = 200;
 
     private RecyclerView mProducerRecyclerView;
+    private RecyclerView mDrinkRecyclerView;
     private int mProducerPosition = ListView.INVALID_POSITION;
     private ProducerAdapter mProducerAdapter;
+    private DrinkAdapter mDrinkAdapter;
 
     private static final String[] PRODUCER_QUERY_COLUMNS = {
             ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,  // without the CursurAdapter doesn't work
@@ -46,6 +51,22 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_QUERY_PRODUCER_DESCRIPTION = 2;
     static final int COL_QUERY_PRODUCER_LOCATION = 3;
     private String mSearchString;
+
+    private static final String[] DRINK_QUERY_COLUMNS = {
+            DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,  // without the CursurAdapter doesn't work
+            Drink.NAME,
+            Drink.PRODUCER_ID,
+            Drink.TYPE,
+            Drink.SPECIFICS,
+            Drink.STYLE};
+
+    static final int COL_QUERY_DRINK__ID = 0;
+    static final int COL_QUERY_DRINK_NAME = 1;
+    static final int COL_QUERY_DRINK_PRODUCER_ID = 2;
+    static final int COL_QUERY_DRINK_TYPE= 3;
+    static final int COL_QUERY_DRINK_SPECIFICS= 4;
+    static final int COL_QUERY_DRINK_STYLE= 5;
+
 
     public MainFragment() {}
 
@@ -63,16 +84,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearchString = query;
-//                Toast.makeText(getActivity(), "submitted: " + query, Toast.LENGTH_SHORT).show();
-                restartLoader();    // producers and drinks
+                restartLoaders();    // producers and drinks
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 mSearchString = newText;
-//                Toast.makeText(getActivity(), "on change: " + newText, Toast.LENGTH_SHORT).show();
-                restartLoader();    // just producers
+                restartLoaders();    // just producers
                 return false;
             }
 
@@ -91,28 +110,46 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             }
         });
 
+        mDrinkAdapter = new DrinkAdapter(new DrinkAdapter.DrinkAdapterClickHandler() {
+            @Override
+            public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder viewHolder) {
+                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
+                Snackbar.make(rootView, drinkName + " clicked...", LENGTH_SHORT).show();
+
+                // TODO: add activity and start it
+            }
+        });
+
+
+
         mProducerRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_producer);
         mProducerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mProducerRecyclerView.setAdapter(mProducerAdapter);
 
+        mDrinkRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_drink);
+        mDrinkRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mDrinkRecyclerView.setAdapter(mDrinkAdapter);
+
         return rootView;
     }
 
-    private void restartLoader() {
+    private void restartLoaders() {
         getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, this);
+        getLoaderManager().restartLoader(DRINK_LOADER_ID, null, this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(PRODUCER_LOADER_ID, null, this);
+        getLoaderManager().initLoader(DRINK_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        restartLoader();
+        restartLoaders();
     }
 
     @Override
@@ -120,20 +157,38 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Log.v(LOG_TAG, "onCreateLoader, mSearchString=" + mSearchString + ", id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - insertDate?
 
-        Uri searchUri = ProducerEntry.buildUriWithName(mSearchString == null ? "" : mSearchString);
-        String sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC";
+        switch (id) {
+            case PRODUCER_LOADER_ID:
+                return new CursorLoader(getActivity(),
+                        ProducerEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
+                        PRODUCER_QUERY_COLUMNS,
+                        null, null,
+                        ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC");
+            case DRINK_LOADER_ID:
+                //TODO: should include producer-name... => maybe sort by drink-id
+                String sortOrder = DrinkEntry.TABLE_NAME + "." + Drink.NAME + " ASC";
+                return new CursorLoader(getActivity(),
+                        DrinkEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
+                        DRINK_QUERY_COLUMNS,
+                        null, null,
+                        sortOrder);
+            default:
+                throw new RuntimeException("wrong loader_id in MainFragment...");
+        }
 
-        return new CursorLoader(getActivity(),
-                searchUri,
-                PRODUCER_QUERY_COLUMNS,
-                null, null, sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, " + "loader = [" + loader + "], data = [" + data + "]");
-        mProducerAdapter.swapCursor(data);
-
+        switch (loader.getId()) {
+            case PRODUCER_LOADER_ID:
+                mProducerAdapter.swapCursor(data);
+                break;
+            case DRINK_LOADER_ID:
+                mDrinkAdapter.swapCursor(data);
+                break;
+        }
 //        if (mProducerPosition != ListView.INVALID_POSITION) {
 //            mBreweryListView.smoothScrollToPosition(mProducerPosition);
 //        }
@@ -143,6 +198,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, " + "loader = [" + loader + "]");
-        mProducerAdapter.swapCursor(null);
+        switch (loader.getId()) {
+            case PRODUCER_LOADER_ID:
+                mProducerAdapter.swapCursor(null);
+                break;
+            case DRINK_LOADER_ID:
+                mDrinkAdapter.swapCursor(null);
+                break;
+        }
     }
 }
