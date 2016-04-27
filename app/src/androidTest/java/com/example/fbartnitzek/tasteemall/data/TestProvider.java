@@ -149,7 +149,7 @@ public class TestProvider extends AndroidTestCase {
 //        TestUtils.printAllCursorEntries(cursor, "joined brewery-location-query");
 //        cursor.close();
 
-        // beer
+        // drink
         tco = TestUtils.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(DrinkEntry.CONTENT_URI, true, tco);
 
@@ -162,9 +162,21 @@ public class TestProvider extends AndroidTestCase {
 
         cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
                 null, null, null, null);
+
         assertTrue("missing beer after insert", cursor.getCount() > 0);
 //        TestUtils.printAllCursorEntries(cursor, "1 beer should be inserted");
         cursor.close();
+
+
+        // joined drink + producer
+        cursor = mContext.getContentResolver().query(DrinkEntry.buildUriWithName(""),
+                null, null, null, null);
+        assertTrue("joined drink query failed", cursor.getCount() > 0
+                && cursor.getColumnCount() == TestUtils.createBeerGose().size()
+                + TestUtils.createBreweryBayrischerBahnhof().size() + 2);   //all attributes + id each
+
+        cursor.close();
+
 
 //        // user
 //        tco = TestUtils.getTestContentObserver();

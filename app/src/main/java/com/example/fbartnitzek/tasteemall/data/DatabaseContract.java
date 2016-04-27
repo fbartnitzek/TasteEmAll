@@ -29,6 +29,7 @@ public class DatabaseContract {
     public static final String PATH_PRODUCER_BY_NAME = "producer_by_name";
     public static final String PATH_DRINK_BY_NAME = "drink_by_name";
     public static final String PATH_DRINK = "drink";
+    public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME = "drink_with_producer_by_name";
     public static final String PATH_REVIEW = "review";
 
 //    //URI data
@@ -87,6 +88,11 @@ public class DatabaseContract {
         }
 
         public static Uri buildUriWithName(String searchString) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER_BY_NAME).
+                    appendPath(searchString).build();
+        }
+
+        public static Uri buildUriDrinkOnlyWithName(String searchString) {
             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_BY_NAME).
                     appendPath(searchString).build();
         }

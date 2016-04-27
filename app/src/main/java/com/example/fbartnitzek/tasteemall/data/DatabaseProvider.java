@@ -7,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -46,6 +47,8 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final int DRINKS = 300;
     private static final int DRINKS_BY_NAME = 301;
+    private static final int DRINKS_WITH_PRODUCER_BY_NAME = 310;
+    private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
 //    private static final int USERS = 400;
     private static final int REVIEWS = 500;
 
@@ -88,10 +91,14 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME+ "/*", PRODUCERS_BY_NAME);
         //TODO: all breweries in certain location - even better in area (center, radius)
 
-        // all beers
+        // all drinks
         matcher.addURI(authority, DatabaseContract.PATH_DRINK, DRINKS);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/", DRINKS_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/*", DRINKS_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/", DRINKS_WITH_PRODUCER_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/*", DRINKS_WITH_PRODUCER_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK + "/#", DRINKS_WITH_PRODUCER_BY_ID);
+
         // TODO: all beers of certain brewery, of breweries in certain location / area
 
         // all users
@@ -151,7 +158,19 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
-
+            case DRINKS_WITH_PRODUCER_BY_NAME:
+                pattern = DrinkEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{pattern + "%"};
+//                cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
+//                        mySelectionArgs, null, null, sortOrder);
+                cursor = sDrinksWithProducersQueryBuilder.query(db,
+                        projection, DRINKS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                break;
+            case DRINKS_WITH_PRODUCER_BY_ID:
+                cursor = sDrinksWithProducersQueryBuilder.query(db,
+                        projection, DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
             case REVIEWS:
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
@@ -162,6 +181,16 @@ public class DatabaseProvider extends ContentProvider {
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
+    }
+
+    private static final SQLiteQueryBuilder sDrinksWithProducersQueryBuilder;
+
+    static{
+        sDrinksWithProducersQueryBuilder = new SQLiteQueryBuilder();
+        sDrinksWithProducersQueryBuilder.setTables(
+                DrinkEntry.TABLE_NAME + " INNER JOIN " + ProducerEntry.TABLE_NAME
+                        + " ON " + DrinkEntry.TABLE_NAME + "." + Drink.PRODUCER_ID + " = "
+                        + ProducerEntry.TABLE_NAME + "." + Producer.PRODUCER_ID);
     }
 
     @Nullable

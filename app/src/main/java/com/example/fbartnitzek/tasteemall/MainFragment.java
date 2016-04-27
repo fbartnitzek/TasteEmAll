@@ -52,13 +52,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_QUERY_PRODUCER_LOCATION = 3;
     private String mSearchString;
 
-    private static final String[] DRINK_QUERY_COLUMNS = {
+    private static final String[] DRINK_WITH_PRODUCER_QUERY_COLUMNS = {
             DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,  // without the CursurAdapter doesn't work
             Drink.NAME,
             Drink.PRODUCER_ID,
             Drink.TYPE,
             Drink.SPECIFICS,
-            Drink.STYLE};
+            Drink.STYLE,
+            Producer.NAME,
+            Producer.LOCATION};
 
     static final int COL_QUERY_DRINK__ID = 0;
     static final int COL_QUERY_DRINK_NAME = 1;
@@ -66,6 +68,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_QUERY_DRINK_TYPE= 3;
     static final int COL_QUERY_DRINK_SPECIFICS= 4;
     static final int COL_QUERY_DRINK_STYLE= 5;
+    static final int COL_QUERY_DRINK_PRODUCER_NAME= 6;
+    static final int COL_QUERY_DRINK_PRODUCER_LOCATION= 7;
+
 
 
     public MainFragment() {}
@@ -116,7 +121,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 Snackbar.make(rootView, drinkName + " clicked...", LENGTH_SHORT).show();
 
-                // TODO: add activity and start it
+
+                Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)
+                        .setData(contentUri);
+                startActivity(intent);
             }
         });
 
@@ -169,7 +177,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 String sortOrder = DrinkEntry.TABLE_NAME + "." + Drink.NAME + " ASC";
                 return new CursorLoader(getActivity(),
                         DrinkEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
-                        DRINK_QUERY_COLUMNS,
+                        DRINK_WITH_PRODUCER_QUERY_COLUMNS,
                         null, null,
                         sortOrder);
             default:

@@ -60,7 +60,7 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
 
         // TODO: joined query...
         holder.producerNameView.setText(
-                mCursor.getString(MainFragment.COL_QUERY_DRINK_PRODUCER_ID));
+                mCursor.getString(MainFragment.COL_QUERY_DRINK_PRODUCER_NAME));
         holder.drinkNameView.setText(
                 mCursor.getString(MainFragment.COL_QUERY_DRINK_NAME));
         holder.drinkTypeView.setText(

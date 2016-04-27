@@ -39,9 +39,17 @@
             android:label="@string/title_add_producer_activity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".AddDrinkActivity"
-                  android:label="@string/title_add_drink_activity"
-                  android:theme="@style/AppTheme.NoActionBar">
+        <activity
+            android:name=".AddDrinkActivity"
+            android:label="@string/title_add_drink_activity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ShowDrinkActivity"
+                  android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
     </application>
 
