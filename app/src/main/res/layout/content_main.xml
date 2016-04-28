@@ -1,3 +1,4 @@
+<!-- TODO: useless...? -->
 <fragment
     android:id="@+id/fragment"
     android:name="com.example.fbartnitzek.tasteemall.MainFragment"

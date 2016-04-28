@@ -11,14 +11,13 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -28,7 +27,7 @@ import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = MainFragment.class.getName();
     private static final int PRODUCER_LOADER_ID = 100;
@@ -83,26 +82,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Log.v(LOG_TAG, "onCreateView, " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // useless for now
-        final SearchView searchView = (SearchView) rootView.findViewById(R.id.search_all);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearchString = query;
-                restartLoaders();    // producers and drinks
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mSearchString = newText;
-                restartLoaders();    // just producers
-                return false;
-            }
-
-        });
-
-
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
             public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
@@ -140,6 +119,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mDrinkRecyclerView.setAdapter(mDrinkAdapter);
 
         return rootView;
+    }
+
+    public void refreshLists(String pattern) {
+        mSearchString = pattern;
+        restartLoaders();
     }
 
     private void restartLoaders() {
@@ -215,4 +199,5 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 break;
         }
     }
+
 }

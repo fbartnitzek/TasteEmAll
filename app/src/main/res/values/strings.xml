@@ -9,4 +9,6 @@
     <string name="title_add_drink_activity">add drink</string>
 
     <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
+    <string name="search_title">search</string>
+    <string name="search_hint">you may search a drink,, a producer or a producer-location</string>
 </resources>
