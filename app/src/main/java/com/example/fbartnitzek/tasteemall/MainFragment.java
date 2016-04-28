@@ -168,7 +168,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         switch (id) {
             case PRODUCER_LOADER_ID:
                 return new CursorLoader(getActivity(),
-                        ProducerEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
+                        ProducerEntry.buildUriWithPattern(mSearchString == null ? "" : mSearchString),
                         PRODUCER_QUERY_COLUMNS,
                         null, null,
                         ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC");

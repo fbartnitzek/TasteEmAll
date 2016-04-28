@@ -44,6 +44,7 @@ public class DatabaseProvider extends ContentProvider {
     private static final int PRODUCERS = 200;
     private static final int PRODUCERS_BY_NAME = 201;
     private static final int PRODUCER_BY_ID = 202;
+    private static final int PRODUCERS_BY_PATTERN = 203;
 
     private static final int DRINKS = 300;
     private static final int DRINKS_BY_NAME = 301;
@@ -69,6 +70,10 @@ public class DatabaseProvider extends ContentProvider {
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
 
+    public static final String PRODUCERS_BY_NAME_OR_LOCATION_SELECTION =
+            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ? OR "
+                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION + " LIKE ?";
+
     public static final String DRINKS_BY_NAME_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'";
 
@@ -89,6 +94,9 @@ public class DatabaseProvider extends ContentProvider {
             // needed for empty string ...
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/" , PRODUCERS_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME+ "/*", PRODUCERS_BY_NAME);
+            // producer.name and producer.location
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/" , PRODUCERS_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/*", PRODUCERS_BY_PATTERN);
         //TODO: all breweries in certain location - even better in area (center, radius)
 
         // all drinks
@@ -147,6 +155,13 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection,
                         ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCERS_BY_PATTERN:
+                pattern = ProducerEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection,
+                        PRODUCERS_BY_NAME_OR_LOCATION_SELECTION,
+                        mySelectionArgs, null, null, sortOrder);
                 break;
             case DRINKS:
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
