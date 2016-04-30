@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_type_titles">
+        <item>Beer</item>
+        <item>Wine</item>
+        <item>Whisk(e)y</item>
+        <item>Coffee</item>
+        <item>Generic</item>
+    </string-array>
+
+    <string-array name="pref_type_values">
+        <item>beer</item>
+        <item>wine</item>
+        <item>whisky</item>
+        <item>coffee</item>
+        <item>generic</item>
+    </string-array>
+
+</resources>

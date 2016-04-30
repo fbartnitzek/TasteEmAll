@@ -2,8 +2,10 @@ package com.example.fbartnitzek.tasteemall;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,9 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
@@ -25,13 +30,13 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddDrinkFragment extends Fragment implements View.OnClickListener{
+public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private String mFilter = "";
 
     private static AutoCompleteTextView mEditCompletionProducerName;
     private static EditText mEditDrinkName;
-    private static EditText mEditDrinkType;
+    private static Spinner mSpinnerDrinkType;
     private static EditText mEditDrinkStyle;
     private static EditText mEditDrinkIngredients;
     private static EditText mEditDrinkSpecifics;
@@ -39,6 +44,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener{
 
     //    private ProducerCompletionAdapter mProducerAdapter;
     SimpleCursorAdapter mAdapter;
+
     private static final int PRODUCER_COMPLETION_LOADER_ID = 124;
 
     private static final String LOG_TAG = AddDrinkFragment.class.getName();
@@ -139,7 +145,25 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener{
 
 
         mEditDrinkName = (EditText) mRootView.findViewById(R.id.drink_name);
-        mEditDrinkType = (EditText) mRootView.findViewById(R.id.drink_type);
+        mSpinnerDrinkType = (Spinner) mRootView.findViewById(R.id.drink_type);
+        // fill type with drink_type from settings
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String drinkType = prefs.getString(getString(R.string.pref_type_key), getString(R.string.pref_type_generic));
+
+        String[] drinkTypes = getActivity().getResources().getStringArray(R.array.pref_type_values);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getActivity(),
+                android.R.layout.simple_list_item_1,
+                drinkTypes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerDrinkType.setAdapter(adapter);
+
+        int spinnerPosition = adapter.getPosition(drinkType);
+        if (spinnerPosition > -1) {
+            mSpinnerDrinkType.setSelection(spinnerPosition);
+        }
+        mSpinnerDrinkType.setOnItemSelectedListener(this);
+
         mEditDrinkStyle = (EditText) mRootView.findViewById(R.id.drink_style);
         mEditDrinkIngredients = (EditText) mRootView.findViewById(R.id.drink_ingredients);
         mEditDrinkSpecifics = (EditText) mRootView.findViewById(R.id.drink_specifics);
@@ -191,7 +215,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener{
                         drinkName,
                         mEditDrinkSpecifics.getText().toString(),
                         mEditDrinkStyle.getText().toString(),
-                        mEditDrinkType.getText().toString(),
+                        mSpinnerDrinkType.getItemAtPosition(mSpinnerDrinkType.getSelectedItemPosition()).toString(),
                         mEditDrinkIngredients.getText().toString(),
                         mProducerId
                 )
@@ -210,6 +234,17 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener{
                 mEditCompletionProducerName.getText().toString());
         startActivity(intent);
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + mSpinnerDrinkType.getItemAtPosition(position).toString() + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
+    }
+
 
 //    @Override
 //    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

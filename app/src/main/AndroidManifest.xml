@@ -44,11 +44,14 @@
             android:label="@string/title_add_drink_activity"
             android:theme="@style/AppTheme">
         </activity>
-        <activity android:name=".ShowDrinkActivity"
+        <activity
+            android:name=".ShowDrinkActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+        </activity>
+        <activity android:name=".SettingsActivity">
         </activity>
     </application>
 
