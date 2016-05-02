@@ -32,6 +32,11 @@ public class AddDrinkActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
+            int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(this, false);
+            String readableDrinkType = getString(Utils.getDrinkName(drinkType));
+            getSupportActionBar().setTitle(
+                    getString(R.string.title_add_drink_activity,
+                    readableDrinkType));
         }
     }
 }

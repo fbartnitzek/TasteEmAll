@@ -98,7 +98,7 @@ public class TestProvider extends AndroidTestCase {
         }
     }
 
-    public void testInserReadProvider() {
+    public void testInsertReadProvider() {
 
         TestUtils.TestContentObserver tco = TestUtils.getTestContentObserver();
 //        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
@@ -176,6 +176,46 @@ public class TestProvider extends AndroidTestCase {
                 + TestUtils.createBreweryBayrischerBahnhof().size() + 2);   //all attributes + id each
 
         cursor.close();
+
+        // other beer and distillery and whisky
+        tco = TestUtils.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(DrinkEntry.CONTENT_URI, true, tco);
+        insertUri = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
+                TestUtils.createBeerSchwarzbier());
+        assertTrue(insertUri != null);
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
+                null, null, null, null);
+        assertTrue("missing beer after second insert", cursor.getCount() > 1);
+        cursor.close();
+
+        // distillery
+        insertUri = mContext.getContentResolver().insert(ProducerEntry.CONTENT_URI,
+                TestUtils.createDistilleryLaphroaig());
+        assertTrue(insertUri != null);
+
+        cursor = mContext.getContentResolver().query(ProducerEntry.CONTENT_URI,
+                null, null, null, null);
+        assertTrue("missing distillery after second insert", cursor.getCount() > 1);
+        cursor.close();
+
+        // whisky
+        insertUri = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
+                TestUtils.createWhiskyLaphroaig());
+        assertTrue(insertUri != null);
+
+        cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
+                null, null, null, null);
+        assertTrue("missing whisky after third insert", cursor.getCount() > 2);
+        cursor.close();
+
+        // query with type...
+        cursor = mContext.getContentResolver().query(DrinkEntry.buildUriWithNameAndType("", "beer"),
+                null, null, null, null);
+        assertTrue("query with type failed", cursor.getCount() > 0);
+        cursor.close();
+
 
 
 //        // user

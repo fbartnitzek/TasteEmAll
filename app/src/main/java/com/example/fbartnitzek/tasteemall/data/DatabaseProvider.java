@@ -36,6 +36,7 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 public class DatabaseProvider extends ContentProvider {
 
+
     private static DatabaseHelper mHelper;
     private static final String LOG_TAG = DatabaseProvider.class.getName();
 
@@ -50,6 +51,8 @@ public class DatabaseProvider extends ContentProvider {
     private static final int DRINKS_BY_NAME = 301;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME = 310;
     private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
+    private static final int DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE = 320;
+
 //    private static final int USERS = 400;
     private static final int REVIEWS = 500;
 
@@ -76,6 +79,12 @@ public class DatabaseProvider extends ContentProvider {
 
     public static final String DRINKS_BY_NAME_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'";
+
+
+    private static final String DRINKS_BY_NAME_AND_TYPE_SELECTION =
+            DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? AND "
+            + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
+
 
     private static final String PRODUCER_BY_ID_SELECTION =
             ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
@@ -105,6 +114,8 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/*", DRINKS_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/", DRINKS_WITH_PRODUCER_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/*", DRINKS_WITH_PRODUCER_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/*", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK + "/#", DRINKS_WITH_PRODUCER_BY_ID);
 
         // TODO: all beers of certain brewery, of breweries in certain location / area
@@ -136,6 +147,7 @@ public class DatabaseProvider extends ContentProvider {
 //        final int match = mUriMatcher.match(uri);
         String[] mySelectionArgs;
         String pattern;
+        String drinkType;
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:
                 Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
@@ -168,18 +180,34 @@ public class DatabaseProvider extends ContentProvider {
                         null, null, sortOrder);
                 break;
             case DRINKS_BY_NAME:
-                pattern = DrinkEntry.getSearchString(uri);
+                pattern = DrinkEntry.getSearchString(uri, false);
                 mySelectionArgs = new String[]{pattern + "%"};
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
             case DRINKS_WITH_PRODUCER_BY_NAME:
-                pattern = DrinkEntry.getSearchString(uri);
+                Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+                pattern = DrinkEntry.getSearchString(uri, false);
                 mySelectionArgs = new String[]{pattern + "%"};
 //                cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
 //                        mySelectionArgs, null, null, sortOrder);
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
                         projection, DRINKS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                break;
+            case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
+                pattern = DrinkEntry.getSearchString(uri, true);
+                drinkType = DrinkEntry.getDrinkType(uri);
+                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+                if (Drink.TYPE_ALL.equals(drinkType)){
+                    mySelectionArgs = new String[]{pattern + "%"};
+                    cursor = sDrinksWithProducersQueryBuilder.query(db,
+                            projection, DRINKS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                } else {
+                    mySelectionArgs = new String[]{pattern + "%", drinkType};
+                    cursor = sDrinksWithProducersQueryBuilder.query(db,
+                            projection, DRINKS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
+                }
+
                 break;
             case DRINKS_WITH_PRODUCER_BY_ID:
                 cursor = sDrinksWithProducersQueryBuilder.query(db,

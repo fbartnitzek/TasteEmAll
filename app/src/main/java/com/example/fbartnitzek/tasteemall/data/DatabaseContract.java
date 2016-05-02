@@ -31,6 +31,8 @@ public class DatabaseContract {
     public static final String PATH_DRINK_BY_NAME = "drink_by_name";
     public static final String PATH_DRINK = "drink";
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME = "drink_with_producer_by_name";
+    public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE = "drink_with_producer_by_name_and_type";
+
     public static final String PATH_REVIEW = "review";
 
 //    //URI data
@@ -84,6 +86,8 @@ public class DatabaseContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
                 + "/" + CONTENT_AUTHORITY + "/" + PATH_DRINK;
 
+
+
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
@@ -98,13 +102,38 @@ public class DatabaseContract {
                     appendPath(searchString).build();
         }
 
-        public static String getSearchString(Uri uri) {
+        public static String getSearchString(Uri uri, boolean withDrink) {
             // may also be empty
+            if (withDrink) {
+                if (uri.getPathSegments().size()>2){
+                    return uri.getPathSegments().get(2);
+                } else {
+                    return "";
+                }
+            } else {
+                if (uri.getPathSegments().size()>1){
+                    return uri.getPathSegments().get(uri.getPathSegments().size()-1);
+                } else {
+                    return "";
+                }
+            }
+
+        }
+
+        public static String getDrinkType(Uri uri) {
+            // should never be empty - how might that work...?
             if (uri.getPathSegments().size()>1){
                 return uri.getPathSegments().get(1);
             } else {
                 return "";
             }
+        }
+
+        public static Uri buildUriWithNameAndType(String searchString, String drinkType) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE)
+                    .appendPath(drinkType)
+                    .appendPath(searchString)
+                    .build();
         }
     }
 

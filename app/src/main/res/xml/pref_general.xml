@@ -3,8 +3,8 @@
 
     <ListPreference
         android:defaultValue="@string/pref_type_generic"
-        android:entries="@array/pref_type_titles"
-        android:entryValues="@array/pref_type_values"
+        android:entries="@array/pref_type_filter_titles"
+        android:entryValues="@array/pref_type_filter_values"
         android:key="@string/pref_type_key"
         android:title="@string/pref_type_label" />
 

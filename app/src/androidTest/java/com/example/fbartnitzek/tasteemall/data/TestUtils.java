@@ -38,8 +38,21 @@ public class TestUtils {
                 "http://www.bayerischer-bahnhof.de", "Leipzig, Bayrischer Platz 1");
     }
 
+    public static ContentValues createDistilleryLaphroaig() {
+        return DatabaseHelper.buildProducerValues("2", "Laphroaig", "The most richly flavoured of all Scotch whiskies",
+                "http://www.laphroaig.com", "Port Ellen, Isle of Islay");
+    }
+
     public static ContentValues createBeerGose() {
         return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", "usual + salt + coriander", "1");
+    }
+
+    public static ContentValues createBeerSchwarzbier() {
+        return DatabaseHelper.buildDrinkValues("2", "Schwarzbier", "ABV 5%", "Schwarzbier", "beer", "usual", "1");
+    }
+
+    public static ContentValues createWhiskyLaphroaig() {
+        return DatabaseHelper.buildDrinkValues("3", "10 year old", "ABV 4.5%", "peaty", "whisky", "usual + peat", "2");
     }
 
 //    public static ContentValues createUserFrank() {

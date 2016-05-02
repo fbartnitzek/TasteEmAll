@@ -24,6 +24,7 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Producer"/>
 
         <TextView
@@ -46,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Location"/>
 
         <TextView
@@ -74,6 +76,7 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Drink"/>
 
         <TextView
@@ -96,6 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Type"/>
 
         <TextView
@@ -117,6 +121,7 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Style"/>
 
         <TextView
@@ -139,6 +144,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Specifics"/>
 
         <TextView
@@ -159,6 +165,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="ingredients"/>
 
         <TextView

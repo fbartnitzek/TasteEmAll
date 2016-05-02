@@ -69,11 +69,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_QUERY_DRINK_STYLE= 5;
     static final int COL_QUERY_DRINK_PRODUCER_NAME= 6;
     static final int COL_QUERY_DRINK_PRODUCER_LOCATION= 7;
-
+    private String mDrinkType;
 
 
     public MainFragment() {}
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -121,18 +120,22 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return rootView;
     }
 
-    public void refreshLists(String pattern) {
+    public void refreshLists(String pattern, String drinkType) {
+        Log.v(LOG_TAG, "refreshLists, hashCode=" + this.hashCode() + ", " + "pattern = [" + pattern + "], drinkType = [" + drinkType + "]");
         mSearchString = pattern;
+        mDrinkType = drinkType;
         restartLoaders();
     }
 
     private void restartLoaders() {
+        Log.v(LOG_TAG, "restartLoaders, hashCode=" + this.hashCode() + ", " + "");
         getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, this);
         getLoaderManager().restartLoader(DRINK_LOADER_ID, null, this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "onActivityCreated, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         getLoaderManager().initLoader(PRODUCER_LOADER_ID, null, this);
         getLoaderManager().initLoader(DRINK_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
@@ -140,13 +143,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onResume() {
+        Log.v(LOG_TAG, "onResume, hashCode=" + this.hashCode() + ", " + "");
         super.onResume();
-        restartLoaders();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "onCreateLoader, mSearchString=" + mSearchString + ", id = [" + id + "], args = [" + args + "]");
+        Log.v(LOG_TAG, "onCreateLoader, mSearchString=" + mSearchString + ", mDrinkType=" + mDrinkType + ", id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - insertDate?
 
         switch (id) {
@@ -160,7 +163,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 //TODO: should include producer-name... => maybe sort by drink-id
                 String sortOrder = DrinkEntry.TABLE_NAME + "." + Drink.NAME + " ASC";
                 return new CursorLoader(getActivity(),
-                        DrinkEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
+//                        DrinkEntry.buildUriWithName(mSearchString == null ? "" : mSearchString),
+                        DrinkEntry.buildUriWithNameAndType(
+                                mSearchString == null ? "" : mSearchString,
+                                mDrinkType == null ? "All" : mDrinkType),
                         DRINK_WITH_PRODUCER_QUERY_COLUMNS,
                         null, null,
                         sortOrder);

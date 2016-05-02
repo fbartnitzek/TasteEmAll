@@ -2,14 +2,14 @@ package com.example.fbartnitzek.tasteemall;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,7 +111,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                 } else {
                     super.setViewText(v, text);
                 }
-
             }
         };
 
@@ -146,11 +145,12 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
         mEditDrinkName = (EditText) mRootView.findViewById(R.id.drink_name);
         mSpinnerDrinkType = (Spinner) mRootView.findViewById(R.id.drink_type);
+
         // fill type with drink_type from settings
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String drinkType = prefs.getString(getString(R.string.pref_type_key), getString(R.string.pref_type_generic));
+        String drinkType = Utils.getDrinkTypeFromSharedPrefs(getActivity(), false);
 
         String[] drinkTypes = getActivity().getResources().getStringArray(R.array.pref_type_values);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
@@ -215,7 +215,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                         drinkName,
                         mEditDrinkSpecifics.getText().toString(),
                         mEditDrinkStyle.getText().toString(),
-                        mSpinnerDrinkType.getItemAtPosition(mSpinnerDrinkType.getSelectedItemPosition()).toString(),
+                        mSpinnerDrinkType.getItemAtPosition(
+                                mSpinnerDrinkType.getSelectedItemPosition()).toString(),
                         mEditDrinkIngredients.getText().toString(),
                         mProducerId
                 )
@@ -237,7 +238,21 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + mSpinnerDrinkType.getItemAtPosition(position).toString() + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+        String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
+        Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+        // just a bit wrong - resets all to generic...
+        // TODO: AddDrinkFragment needs Toolbar for best implementation
+        Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
+        int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
+        String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(
+                    getString(R.string.title_add_drink_activity,
+                            readableDrinkType));
+        }
+        ((TextView) mRootView.findViewById(R.id.drink_label)).setText(readableDrinkType);
+
     }
 
     @Override

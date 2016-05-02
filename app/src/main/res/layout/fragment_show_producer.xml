@@ -19,6 +19,7 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Producer"/>
 
         <TextView
@@ -41,6 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Location"/>
 
         <TextView
@@ -61,6 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Website"/>
 
         <TextView
@@ -82,6 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="40dp"
+            android:paddingEnd="40dp"
             android:text="Description"/>
 
         <TextView

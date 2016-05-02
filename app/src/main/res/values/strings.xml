@@ -4,16 +4,28 @@
     <string name="title_activity_producer">ProducerActivity</string>
 
     <string name="title_add_producer_activity">add producer</string>
-    <string name="title_add_drink_activity">add drink</string>
+    <string name="title_add_drink_activity">add a <xliff:g id="producer">%1$s</xliff:g></string>
 
     <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
     <string name="search_title">search</string>
     <string name="search_hint">you may search a drink,, a producer or a producer-location</string>
 
+    <string name="drink_show_generic">Drink</string>
+    <string name="drink_show_coffee">Coffee</string>
+    <string name="drink_show_wine">Wine</string>
+    <string name="drink_show_beer">Beer</string>
+    <string name="drink_show_whisky">Whisk(e)y</string>
+    <string name="drink_key_generic">generic</string>
+    <string name="drink_key_coffee">coffee</string>
+    <string name="drink_key_wine">wine</string>
+    <string name="drink_key_beer">beer</string>
+    <string name="drink_key_whisky">whisky</string>
 
     <string name="pref_type_generic">generic</string>
+    <string name="pref_type_all">all</string>
     <string name="pref_type_label">Type of drink</string>
     <string name="pref_type_key">drink_type</string>
+    <string name="show_drink_title"><xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g></string>
 
 
 </resources>

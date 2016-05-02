@@ -67,6 +67,7 @@ public class SettingsActivity extends PreferenceActivity {
                 if (prefIndex >= 0) {
                     preference.setSummary(listPreference.getEntries()[prefIndex]);
                 }
+
 //        } else if (getString(R.string.pref_location_key).equals(key)) {
 //            @SunshineSyncAdapter.LocationStatus int status = Utility.getLocationStatus(this);
 //            switch (status) {

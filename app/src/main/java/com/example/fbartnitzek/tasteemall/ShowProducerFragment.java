@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -116,7 +117,10 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             mProducerWebsiteView.setText(website);
             String desciption = data.getString(COL_PRODUCER_DESCRIPTION);
             mProducerDescriptionView.setText(desciption);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(name);
+            ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (supportActionBar != null) {
+                supportActionBar.setTitle(name);
+            }
             Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + desciption+ "]");
         }
     }

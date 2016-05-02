@@ -1,8 +1,12 @@
 package com.example.fbartnitzek.tasteemall;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
@@ -46,6 +50,53 @@ public class Utils {
 
     public static String calcDrinkId(String drinkName, String producerName) {
         return "producer_" + producerName + "_;drink_" + drinkName;
+    }
+
+    public static int getDrinkTypeIndexFromSharedPrefs(Context context, boolean isFilter) {
+        // TODO: currently kind of wrong way around :-p
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String drinkType = prefs.getString(
+                context.getString(R.string.pref_type_key),
+                context.getString(R.string.pref_type_generic));
+        int drinkIndex = getDrinkTypeIndex(context, drinkType);
+        if (isFilter) {
+            return drinkIndex;
+        } else {
+            return Drink.TYPE_ALL.equals(drinkType) ? R.string.drink_key_generic : drinkIndex;
+        }
+    }
+
+    private static int getDrinkTypeIndex(Context context, String drinkType) {
+        if (context.getString(R.string.drink_key_beer).equals(drinkType)) {
+            return R.string.drink_key_beer;
+        } else if (context.getString(R.string.drink_key_coffee).equals(drinkType)) {
+            return R.string.drink_key_coffee;
+        } else if (context.getString(R.string.drink_key_whisky).equals(drinkType)) {
+            return R.string.drink_key_whisky;
+        } else if (context.getString(R.string.drink_key_wine).equals(drinkType)){
+            return R.string.drink_key_wine;
+        } else {
+            return R.string.drink_key_generic;
+        }
+    }
+
+    public static String getDrinkTypeFromSharedPrefs(Context context, boolean isFilter) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String drinkType = prefs.getString(
+                context.getString(R.string.pref_type_key),
+                context.getString(R.string.pref_type_generic));
+        if (isFilter) {
+            return drinkType;
+        } else {
+            return Drink.TYPE_ALL.equals(drinkType) ? Drink.TYPE_GENERIC : drinkType;
+        }
+    }
+
+    public static void setSharedPrefsDrinkType(Context context, String drinkType) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putString(context.getString(R.string.pref_type_key), drinkType);
+        spe.apply();
     }
 
     public static ContentValues getContentValues(Producer producer) {
@@ -99,4 +150,19 @@ public class Utils {
 ////        return new Location(country, Double.toString(latitude), "location_" + locationString, Double.toString(longitude), postalCode, locality, route, formattedAddress);
     }
 
+    public static int getDrinkName(int drinkType) {
+
+        switch (drinkType) {
+            case R.string.drink_key_beer:
+                return R.string.drink_show_beer;
+            case R.string.drink_key_coffee:
+                return R.string.drink_show_coffee;
+            case R.string.drink_key_whisky:
+                return R.string.drink_show_whisky;
+            case R.string.drink_key_wine:
+                return R.string.drink_show_wine;
+            default:
+                return R.string.drink_show_generic;
+        }
+    }
 }

@@ -25,6 +25,9 @@ public class Drink {
     public static final String TYPE = "drink_type";
     public static final String INGREDIENTS = "drink_ingredients";
 
+    public static final String TYPE_ALL = "all";
+    public static final String TYPE_GENERIC = "generic";
+
     public static final String PRODUCER_ID = "drink_producer_id";
 
     private String drinkId;

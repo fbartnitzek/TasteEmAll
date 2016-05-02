@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,14 +122,23 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-            mProducerNameView.setText(data.getString(COL_QUERY_DRINK_PRODUCER_NAME));
+
+            String producerName = data.getString(COL_QUERY_DRINK_PRODUCER_NAME);
+            mProducerNameView.setText(producerName);
             mProducerLocationView.setText(data.getString(COL_QUERY_DRINK_PRODUCER_LOCATION));
 
-            mDrinkNameView.setText(data.getString(COL_QUERY_DRINK_NAME));
+            String drinkName = data.getString(COL_QUERY_DRINK_NAME);
+            mDrinkNameView.setText(drinkName);
             mDrinkTypeView.setText(data.getString(COL_QUERY_DRINK_TYPE));
             mDrinkStyleView.setText(data.getString(COL_QUERY_DRINK_STYLE));
             mDrinkSpecificsView.setText(data.getString(COL_QUERY_DRINK_SPECIFICS));
             mDrinkIngredientsView.setText(data.getString(COL_QUERY_DRINK_INGREDIENTS));
+
+            ActionBar toolbar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (toolbar != null) {
+                toolbar.setTitle(getActivity().getString(
+                        R.string.show_drink_title, producerName, drinkName));
+            }
         }
     }
 
