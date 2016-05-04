@@ -26,6 +26,11 @@
     <string name="pref_type_label">Type of drink</string>
     <string name="pref_type_key">drink_type</string>
     <string name="show_drink_title"><xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g></string>
+    <string name="producer_show_beer">Brewery</string>
+    <string name="producer_show_coffee">Coffee Roaster</string>
+    <string name="producer_show_whisky">Distillery</string>
+    <string name="producer_show_wine">Winery</string>
+    <string name="producer_show_generic">Producer</string>
 
 
 </resources>

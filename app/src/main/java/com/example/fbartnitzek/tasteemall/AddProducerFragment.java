@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,7 +78,28 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
 
+        initToolbar();
+
         return mRootView;
+    }
+
+    public void initToolbar() {
+        // toolbar NOT  at first
+        Log.v(LOG_TAG, "initToolbar, hashCode=" + this.hashCode() + ", " + "");
+        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            activity.setSupportActionBar(toolbar);
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
+            String readableProducer = getString(Utils.getProducerName(drinkType));
+            activity.getSupportActionBar().setTitle(
+                    getString(R.string.title_add_drink_activity,
+                            readableProducer));
+        } else {
+            Log.v(LOG_TAG, "initToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
     }
 
 
@@ -93,13 +116,11 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.fab_save) {
-            insertData();
-        }
+        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
     }
-// TODO: on save: close keyboard and go to parent activity/fragment
+
     //TODO: async task
-    private void insertData() {
+    void insertData() {
 
         String producerName = mEditProducerName.getText().toString();
         Uri insertProducerUri = getActivity().getContentResolver().insert(
@@ -113,20 +134,14 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         );
 
         if (insertProducerUri != null) {
-//            Snackbar.make(mRootView, "Created new producer " + producerName,
-//                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
             Intent output = new Intent();
             output.setData(insertProducerUri);
-//            output.putExtra(AddProducerActivity.PRODUCER_URI, insertProducerUri);
             getActivity().setResult(AddProducerActivity.RESULT_OK, output);
             getActivity().finish();
         } else {
             Snackbar.make(mRootView, "Creating new producer " + producerName + " didn't work...",
                     Snackbar.LENGTH_SHORT).setAction("Action", null).show();
         }
-
-
-
 
     }
 
@@ -137,4 +152,5 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     public void setProducerName(String producerName) {
         this.mProducerName = producerName;
     }
+
 }

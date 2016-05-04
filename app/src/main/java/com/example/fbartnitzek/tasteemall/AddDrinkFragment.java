@@ -140,8 +140,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
 
         mRootView.findViewById(R.id.add_producer_button).setOnClickListener(this);
-        mRootView.findViewById(R.id.fab_save).setOnClickListener(this);
-
 
         mEditDrinkName = (EditText) mRootView.findViewById(R.id.drink_name);
         mSpinnerDrinkType = (Spinner) mRootView.findViewById(R.id.drink_type);
@@ -183,16 +181,13 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             case R.id.add_producer_button:
                 createProducer();
                 break;
-            case R.id.fab_save:
-                insertData();
-                break;
             default:
                 Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "useless view = [" + view + "]");
         }
     }
 
     //TODO: async task
-    private void insertData() {
+    void insertData() {
         Log.v(LOG_TAG, "insertData, hashCode=" + this.hashCode() + ", " + "");
 
         String drinkName = mEditDrinkName.getText().toString();
@@ -221,8 +216,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         );
 
         if (drinkUri != null) {
-//            Snackbar.make(mRootView, "Created new drink " + drinkName,
-//                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
             Intent output = new Intent();
             output.setData(drinkUri);
             getActivity().setResult(Activity.RESULT_OK, output);
@@ -244,7 +237,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             Uri producerUri = data.getData();
             updateProvider(producerUri);
         }
-//        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void createProducer() {

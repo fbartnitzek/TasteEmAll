@@ -2,13 +2,15 @@ package com.example.fbartnitzek.tasteemall;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class AddProducerActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddProducerActivity.class.getName();
     public static final String PRODUCER_NAME_EXTRA = "producer_name_extra";
+    private static final String ADD_PRODUCER_FRAGMENT_TAG = "ADD_PRODUCER_FRAGMENT_TAG";
 
 
     @Override
@@ -17,36 +19,62 @@ public class AddProducerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_producer);
 
-        // use name from calling activity...
-        AddProducerFragment addProducerFragment;
-        if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
-            addProducerFragment = AddProducerFragment.newInstance(
-                    getIntent().getStringExtra(PRODUCER_NAME_EXTRA)
-            );
-        } else {
-            addProducerFragment = AddProducerFragment.newInstance();
-        }
+        // explicitly add fragment with pattern
+        if (findViewById(R.id.fragment_container) != null) {
 
-        if (savedInstanceState == null) {
-            Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", new fragment");
+            if (savedInstanceState != null) {   // no overlapping fragments on return
+                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+                return;
+            }
+
+            AddProducerFragment addProducerFragment;
+
+            // use name from calling activity
+            if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
+                addProducerFragment = AddProducerFragment.newInstance(
+                        getIntent().getStringExtra(PRODUCER_NAME_EXTRA)
+                );
+            } else {
+                addProducerFragment = AddProducerFragment.newInstance();
+            }
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.add_container, addProducerFragment)
+                    .add(R.id.fragment_container, addProducerFragment, ADD_PRODUCER_FRAGMENT_TAG)
                     .commit();
         } else {
-            Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", fragment should already exist");
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // add toolbar from fragment (if view is initialized
 
-        if (getSupportActionBar() != null) {
-            Log.v(LOG_TAG, "onCreate - supportActionBar ready, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
+    }
 
-        } else {
-            Log.v(LOG_TAG, "onCreate - supportActionBar not ready... , hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
+        getMenuInflater().inflate(R.menu.menu_add, menu);
+        return true;
+    }
+
+    private AddProducerFragment getFragment() {
+        return (AddProducerFragment) getSupportFragmentManager().findFragmentByTag(ADD_PRODUCER_FRAGMENT_TAG);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_save:
+                AddProducerFragment fragment = getFragment();
+                if (fragment != null) {
+                    Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                    fragment.insertData();
+                }
+                break;
+            default:
+                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
+
+        return super.onOptionsItemSelected(item);
     }
 }

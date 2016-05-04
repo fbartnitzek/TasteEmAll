@@ -165,4 +165,19 @@ public class Utils {
                 return R.string.drink_show_generic;
         }
     }
+
+    public static int getProducerName(int drinkType) {
+        switch (drinkType) {
+            case R.string.drink_key_beer:
+                return R.string.producer_show_beer;
+            case R.string.drink_key_coffee:
+                return R.string.producer_show_coffee;
+            case R.string.drink_key_whisky:
+                return R.string.producer_show_whisky;
+            case R.string.drink_key_wine:
+                return R.string.producer_show_wine;
+            default:
+                return R.string.producer_show_generic;
+        }
+    }
 }
