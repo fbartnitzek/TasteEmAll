@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -21,8 +20,6 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
-
-import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -85,7 +82,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
                 Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
-                Snackbar.make(rootView, producerName + " clicked ...", LENGTH_SHORT).show();
+//                Snackbar.make(rootView, producerName + " clicked ...", LENGTH_SHORT).show();
 
                 Intent intent = new Intent(getActivity(), ShowProducerActivity.class)
                         .setData(contentUri);
@@ -97,7 +94,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder viewHolder) {
                 Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
-                Snackbar.make(rootView, drinkName + " clicked...", LENGTH_SHORT).show();
+//                Snackbar.make(rootView, drinkName + " clicked...", LENGTH_SHORT).show();
 
 
                 Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)

@@ -113,8 +113,8 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         );
 
         if (insertProducerUri != null) {
-            Snackbar.make(mRootView, "Created new producer " + producerName,
-                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+//            Snackbar.make(mRootView, "Created new producer " + producerName,
+//                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
             Intent output = new Intent();
             output.setData(insertProducerUri);
 //            output.putExtra(AddProducerActivity.PRODUCER_URI, insertProducerUri);

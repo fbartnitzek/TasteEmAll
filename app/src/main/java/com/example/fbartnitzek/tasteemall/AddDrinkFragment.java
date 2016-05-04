@@ -221,8 +221,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         );
 
         if (drinkUri != null) {
-            Snackbar.make(mRootView, "Created new drink " + drinkName,
-                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+//            Snackbar.make(mRootView, "Created new drink " + drinkName,
+//                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
             Intent output = new Intent();
             output.setData(drinkUri);
             getActivity().setResult(Activity.RESULT_OK, output);
@@ -289,7 +289,9 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             mProducerId = cursor.getString(COL_QUERY_PRODUCER_ID);
             mProducerName = cursor.getString(COL_QUERY_PRODUCER_NAME);
             Log.v(LOG_TAG, "updateProvider, mProducerName=" + mProducerName + ", hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
+
             mEditCompletionProducerName.setText(mProducerName);
+            mEditCompletionProducerName.dismissDropDown();
         }
 
     }
