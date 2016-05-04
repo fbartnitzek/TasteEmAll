@@ -1,6 +1,7 @@
 package com.example.fbartnitzek.tasteemall;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -111,8 +112,22 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                         mEditProducerLocation.getText().toString())
         );
 
-        Snackbar.make(mRootView, "Created new entry " + producerName,
-                Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        if (insertProducerUri != null) {
+            Snackbar.make(mRootView, "Created new producer " + producerName,
+                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            Intent output = new Intent();
+            output.setData(insertProducerUri);
+//            output.putExtra(AddProducerActivity.PRODUCER_URI, insertProducerUri);
+            getActivity().setResult(AddProducerActivity.RESULT_OK, output);
+            getActivity().finish();
+        } else {
+            Snackbar.make(mRootView, "Creating new producer " + producerName + " didn't work...",
+                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        }
+
+
+
+
     }
 
     public String getProducerName() {

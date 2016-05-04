@@ -1,6 +1,8 @@
 package com.example.fbartnitzek.tasteemall;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,6 +25,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     private static final String LOG_TAG = MainActivity.class.getName();
+    private static final int ADD_DRINK_REQUEST = 555;
 
 
     private Spinner mSpinnerType;
@@ -153,9 +156,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v.getId() == R.id.fab_add){
             // TODO: twoPane-mode and maybe some other stuff
             Intent intent = new Intent(this, AddDrinkActivity.class);
+//            startActivity(intent);
+            startActivityForResult(intent, ADD_DRINK_REQUEST);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        if (requestCode == ADD_DRINK_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+
+            Uri drinkUri = data.getData();
+            Intent intent = new Intent(this, ShowDrinkActivity.class)
+                    .setData(drinkUri);
             startActivity(intent);
         }
 
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private String getSelectedDrinkType() {

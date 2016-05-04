@@ -1,8 +1,10 @@
 package com.example.fbartnitzek.tasteemall;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -32,7 +34,7 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
  */
 public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
-    private String mFilter = "";
+    public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
 
     private static AutoCompleteTextView mEditCompletionProducerName;
     private static EditText mEditDrinkName;
@@ -63,6 +65,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     private String mProducerName;
     private int mProducer_Id;
     private String mProducerId;
+    private String mFilter = "";
 
     public AddDrinkFragment() {
         // Required empty public constructor
@@ -115,9 +118,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         };
 
         mEditCompletionProducerName.setAdapter(mAdapter);
-        //both do not apply for select-item-clicks
-//        mEditCompletionProducerName.setOnClickListener(this);
-//        mEditCompletionProducerName.setOnItemSelectedListener(this);
 
         mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             @Override
@@ -206,9 +206,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             return;
         }
 
-        // TODO: store id on query...
-
-        getActivity().getContentResolver().insert(
+        Uri drinkUri = getActivity().getContentResolver().insert(
                 DatabaseContract.DrinkEntry.CONTENT_URI,
                 DatabaseHelper.buildDrinkValues(
                         Utils.calcDrinkId(drinkName, mProducerName),
@@ -222,9 +220,31 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                 )
         );
 
-        Snackbar.make(mRootView, "Created new entry " + drinkName,
-                Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        if (drinkUri != null) {
+            Snackbar.make(mRootView, "Created new drink " + drinkName,
+                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            Intent output = new Intent();
+            output.setData(drinkUri);
+            getActivity().setResult(Activity.RESULT_OK, output);
+            getActivity().finish();
+        } else {
+            Snackbar.make(mRootView, "Creating new entry " + drinkName + " didn't work ...",
+                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        }
 
+
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        if (requestCode == PRODUCER_ACTIVITY_REQUEST_CODE &&
+                resultCode == Activity.RESULT_OK && data != null) {
+            Uri producerUri = data.getData();
+            updateProvider(producerUri);
+        }
+//        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void createProducer() {
@@ -233,7 +253,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         // use pre filled name
         intent.putExtra(AddProducerActivity.PRODUCER_NAME_EXTRA,
                 mEditCompletionProducerName.getText().toString());
-        startActivity(intent);
+        startActivityForResult(intent, PRODUCER_ACTIVITY_REQUEST_CODE);
     }
 
     @Override
@@ -258,6 +278,20 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
+    }
+
+    public void updateProvider(Uri producerUri) {
+
+        Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
+        Cursor cursor = getActivity().getContentResolver().query(producerUri, PRODUCER_QUERY_COLUMNS, null, null, null);
+        if (cursor.moveToFirst()) {
+            mProducer_Id = cursor.getInt(COL_QUERY_PRODUCER__ID);
+            mProducerId = cursor.getString(COL_QUERY_PRODUCER_ID);
+            mProducerName = cursor.getString(COL_QUERY_PRODUCER_NAME);
+            Log.v(LOG_TAG, "updateProvider, mProducerName=" + mProducerName + ", hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
+            mEditCompletionProducerName.setText(mProducerName);
+        }
+
     }
 
 
