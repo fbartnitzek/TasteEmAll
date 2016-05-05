@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/fragment_add_producer">
+    tools:showIn="@layout/fragment_show_producer">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,29 +13,28 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:text="Producer"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/label_producer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="8dp"
+                android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Name"/>
+                android:text="Producer"/>
 
-            <EditText
+            <TextView
                 android:id="@+id/producer_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="8dp"
+                android:text="testName"/>
         </LinearLayout>
 
         <LinearLayout
@@ -47,32 +44,18 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:id="@+id/label_producer_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingEnd="40dp"
                 android:paddingRight="40dp"
                 android:text="Location"/>
 
-            <EditText
-                android:id="@+id/producer_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
             <TextView
+                android:id="@+id/producer_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:text="Website"/>
-
-            <EditText
-                android:id="@+id/producer_website"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:text="TestLocation"/>
         </LinearLayout>
 
         <LinearLayout
@@ -82,16 +65,43 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:id="@+id/label_producer_website"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="description"/>
+                android:text="Website"/>
 
-            <EditText
+            <TextView
+                android:id="@+id/producer_website"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NO website"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:id="@+id/label_producer_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp"
+                android:paddingRight="40dp"
+                android:text="Description"/>
+
+            <TextView
                 android:id="@+id/producer_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EMPTY description"/>
         </LinearLayout>
 
     </LinearLayout>
+
 </android.support.v4.widget.NestedScrollView>
+

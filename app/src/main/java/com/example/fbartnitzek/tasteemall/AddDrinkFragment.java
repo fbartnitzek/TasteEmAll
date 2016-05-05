@@ -224,9 +224,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             Snackbar.make(mRootView, "Creating new entry " + drinkName + " didn't work ...",
                     Snackbar.LENGTH_SHORT).setAction("Action", null).show();
         }
-
-
-
     }
 
     @Override
@@ -251,10 +248,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        // resets all to generic - but there is no better way...
         String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
         Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
-        // just a bit wrong - resets all to generic...
-        // TODO: AddDrinkFragment needs Toolbar for best implementation
+
         Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
         int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
         String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
@@ -264,7 +262,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                     getString(R.string.title_add_drink_activity,
                             readableDrinkType));
         }
-        ((TextView) mRootView.findViewById(R.id.drink_label)).setText(readableDrinkType);
+        ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
 
     }
 

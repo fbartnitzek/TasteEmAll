@@ -66,7 +66,7 @@ public class Utils {
         }
     }
 
-    private static int getDrinkTypeIndex(Context context, String drinkType) {
+    public static int getDrinkTypeIndex(Context context, String drinkType) {
         if (context.getString(R.string.drink_key_beer).equals(drinkType)) {
             return R.string.drink_key_beer;
         } else if (context.getString(R.string.drink_key_coffee).equals(drinkType)) {

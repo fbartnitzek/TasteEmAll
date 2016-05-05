@@ -10,13 +10,14 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 
@@ -49,17 +50,19 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
     private TextView mProducerDescriptionView;
     private TextView mProducerWebsiteView;
     private Uri mUri;
+    private View mRootView;
+    private int mDrinkTypeIndex;
 
     public ShowProducerFragment() {
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
-        setHasOptionsMenu(true);    // maybe needed later...
+//        setHasOptionsMenu(true);    // maybe needed later...
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreateView, " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-        View rootView = inflater.inflate(R.layout.fragment_show_producer, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_show_producer, container, false);
 
         Bundle args = getArguments();
         if (args == null){
@@ -71,12 +74,26 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             }
         }
 
-        mProducerNameView = (TextView) rootView.findViewById(R.id.producer_name);
-        mProducerLocationView = (TextView) rootView.findViewById(R.id.producer_location);
-        mProducerDescriptionView = (TextView) rootView.findViewById(R.id.producer_description);
-        mProducerWebsiteView = (TextView) rootView.findViewById(R.id.producer_website);
+        mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
+        mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
+        mProducerDescriptionView = (TextView) mRootView.findViewById(R.id.producer_description);
+        mProducerWebsiteView = (TextView) mRootView.findViewById(R.id.producer_website);
 
-        return rootView;
+        createToolbar();
+
+        return mRootView;
+    }
+
+    private void createToolbar() {
+        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            activity.setSupportActionBar(toolbar);
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            activity.getSupportActionBar().setHomeButtonEnabled(true);
+        } else {
+            Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
     }
 
     @Override
@@ -103,6 +120,22 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         return null;
     }
 
+    private void initToolbar() {
+        Log.v(LOG_TAG, "initToolbar, hashCode=" + this.hashCode() + ", " + "");
+
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+
+            // later: when called from drink you may use the drinkType - now it's ... wrong
+//            String readableProducerType = getString(Utils.getProducerName(mDrinkTypeIndex));
+            String producerName= mProducerNameView.getText().toString();
+            actionBar.setTitle(
+                    getString(R.string.title_show_producer, producerName));
+        } else {
+            Log.v(LOG_TAG, "initToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
+    }
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
@@ -115,13 +148,12 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             mProducerLocationView.setText(location);
             String website = data.getString(COL_PRODUCER_WEBSITE);
             mProducerWebsiteView.setText(website);
-            String desciption = data.getString(COL_PRODUCER_DESCRIPTION);
-            mProducerDescriptionView.setText(desciption);
-            ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-            if (supportActionBar != null) {
-                supportActionBar.setTitle(name);
-            }
-            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + desciption+ "]");
+            String description = data.getString(COL_PRODUCER_DESCRIPTION);
+            mProducerDescriptionView.setText(description);
+
+            initToolbar();
+
+            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }
     }
 

@@ -1,98 +1,20 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="16dp"
-              tools:context=".ShowProducerFragment"
-              tools:showIn="@layout/fragment_show_producer">
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ShowProducerActivity">
 
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/label_producer_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Producer"/>
+        <include
+            android:id="@+id/toolbar_layout"
+            layout="@layout/toolbar_no_spinner"/>
 
-        <TextView
-            android:id="@+id/producer_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:text="testName"/>
-    </LinearLayout>
+        <include layout="@layout/fragment_show_producer_detail"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
+    </android.support.design.widget.CoordinatorLayout>
 
-        <TextView
-            android:id="@+id/label_producer_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Location"/>
-
-        <TextView
-            android:id="@+id/producer_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TestLocation"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_producer_website"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Website"/>
-
-        <TextView
-            android:id="@+id/producer_website"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NO website"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_producer_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Description"/>
-
-        <TextView
-            android:id="@+id/producer_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="EMPTY description"/>
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

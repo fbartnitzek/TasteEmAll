@@ -1,178 +1,20 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="16dp"
-              tools:context=".ShowDrinkFragment"
-              tools:showIn="@layout/fragment_show_drink">
+<FrameLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ShowDrinkActivity">
 
-    <TextView
-        android:text="producer details"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        <include
+            android:id="@+id/toolbar_layout"
+            layout="@layout/toolbar_no_spinner"/>
 
-        <TextView
-            android:id="@+id/label_producer_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Producer"/>
+        <include layout="@layout/fragment_show_drink_detail"/>
 
-        <TextView
-            android:id="@+id/producer_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:text="testName"/>
-    </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_producer_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Location"/>
-
-        <TextView
-            android:id="@+id/producer_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TestLocation"/>
-    </LinearLayout>
-
-
-    <TextView
-        android:text="drink details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <LinearLayout
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/label_drink_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Drink"/>
-
-        <TextView
-            android:id="@+id/drink_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:text="testDrinkName"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_drink_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Type"/>
-
-        <TextView
-            android:id="@+id/drink_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="generic"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/label_drink_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Style"/>
-
-        <TextView
-            android:id="@+id/drink_style"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingBottom="8dp"
-            android:text="some style"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_drink_specifics"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="Specifics"/>
-
-        <TextView
-            android:id="@+id/drink_specifics"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="some specifics"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="32dp">
-
-        <TextView
-            android:id="@+id/label_drink_ingredients"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="40dp"
-            android:paddingEnd="40dp"
-            android:text="ingredients"/>
-
-        <TextView
-            android:id="@+id/drink_ingredients"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="some ingredients"/>
-    </LinearLayout>
-
-</LinearLayout>
+    </FrameLayout>

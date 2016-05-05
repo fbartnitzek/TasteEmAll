@@ -70,7 +70,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         mRootView = inflater.inflate(R.layout.fragment_add_producer, container, false);
 
-        mRootView.findViewById(R.id.fab_save).setOnClickListener(this);
         mEditProducerName = (EditText) mRootView.findViewById(R.id.producer_name);
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "producerName = " + mProducerName);
         mEditProducerName.setText(mProducerName);
