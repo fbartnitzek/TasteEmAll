@@ -44,4 +44,16 @@ public class DrinkFragmentHelper {
     static final int COL_QUERY_DRINK_INGREDIENTS = 7;
     static final int COL_QUERY_DRINK_PRODUCER_NAME = 8;
     static final int COL_QUERY_DRINK_PRODUCER_LOCATION = 9;
+
+
+    static final String[] PRODUCER_QUERY_COLUMNS = {
+            DatabaseContract.ProducerEntry.TABLE_NAME + "." +  DatabaseContract.ProducerEntry._ID,
+            Producer.NAME,
+            Producer.LOCATION,
+            Producer.PRODUCER_ID};
+
+    static final int COL_QUERY_PRODUCER__ID = 0;
+    static final int COL_QUERY_PRODUCER_NAME = 1;
+    static final int COL_QUERY_PRODUCER_LOCATION = 2;
+    static final int COL_QUERY_PRODUCER_ID = 3;
 }

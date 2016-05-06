@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,12 +22,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -36,7 +33,7 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,CompletionTextViewAdapter.CompletionAdapterUpdateHandler {
 
     public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
     private static final int EDIT_DRINK_LOADER_ID = 1234567;
@@ -49,23 +46,9 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     private static EditText mEditDrinkSpecifics;
     private static View mRootView;
 
-    //    private ProducerCompletionAdapter mProducerAdapter;
-    SimpleCursorAdapter mAdapter;
-
     private static final int PRODUCER_COMPLETION_LOADER_ID = 124;
 
     private static final String LOG_TAG = AddDrinkFragment.class.getName();
-
-    public static final String[] PRODUCER_QUERY_COLUMNS = {
-            ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,
-            Producer.NAME,
-            Producer.LOCATION,
-            Producer.PRODUCER_ID};
-
-    static final int COL_QUERY_PRODUCER__ID = 0;
-    static final int COL_QUERY_PRODUCER_NAME = 1;
-    static final int COL_QUERY_PRODUCER_LOCATION = 2;
-    static final int COL_QUERY_PRODUCER_ID = 3;
 
     private String mProducerName;
     private int mProducer_Id;
@@ -89,21 +72,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         return fragment;
     }
 
-
-    public Cursor getCursor(CharSequence str) {
-
-        //TODO: might produce lots of cursors...
-
-        // working with SimpleCursorAdapter - modify to Custom CursorAdapter later...
-        // Loader currently useless
-        String select = Producer.NAME + " LIKE ? ";
-        String[] selectArgs = { "%" + str + "%"};
-
-        return getActivity().getContentResolver().query(
-                ProducerEntry.CONTENT_URI, PRODUCER_QUERY_COLUMNS,
-                select, selectArgs, null);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -115,46 +83,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
         createToolbar();
 
-        mAdapter = new SimpleCursorAdapter(
+        CompletionTextViewAdapter completionAdapter = new CompletionTextViewAdapter(
                 getActivity(),
                 R.layout.list_item_producer_completion,
-                null,
                 new String[]{Producer.NAME, Producer.LOCATION},
                 new int[]{R.id.list_item_producer_name, R.id.list_item_producer_location },
-                0){
+                this);
 
-            @Override
-            public void setViewText(TextView v, String text) {
-                if (v.getId() == R.id.list_item_producer_location) {
-                    v.setText(getActivity().getString(
-                            R.string.location_completion_postfix, text));
-                } else {
-                    super.setViewText(v, text);
-                }
-            }
-        };
-
-        mEditCompletionProducerName.setAdapter(mAdapter);
-
-        mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-            @Override
-            public Cursor runQuery(CharSequence constraint) {
-                return getCursor(constraint);
-            }
-        });
-
-        mAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
-            @Override
-            public CharSequence convertToString(Cursor cursor) {
-                // TODO: really bad side effect...
-                Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
-                mProducer_Id = cursor.getInt(COL_QUERY_PRODUCER__ID);
-                mProducerId = cursor.getString(COL_QUERY_PRODUCER_ID);
-                mProducerName = cursor.getString(COL_QUERY_PRODUCER_NAME);
-                return mProducerName;
-            }
-        });
-
+        mEditCompletionProducerName.setAdapter(completionAdapter);
 
         mRootView.findViewById(R.id.add_producer_button).setOnClickListener(this);
 
@@ -392,11 +328,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     public void updateProvider(Uri producerUri) {
 
         Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
-        Cursor cursor = getActivity().getContentResolver().query(producerUri, PRODUCER_QUERY_COLUMNS, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(producerUri, DrinkFragmentHelper.PRODUCER_QUERY_COLUMNS, null, null, null);
         if (cursor.moveToFirst()) {
-            mProducer_Id = cursor.getInt(COL_QUERY_PRODUCER__ID);
-            mProducerId = cursor.getString(COL_QUERY_PRODUCER_ID);
-            mProducerName = cursor.getString(COL_QUERY_PRODUCER_NAME);
+            mProducer_Id = cursor.getInt(DrinkFragmentHelper.COL_QUERY_PRODUCER__ID);
+            mProducerId = cursor.getString(DrinkFragmentHelper.COL_QUERY_PRODUCER_ID);
+            mProducerName = cursor.getString(DrinkFragmentHelper.COL_QUERY_PRODUCER_NAME);
             Log.v(LOG_TAG, "updateProvider, mProducerName=" + mProducerName + ", hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
 
             mEditCompletionProducerName.setText(mProducerName);
@@ -472,4 +408,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
+    @Override
+    public void onUpdate(String entryName, String entryId, int entry_Id) {
+        mProducer_Id = entry_Id;
+        mProducerId = entryId;
+        mProducerName = entryName;
+    }
 }

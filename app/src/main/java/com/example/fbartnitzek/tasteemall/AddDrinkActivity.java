@@ -27,16 +27,21 @@ public class AddDrinkActivity extends AppCompatActivity {
             }
 
             // edit or add
-            AddDrinkFragment fragment;
-            if (getIntent().getData() != null) {
-                fragment = AddDrinkFragment.newInstance(getIntent().getData());
+            AddDrinkFragment fragment = getFragment();
+            if (fragment == null) {
+                if (getIntent().getData() != null) {
+                    fragment = AddDrinkFragment.newInstance(getIntent().getData());
+                } else {
+                    fragment = AddDrinkFragment.newInstance();
+                }
+
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
+                        .commit();
             } else {
-                fragment = AddDrinkFragment.newInstance();
+                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
-                    .commit();
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
@@ -66,8 +71,6 @@ public class AddDrinkActivity extends AppCompatActivity {
                 }
                 break;
             default:
-                // f.e. back button...
-//                Log.e(LOG_TAG, "onOptionsItemSelected - other option selected..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);
