@@ -33,6 +33,12 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 public class AddProducerFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EDIT_PRODUCER_LOADER_ID = 12345;
+    private static final String STATE_PRODUCER_NAME = "STATE_PRODUCER_NAME";
+    private static final String STATE_PRODUCER_LOCATION = "STATE_PRODUCER_LOCATION";
+    private static final String STATE_PRODUCER_WEBSITE = "STATE_PRODUCER_WEBSITE";
+    private static final String STATE_PRODUCER_DESCRIPTION = "STATE_PRODUCER_DESCRIPTION";
+    private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
+    private static final String STATE_PRODUCER_ID= "STATE_PRODUCER_ID";
     private static EditText mEditProducerName;
     private static EditText mEditProducerLocation;
     private static EditText mEditProducerWebsite;
@@ -74,7 +80,16 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //TODO: restore savedInstanceState with json/parcelable/cursor
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+                mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+            }
+            if (savedInstanceState.containsKey(STATE_PRODUCER_ID)) {
+                mProducerId = savedInstanceState.getString(STATE_PRODUCER_ID);
+            }
+        }
+
         super.onCreate(savedInstanceState);
     }
 
@@ -91,6 +106,13 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mEditProducerLocation = (EditText) mRootView.findViewById(R.id.producer_location);
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
+
+        if (savedInstanceState != null) {
+            mEditProducerName.setText(savedInstanceState.getString(STATE_PRODUCER_NAME));
+            mEditProducerLocation.setText(savedInstanceState.getString(STATE_PRODUCER_LOCATION));
+            mEditProducerWebsite.setText(savedInstanceState.getString(STATE_PRODUCER_WEBSITE));
+            mEditProducerDescription.setText(savedInstanceState.getString(STATE_PRODUCER_DESCRIPTION));
+        }
 
         createToolbar();
 
@@ -120,6 +142,23 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(STATE_PRODUCER_NAME, mEditProducerName.getText().toString());
+        outState.putString(STATE_PRODUCER_LOCATION, mEditProducerLocation.getText().toString());
+        outState.putString(STATE_PRODUCER_WEBSITE, mEditProducerWebsite.getText().toString());
+        outState.putString(STATE_PRODUCER_DESCRIPTION, mEditProducerDescription.getText().toString());
+
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+        if (mProducerId != null) {
+            outState.putString(STATE_PRODUCER_ID, mProducerId);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     private void updateToolbar(String producerName) {

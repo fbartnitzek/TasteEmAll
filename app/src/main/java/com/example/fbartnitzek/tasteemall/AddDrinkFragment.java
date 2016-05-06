@@ -38,6 +38,16 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
     private static final int EDIT_DRINK_LOADER_ID = 1234567;
 
+    private static final String STATE_PRODUCER_NAME = "STATE_PRODUCER_NAME";
+    private static final String STATE_PRODUCER_ID = "STATE_PRODUCER_ID";
+    private static final String STATE_PRODUCER__ID = "STATE_PRODUCER__ID";
+    private static final String STATE_DRINK_NAME = "STATE_DRINK_NAME";
+    private static final String STATE_DRINK_TYPE_POSITION = "STATE_DRINK_TYPE_POSITION";
+    private static final String STATE_DRINK_STYLE = "STATE_DRINK_STYLE";
+    private static final String STATE_DRINK_INGREDIENTS = "STATE_DRINK_INGREDIENTS";
+    private static final String STATE_DRINK_SPECIFICS = "STATE_DRINK_SPECIFICS";
+    private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
+
     private static AutoCompleteTextView mEditCompletionProducerName;
     private static EditText mEditDrinkName;
     private static Spinner mSpinnerDrinkType;
@@ -81,6 +91,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
         mEditCompletionProducerName = (AutoCompleteTextView) mRootView.findViewById(R.id.producer_name);
 
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_PRODUCER_NAME)) {
+            mEditCompletionProducerName.setText(savedInstanceState.getString(STATE_PRODUCER_NAME));
+        }
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_PRODUCER_ID)) {
+            mProducer_Id = savedInstanceState.getInt(STATE_PRODUCER__ID);
+            mProducerId = savedInstanceState.getString(STATE_PRODUCER_ID);
+        }
+
         createToolbar();
 
         CompletionTextViewAdapter completionAdapter = new CompletionTextViewAdapter(
@@ -98,7 +116,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         mSpinnerDrinkType = (Spinner) mRootView.findViewById(R.id.drink_type);
 
         // fill type with drink_type from settings
-        String drinkType = Utils.getDrinkTypeFromSharedPrefs(getActivity(), false);
 
         String[] drinkTypes = getActivity().getResources().getStringArray(R.array.pref_type_values);
 
@@ -109,7 +126,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         mDrinkTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerDrinkType.setAdapter(mDrinkTypeAdapter);
 
-        int spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
+        int spinnerPosition;
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_DRINK_TYPE_POSITION)) {
+            spinnerPosition = savedInstanceState.getInt(STATE_DRINK_TYPE_POSITION);
+        } else {
+            String drinkType = Utils.getDrinkTypeFromSharedPrefs(getActivity(), false);
+            spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
+        }
+
         if (spinnerPosition > -1) {
             mSpinnerDrinkType.setSelection(spinnerPosition);
         }
@@ -119,7 +143,36 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         mEditDrinkIngredients = (EditText) mRootView.findViewById(R.id.drink_ingredients);
         mEditDrinkSpecifics = (EditText) mRootView.findViewById(R.id.drink_specifics);
 
+        if (savedInstanceState != null) {
+            mEditDrinkName.setText(savedInstanceState.getString(STATE_DRINK_NAME));
+            mEditDrinkStyle.setText(savedInstanceState.getString(STATE_DRINK_STYLE));
+            mEditDrinkIngredients.setText(savedInstanceState.getString(STATE_DRINK_INGREDIENTS));
+            mEditDrinkSpecifics.setText(savedInstanceState.getString(STATE_DRINK_SPECIFICS));
+        }
+
         return mRootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(STATE_PRODUCER_NAME, mEditCompletionProducerName.getText().toString());
+
+        outState.putString(STATE_DRINK_NAME, mEditDrinkName.getText().toString());
+        outState.putInt(STATE_DRINK_TYPE_POSITION, mSpinnerDrinkType.getSelectedItemPosition());
+        outState.putString(STATE_DRINK_STYLE, mEditDrinkStyle.getText().toString());
+        outState.putString(STATE_DRINK_INGREDIENTS, mEditDrinkIngredients.getText().toString());
+        outState.putString(STATE_DRINK_SPECIFICS, mEditDrinkSpecifics.getText().toString());
+
+        if (mProducerId != null) {
+            outState.putString(STATE_PRODUCER_ID, mProducerId);
+            outState.putInt(STATE_PRODUCER__ID, mProducer_Id);
+        }
+
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     public void createToolbar() {
@@ -155,6 +208,13 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+                mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+            }
+        }
+
         super.onCreate(savedInstanceState);
     }
 
