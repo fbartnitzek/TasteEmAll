@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -65,11 +64,10 @@ public class ShowProducerActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-                Snackbar.make(findViewById(R.id.fragment_container),
-                        "TODO: edit...", Snackbar.LENGTH_SHORT).show();
-//                Intent intent = new Intent(this, AddProducerActivity.class);
-//                intent.setData(mContentUri);
-//                startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
+
+                Intent intent = new Intent(this, AddProducerActivity.class);
+                intent.setData(mContentUri);
+                startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
                 break;
             default:
                 Log.v(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
@@ -82,7 +80,13 @@ public class ShowProducerActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         if (requestCode == EDIT_PRODUCER_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             Uri producerUri = data.getData();
-            // TODO: update fragment
+
+            ShowProducerFragment fragment = getFragment();
+            if (fragment != null && producerUri != null) {
+                fragment.updateFragment(producerUri);
+            } else {
+                Log.v(LOG_TAG, "onActivityResult - data or fragment missing..., hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

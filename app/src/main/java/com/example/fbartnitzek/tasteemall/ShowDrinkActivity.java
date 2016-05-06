@@ -1,5 +1,8 @@
 package com.example.fbartnitzek.tasteemall;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +14,9 @@ public class ShowDrinkActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "SHOw_DRINK_TAG";
     private static final String LOG_TAG = ShowDrinkActivity.class.getName();
     public static final String EXTRA_DRINK_URI = "EXTRA_DRINK_URI";
+    private static final int EDIT_DRINK_REQUEST = 432;
+    private Uri mContentUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,9 +32,10 @@ public class ShowDrinkActivity extends AppCompatActivity {
 
             ShowDrinkFragment fragment = new ShowDrinkFragment();
 
-            if (getIntent().getData() != null) {
+            mContentUri = getIntent().getData();
+            if (mContentUri != null) {
                 Bundle args = new Bundle();
-                args.putParcelable(EXTRA_DRINK_URI, getIntent().getData());
+                args.putParcelable(EXTRA_DRINK_URI, mContentUri);
                 fragment.setArguments(args);
             } else {
                 Log.e(LOG_TAG, "onCreate - without intentData???, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -60,11 +67,32 @@ public class ShowDrinkActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+
+                Intent intent = new Intent(this, AddDrinkActivity.class);
+                intent.setData(mContentUri);
+                startActivityForResult(intent, EDIT_DRINK_REQUEST);
+
                 break;
             default:
                 Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        if (requestCode == EDIT_DRINK_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri drinkUri = data.getData();
+            ShowDrinkFragment fragment = getFragment();
+            if (fragment != null && drinkUri != null) {
+                fragment.updateFragment(drinkUri);
+            } else {
+                Log.v(LOG_TAG, "onActivityResult - data or fragment missing..., hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+            }
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

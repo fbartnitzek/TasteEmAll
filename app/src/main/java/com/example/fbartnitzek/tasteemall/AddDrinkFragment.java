@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,14 +30,16 @@ import android.widget.TextView;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
+    private static final int EDIT_DRINK_LOADER_ID = 1234567;
 
     private static AutoCompleteTextView mEditCompletionProducerName;
     private static EditText mEditDrinkName;
@@ -66,6 +71,9 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     private int mProducer_Id;
     private String mProducerId;
     private String mFilter = "";
+    private Uri mContentUri = null;
+    private String mDrinkId = null;
+    private ArrayAdapter<String> mDrinkTypeAdapter;
 
     public AddDrinkFragment() {
         // Required empty public constructor
@@ -74,6 +82,13 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     public static AddDrinkFragment newInstance() {
         return new AddDrinkFragment();
     }
+
+    public static AddDrinkFragment newInstance(Uri contentUri) {
+        AddDrinkFragment fragment = new AddDrinkFragment();
+        fragment.setContentUri(contentUri);
+        return fragment;
+    }
+
 
     public Cursor getCursor(CharSequence str) {
 
@@ -97,6 +112,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         mRootView = inflater.inflate(R.layout.fragment_add_drink, container, false);
 
         mEditCompletionProducerName = (AutoCompleteTextView) mRootView.findViewById(R.id.producer_name);
+
+        createToolbar();
 
         mAdapter = new SimpleCursorAdapter(
                 getActivity(),
@@ -149,14 +166,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
         String[] drinkTypes = getActivity().getResources().getStringArray(R.array.pref_type_values);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        mDrinkTypeAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
                 drinkTypes);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerDrinkType.setAdapter(adapter);
+        mDrinkTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerDrinkType.setAdapter(mDrinkTypeAdapter);
 
-        int spinnerPosition = adapter.getPosition(drinkType);
+        int spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
         if (spinnerPosition > -1) {
             mSpinnerDrinkType.setSelection(spinnerPosition);
         }
@@ -169,10 +186,52 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         return mRootView;
     }
 
+    public void createToolbar() {
+        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
+        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            activity.setSupportActionBar(toolbar);
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
+            String readableDrink = getString(Utils.getDrinkName(drinkType));
+
+            if (mContentUri != null) {
+                Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
+                activity.getSupportActionBar().setTitle(
+                        getString(R.string.title_edit_drink_activity_preview,
+                                readableDrink));
+            } else {
+                Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
+                activity.getSupportActionBar().setTitle(
+                        getString(R.string.title_add_drink_activity,
+                                readableDrink));
+            }
+
+        } else {
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
+    }
+
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+
+        if (mContentUri != null) {
+            Log.v(LOG_TAG, "onActivityCreated with contentUri - edit, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            getLoaderManager().initLoader(EDIT_DRINK_LOADER_ID, null, this);
+        } else {
+            Log.v(LOG_TAG, "onActivityCreated without contentUri - add, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+        }
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -187,8 +246,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     }
 
     //TODO: async task
-    void insertData() {
-        Log.v(LOG_TAG, "insertData, hashCode=" + this.hashCode() + ", " + "");
+    void saveData() {
+        Log.v(LOG_TAG, "saveData, hashCode=" + this.hashCode() + ", " + "");
 
         String drinkName = mEditDrinkName.getText().toString();
 
@@ -201,10 +260,60 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             return;
         }
 
-        Uri drinkUri = getActivity().getContentResolver().insert(
+        Uri drinkUri;
+        if (mContentUri != null) {
+            drinkUri = updateData(drinkName);
+        } else {
+            drinkUri = insertData(drinkName);
+        }
+
+        if (drinkUri != null) {
+            Intent output = new Intent();
+            output.setData(drinkUri);
+            getActivity().setResult(Activity.RESULT_OK, output);
+            getActivity().finish();
+        } else {
+            if (mContentUri != null) {
+                Snackbar.make(mRootView, "Updating drink " + drinkName + " didn't work ...",
+                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            } else {
+                Snackbar.make(mRootView, "Creating new entry " + drinkName + " didn't work ...",
+                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            }
+
+        }
+    }
+
+    private Uri updateData(String drinkName) {
+        String[] selectionArgs = new String[]{mDrinkId};
+        String where = DatabaseContract.DrinkEntry.TABLE_NAME + "." + Drink.DRINK_ID + " = ?";
+        int rows = getActivity().getContentResolver().update(
                 DatabaseContract.DrinkEntry.CONTENT_URI,
                 DatabaseHelper.buildDrinkValues(
-                        Utils.calcDrinkId(drinkName, mProducerName),
+                        mDrinkId,
+                        drinkName,
+                        mEditDrinkSpecifics.getText().toString(),
+                        mEditDrinkStyle.getText().toString(),
+                        mSpinnerDrinkType.getItemAtPosition(
+                                mSpinnerDrinkType.getSelectedItemPosition()).toString(),
+                        mEditDrinkIngredients.getText().toString(),
+                        mProducerId),
+                where,
+                selectionArgs);
+
+        if (rows < 1) {
+            return null;
+        } else {
+            return mContentUri;
+        }
+    }
+
+
+    private Uri insertData(String drinkName) {
+        return getActivity().getContentResolver().insert(
+                DatabaseContract.DrinkEntry.CONTENT_URI,
+                DatabaseHelper.buildDrinkValues(
+                        Utils.calcDrinkId(drinkName, mProducerId),
                         drinkName,
                         mEditDrinkSpecifics.getText().toString(),
                         mEditDrinkStyle.getText().toString(),
@@ -214,17 +323,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                         mProducerId
                 )
         );
-
-        if (drinkUri != null) {
-            Intent output = new Intent();
-            output.setData(drinkUri);
-            getActivity().setResult(Activity.RESULT_OK, output);
-            getActivity().finish();
-        } else {
-            Snackbar.make(mRootView, "Creating new entry " + drinkName + " didn't work ...",
-                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-        }
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -256,14 +356,32 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
         int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
         String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
-        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setTitle(
-                    getString(R.string.title_add_drink_activity,
-                            readableDrinkType));
+
+        if (mContentUri == null) {  //just update for new drinks, ignore for edits
+            updateToolbar(readableDrinkType, null);
         }
+
         ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
 
+    }
+
+    private void updateToolbar(String drinkNameOrDrinkType, String producerName) {
+        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+
+        if (activity.getSupportActionBar()!= null) {
+            if (mContentUri != null) {  // edit
+                activity.getSupportActionBar().setTitle(
+                        getString(R.string.title_edit_drink_activity,
+                                drinkNameOrDrinkType, producerName));
+            } else {    // add
+                activity.getSupportActionBar().setTitle(
+                        getString(R.string.title_add_drink_activity,
+                                drinkNameOrDrinkType));
+            }
+        } else {
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
+        }
     }
 
     @Override
@@ -287,69 +405,71 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
 
     }
 
+    public void setContentUri(Uri contentUri) {
+        this.mContentUri = contentUri;
+    }
 
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        Log.v(LOG_TAG, "onItemSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
-//        switch (view.getId()) {
-//            case R.id.producer_name:
-//                if (mAdapter != null && mAdapter.getCursor() != null) {
-//                    int currentPos = mAdapter.getCursor().getPosition();
-//                    Log.v(LOG_TAG, "onItemSelected, hashCode=" + this.hashCode() + ", currentCursorPosition=" + currentPos + "], position = [" + position + "], id = [" + id + "]");
-//                    mProducerName = mAdapter.getCursor().getString(COL_QUERY_PRODUCER_NAME);
-//                    mProducer_Id = mAdapter.getCursor().getInt(COL_QUERY_PRODUCER__ID);
-//                    mProducerId = mAdapter.getCursor().getString(COL_QUERY_PRODUCER_ID);
-//                    Log.v(LOG_TAG, "onClick, prodName: " + mProducerName + ", prodId: " + mProducerId + ", hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
-//                    mEditCompletionProducerName.setText(mProducerName);
-//                }
-//                break;
-//            default:
-//                Log.v(LOG_TAG, "onItemSelected - something other selected..., hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
-//        }
-//    }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+        switch (id) {
+            case EDIT_DRINK_LOADER_ID:
+                if (mContentUri != null) {
+                    return new CursorLoader(
+                            getActivity(),
+                            mContentUri,
+                            DrinkFragmentHelper.DETAIL_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
+        }
 
+        return null;
+    }
 
-//
-//    @Override
-//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
-//        switch (id) {
-//            case PRODUCER_COMPLETION_LOADER_ID:
-//                Uri searchUri = ProducerEntry.buildUriWithName(mFilter == null ? "" : mFilter);
-//                return new CursorLoader(getActivity(),
-//                        searchUri,
-//                        PRODUCER_QUERY_COLUMNS,
-//                        null, null,
-//                        ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC");
-//        }
-//        return null;
-//    }
-//
-//    @Override
-//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-////        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
-//        switch (loader.getId()) {
-//            case PRODUCER_COMPLETION_LOADER_ID:
-//
-//                if (data != null) {
-//                    Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "data.closed() = [" + data.isClosed() + "]" + ", " + "data.count() = [" + data.getCount() + "]" + ", " + "data.getColumnCount() = [" + data.getColumnCount() + "]");
-//                }
-//
-//                //confusing and seems wrong...
-////                mProducerAdapter = new ProducerCompletionAdapter(getActivity(), data, false);
-////                mEditCompletionProducerName.setAdapter(mProducerAdapter);
-//
-////                mProducerAdapter.swapCursor(data);
-//
-//                break;
-//        }
-//    }
-//
-//    @Override
-//    public void onLoaderReset(Loader<Cursor> loader) {
-//        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
-//        // seems useless...
-////        mProducerAdapter.swapCursor(null);
-//
-//    }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+
+        switch (loader.getId()) {
+            case EDIT_DRINK_LOADER_ID:
+                if (data != null && data.moveToFirst()) {
+                    // variables not really needed - optimize later...
+                    mProducerName= data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_NAME);
+                    String drinkName= data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_NAME);
+                    mDrinkId = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_ID);
+                    mProducerId = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_ID);
+                    String drinkStyle = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_STYLE);
+                    String drinkIngredients = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_INGREDIENTS);
+                    String drinkSpecifics = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_SPECIFICS);
+                    String drinkType = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_TYPE);
+
+                    mEditCompletionProducerName.setText(mProducerName);
+                    mEditCompletionProducerName.dismissDropDown();
+                    mEditDrinkName.setText(drinkName);
+                    mEditDrinkStyle.setText(drinkStyle);
+                    mEditDrinkIngredients.setText(drinkIngredients);
+                    mEditDrinkSpecifics.setText(drinkSpecifics);
+                    int spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
+                    if (spinnerPosition > -1) {
+                        mSpinnerDrinkType.setSelection(spinnerPosition);
+                    }
+
+                    updateToolbar(drinkName, mProducerName);
+
+                    Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+                }
+                break;
+            default:
+                Log.e(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+    }
+
 }

@@ -18,10 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
-import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,27 +25,6 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = ShowDrinkFragment.class.getName();
-
-    private static final String[] DETAIL_COLUMNS = {
-            DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursurAdapter doesn't work
-            Drink.NAME,
-            Drink.PRODUCER_ID,
-            Drink.TYPE,
-            Drink.SPECIFICS,
-            Drink.STYLE,
-            Drink.INGREDIENTS,
-            Producer.NAME,
-            Producer.LOCATION};
-
-    static final int COL_QUERY_DRINK__ID = 0;
-    static final int COL_QUERY_DRINK_NAME = 1;
-    static final int COL_QUERY_DRINK_PRODUCER_ID = 2;
-    static final int COL_QUERY_DRINK_TYPE = 3;
-    static final int COL_QUERY_DRINK_SPECIFICS = 4;
-    static final int COL_QUERY_DRINK_STYLE = 5;
-    static final int COL_QUERY_DRINK_INGREDIENTS = 6;
-    static final int COL_QUERY_DRINK_PRODUCER_NAME = 7;
-    static final int COL_QUERY_DRINK_PRODUCER_LOCATION = 8;
 
     public static final int SHOW_DRINK_LOADER_ID = 21;
 
@@ -71,7 +46,6 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
 
     public ShowDrinkFragment() {
         Log.v(LOG_TAG, "ShowDrinkFragment, hashCode=" + this.hashCode() + ", " + "");
-//        setHasOptionsMenu(true);    //later...
     }
 
 
@@ -121,9 +95,8 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         }
     }
 
-    public void initToolbar() {
-        // toolbar NOT  at first
-        Log.v(LOG_TAG, "initToolbar, hashCode=" + this.hashCode() + ", " + "");
+    public void updateToolbar() {
+        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
@@ -135,7 +108,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
                     getString(R.string.title_show_drink,
                             readableDrink, producerName, drinkName));
         } else {
-            Log.v(LOG_TAG, "initToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
     }
 
@@ -153,7 +126,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    DETAIL_COLUMNS,
+                    DrinkFragmentHelper.DETAIL_COLUMNS,
                     null,
                     null,
                     null);
@@ -165,7 +138,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            String drinkType = data.getString(COL_QUERY_DRINK_TYPE);
+            String drinkType = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_TYPE);
             mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
@@ -181,23 +154,29 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
                             getString(readableDrinkTypeIndex)));
             mDrinkNameLabelView.setText(readableDrinkTypeIndex);
 
-            String producerName = data.getString(COL_QUERY_DRINK_PRODUCER_NAME);
+            String producerName = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_NAME);
             mProducerNameView.setText(producerName);
-            mProducerLocationView.setText(data.getString(COL_QUERY_DRINK_PRODUCER_LOCATION));
+            mProducerLocationView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_LOCATION));
 
-            String drinkName = data.getString(COL_QUERY_DRINK_NAME);
+            String drinkName = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_NAME);
             mDrinkNameView.setText(drinkName);
 
-            mDrinkStyleView.setText(data.getString(COL_QUERY_DRINK_STYLE));
-            mDrinkSpecificsView.setText(data.getString(COL_QUERY_DRINK_SPECIFICS));
-            mDrinkIngredientsView.setText(data.getString(COL_QUERY_DRINK_INGREDIENTS));
+            mDrinkStyleView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_STYLE));
+            mDrinkSpecificsView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_SPECIFICS));
+            mDrinkIngredientsView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_INGREDIENTS));
 
-            initToolbar();
+            updateToolbar();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+    }
+
+    public void updateFragment(Uri drinkUri) {
+        Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
+        mUri = drinkUri;
+        getLoaderManager().restartLoader(SHOW_DRINK_LOADER_ID, null, this);
     }
 }

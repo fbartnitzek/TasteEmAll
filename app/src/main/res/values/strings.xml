@@ -4,7 +4,12 @@
     <string name="title_activity_producer">ProducerActivity</string>
 
     <string name="title_add_producer_activity">add producer</string>
-    <string name="title_add_drink_activity">add a <xliff:g id="producer">%1$s</xliff:g></string>
+    <string name="title_edit_producer_activity_preview">edit a <xliff:g id="producerType">%1$s</xliff:g></string>
+    <string name="title_edit_producer_activity">edit <xliff:g id="producer">%1$s</xliff:g></string>
+
+    <string name="title_add_drink_activity">add a <xliff:g id="drinkType">%1$s</xliff:g></string>
+    <string name="title_edit_drink_activity_preview">edit a <xliff:g id="drinkType">%1$s</xliff:g></string>
+    <string name="title_edit_drink_activity">edit <xliff:g id="producerName">%2$s</xliff:g> - <xliff:g id="drinkName">%1$s</xliff:g></string>
 
     <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
     <string name="search_title">search</string>

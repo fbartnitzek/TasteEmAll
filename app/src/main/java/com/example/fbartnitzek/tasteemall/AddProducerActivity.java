@@ -34,6 +34,9 @@ public class AddProducerActivity extends AppCompatActivity {
                 addProducerFragment = AddProducerFragment.newInstance(
                         getIntent().getStringExtra(PRODUCER_NAME_EXTRA)
                 );
+            } else if (getIntent().getData() != null) {
+                addProducerFragment = AddProducerFragment.newInstance(
+                        getIntent().getData());
             } else {
                 addProducerFragment = AddProducerFragment.newInstance();
             }
@@ -45,7 +48,7 @@ public class AddProducerActivity extends AppCompatActivity {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
-        // add toolbar from fragment (if view is initialized
+        // add toolbar from fragment (when view is initialized)
 
     }
 
@@ -68,7 +71,7 @@ public class AddProducerActivity extends AppCompatActivity {
                 AddProducerFragment fragment = getFragment();
                 if (fragment != null) {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-                    fragment.insertData();
+                    fragment.saveData();
                 }
                 break;
             default:

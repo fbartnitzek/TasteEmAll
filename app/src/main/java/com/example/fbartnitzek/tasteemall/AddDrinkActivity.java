@@ -2,7 +2,6 @@ package com.example.fbartnitzek.tasteemall;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,6 +9,7 @@ import android.view.MenuItem;
 public class AddDrinkActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddDrinkActivity.class.getName();
+    private static final String ADD_DRINK_FRAGMENT_TAG = "ADD_DRINK_FRAGMENT_TAG";
 
 
     @Override
@@ -18,22 +18,30 @@ public class AddDrinkActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_drink);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // explicitly add fragment, toolbar from fragment...
+        if (findViewById(R.id.fragment_container) != null) {
 
-        if (toolbar != null) {
-            Log.v(LOG_TAG, "onCreate - init toolbar..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-            setSupportActionBar(toolbar);
+            if (savedInstanceState != null) {   // no overlapping fragments on return
+                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+                return;
+            }
 
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-            int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(this, false);
-            String readableDrink = getString(Utils.getDrinkName(drinkType));
-            getSupportActionBar().setTitle(
-                    getString(R.string.title_add_drink_activity,
-                            readableDrink));
+            // edit or add
+            AddDrinkFragment fragment;
+            if (getIntent().getData() != null) {
+                fragment = AddDrinkFragment.newInstance(getIntent().getData());
+            } else {
+                fragment = AddDrinkFragment.newInstance();
+            }
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
+                    .commit();
+        } else {
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
-        //  Fragment gets added by default from xml fragment entry
+        // add toolbar from fragment (when view is initialized)
     }
 
     @Override
@@ -44,7 +52,7 @@ public class AddDrinkActivity extends AppCompatActivity {
     }
 
     private AddDrinkFragment getFragment() {
-        return (AddDrinkFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_add_drink);
+        return (AddDrinkFragment) getSupportFragmentManager().findFragmentByTag(ADD_DRINK_FRAGMENT_TAG);
     }
 
     @Override
@@ -54,11 +62,12 @@ public class AddDrinkActivity extends AppCompatActivity {
                 AddDrinkFragment fragment = getFragment();
                 if (fragment != null) {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-                    fragment.insertData();
+                    fragment.saveData();
                 }
                 break;
             default:
-                Log.e(LOG_TAG, "onOptionsItemSelected - other option selected..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                // f.e. back button...
+//                Log.e(LOG_TAG, "onOptionsItemSelected - other option selected..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);

@@ -17,9 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
-import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
-
 
 /**
  * A placeholder fragment containing a simple view.
@@ -28,21 +25,6 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
 
     private static final String LOG_TAG = ShowProducerFragment.class.getName();
 
-    private static final String[] DETAIL_COLUMNS = {
-            ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID,
-            Producer.PRODUCER_ID,
-            Producer.NAME,
-            Producer.DESCRIPTION,
-            Producer.WEBSITE,
-            Producer.LOCATION
-    };
-
-    static final int COL_PRODUCER__ID = 0;
-    static final int COL_PRODUCER_ID = 1;
-    static final int COL_PRODUCER_NAME = 2;
-    static final int COL_PRODUCER_DESCRIPTION = 3;
-    static final int COL_PRODUCER_WEBSITE = 4;
-    static final int COL_PRODUCER_LOCATION = 5;
     private static final int SHOW_PRODUCER_LOADER_ID = 42;
 
     private TextView mProducerNameView;
@@ -55,7 +37,12 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
 
     public ShowProducerFragment() {
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
-//        setHasOptionsMenu(true);    // maybe needed later...
+    }
+
+    public void updateFragment(Uri contentUri) {
+        Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "]");
+        mUri = contentUri;
+        getLoaderManager().restartLoader(SHOW_PRODUCER_LOADER_ID, null, this);
     }
 
     @Override
@@ -111,7 +98,7 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    DETAIL_COLUMNS,
+                    ProducerFragmentHelper.DETAIL_COLUMNS,
                     null,
                     null,
                     null);
@@ -120,8 +107,8 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         return null;
     }
 
-    private void initToolbar() {
-        Log.v(LOG_TAG, "initToolbar, hashCode=" + this.hashCode() + ", " + "");
+    private void updateToolbar() {
+        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
@@ -132,7 +119,7 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             actionBar.setTitle(
                     getString(R.string.title_show_producer, producerName));
         } else {
-            Log.v(LOG_TAG, "initToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
     }
 
@@ -142,16 +129,16 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
 
         if (data != null && data.moveToFirst()) {
             // variables not really needed - optimize later...
-            String name = data.getString(COL_PRODUCER_NAME);
+            String name = data.getString(ProducerFragmentHelper.COL_PRODUCER_NAME);
             mProducerNameView.setText(name);
-            String location = data.getString(COL_PRODUCER_LOCATION);
+            String location = data.getString(ProducerFragmentHelper.COL_PRODUCER_LOCATION);
             mProducerLocationView.setText(location);
-            String website = data.getString(COL_PRODUCER_WEBSITE);
+            String website = data.getString(ProducerFragmentHelper.COL_PRODUCER_WEBSITE);
             mProducerWebsiteView.setText(website);
-            String description = data.getString(COL_PRODUCER_DESCRIPTION);
+            String description = data.getString(ProducerFragmentHelper.COL_PRODUCER_DESCRIPTION);
             mProducerDescriptionView.setText(description);
 
-            initToolbar();
+            updateToolbar();
 
             Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }

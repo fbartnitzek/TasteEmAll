@@ -48,8 +48,8 @@ public class Utils {
         return "producer_" + producerName;
     }
 
-    public static String calcDrinkId(String drinkName, String producerName) {
-        return "producer_" + producerName + "_;drink_" + drinkName;
+    public static String calcDrinkId(String drinkName, String producerId) {
+        return producerId + "_;drink_" + drinkName;
     }
 
     public static int getDrinkTypeIndexFromSharedPrefs(Context context, boolean isFilter) {
