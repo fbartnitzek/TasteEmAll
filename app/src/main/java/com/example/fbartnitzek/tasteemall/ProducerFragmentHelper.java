@@ -21,7 +21,7 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 
 public class ProducerFragmentHelper {
 
-    static final String[] DETAIL_COLUMNS = {
+    public static final String[] DETAIL_COLUMNS = {
             DatabaseContract.ProducerEntry.TABLE_NAME + "." + DatabaseContract.ProducerEntry._ID,
             Producer.PRODUCER_ID,
             Producer.NAME,
@@ -33,7 +33,7 @@ public class ProducerFragmentHelper {
     static final int COL_PRODUCER__ID = 0;
     static final int COL_PRODUCER_ID = 1;
     static final int COL_PRODUCER_NAME = 2;
-    static final int COL_PRODUCER_DESCRIPTION = 3;
+    public static final int COL_PRODUCER_DESCRIPTION = 3;
     static final int COL_PRODUCER_WEBSITE = 4;
     static final int COL_PRODUCER_LOCATION = 5;
 }

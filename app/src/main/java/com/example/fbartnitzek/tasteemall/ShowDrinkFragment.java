@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,6 +50,12 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         Log.v(LOG_TAG, "ShowDrinkFragment, hashCode=" + this.hashCode() + ", " + "");
     }
 
+    private void calcCompleteUri() {    //if called with drink-only-id...
+        if (mUri != null) {
+            int id = DatabaseContract.getIdFromUri(mUri);
+            mUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +69,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         } else {
             if (args.containsKey(ShowDrinkActivity.EXTRA_DRINK_URI)) {
                 mUri = args.getParcelable(ShowDrinkActivity.EXTRA_DRINK_URI);
+                calcCompleteUri();
                 Log.v(LOG_TAG, "onCreateView, mUri=" + mUri + ", hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
             }
         }
@@ -177,6 +186,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     public void updateFragment(Uri drinkUri) {
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
         mUri = drinkUri;
+        calcCompleteUri();
         getLoaderManager().restartLoader(SHOW_DRINK_LOADER_ID, null, this);
     }
 }

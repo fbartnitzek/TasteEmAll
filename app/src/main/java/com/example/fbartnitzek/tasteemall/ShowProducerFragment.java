@@ -39,9 +39,14 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
     }
 
+    private void calcCompleteUri() {    //if called with producer-only-id...
+        // still the same for now...
+    }
+
     public void updateFragment(Uri contentUri) {
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "]");
         mUri = contentUri;
+        calcCompleteUri();
         getLoaderManager().restartLoader(SHOW_PRODUCER_LOADER_ID, null, this);
     }
 
@@ -57,6 +62,7 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         } else {
             if (args.containsKey(ShowProducerActivity.EXTRA_PRODUCER_URI)) {
                 mUri = args.getParcelable(ShowProducerActivity.EXTRA_PRODUCER_URI);
+                calcCompleteUri();
                 Log.v(LOG_TAG, "onCreateView, mUri=" + mUri + ", hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
             }
         }

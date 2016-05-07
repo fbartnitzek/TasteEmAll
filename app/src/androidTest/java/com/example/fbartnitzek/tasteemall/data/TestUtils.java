@@ -44,7 +44,7 @@ public class TestUtils {
     }
 
     public static ContentValues createBeerGose() {
-        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", "usual + salt + coriander", "1");
+        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", OLD_BEER_GOSE_INGREDIENTS, "1");
     }
 
     public static ContentValues createBeerSchwarzbier() {
@@ -89,6 +89,20 @@ public class TestUtils {
         while (teamCursor.moveToNext()){
             printCurrentCursorEntry(teamCursor);
         }
+    }
+
+    public static ContentValues updateDistilleryLaphroaig() {
+        return DatabaseHelper.buildProducerValues("2", "Laphroaig", NEW_PRODUCER_LAPHROAIG_DESCRIPTION,
+                "http://www.laphroaig.com", "Port Ellen, Isle of Islay");
+    }
+
+    public static String OLD_BEER_GOSE_INGREDIENTS = "usual + salt + coriander";
+    public static String NEW_BEER_GOSE_INGREDIENTS = "water + hops + barleyMalt + salt + coriander";
+
+    public static String NEW_PRODUCER_LAPHROAIG_DESCRIPTION = "The absolutely most richly flavoured of all Scotch whiskies";
+
+    public static ContentValues updateBeerGose() {
+        return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", NEW_BEER_GOSE_INGREDIENTS, "1");
     }
 
 

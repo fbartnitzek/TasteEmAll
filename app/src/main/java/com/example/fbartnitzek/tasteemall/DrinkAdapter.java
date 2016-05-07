@@ -99,7 +99,7 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
         public void onClick(View view) {
             mCursor.moveToPosition(getAdapterPosition());
             int drinkId = mCursor.getInt(MainFragment.COL_QUERY_DRINK__ID);
-            Uri contentUri = DatabaseContract.DrinkEntry.buildUri(drinkId);
+            Uri contentUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(drinkId);
             mClickHandler.onClick(
                     mCursor.getString(MainFragment.COL_QUERY_DRINK_NAME),
                     contentUri,

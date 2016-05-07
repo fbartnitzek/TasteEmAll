@@ -1,12 +1,10 @@
 package com.example.fbartnitzek.tasteemall;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,9 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
-import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
 
 /**
@@ -202,66 +201,39 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
     }
 
-    //TODO: async task
-
-    private Uri insertData(String producerName) {
-
-        return getActivity().getContentResolver().insert(
-                DatabaseContract.ProducerEntry.CONTENT_URI,
-                DatabaseHelper.buildProducerValues(
-                        Utils.calcProducerId(producerName),
-                        producerName,
-                        mEditProducerDescription.getText().toString(),
-                        mEditProducerWebsite.getText().toString(),
-                        mEditProducerLocation.getText().toString())
-        );
+    private void insertData(String producerName) {
+        new InsertEntryTask(
+                getActivity(), ProducerEntry.CONTENT_URI, mRootView,mProducerName)
+                    .execute(DatabaseHelper.buildProducerValues(
+                            Utils.calcProducerId(producerName),
+                            producerName,
+                            mEditProducerDescription.getText().toString(),
+                            mEditProducerWebsite.getText().toString(),
+                            mEditProducerLocation.getText().toString()));
     }
 
-    private Uri updateData(String producerName) {
-        String[] selectionArgs = new String[]{mProducerId};
-        String where = DatabaseContract.ProducerEntry.TABLE_NAME + "." + Producer.PRODUCER_ID + " = ?";
-        int rows = getActivity().getContentResolver().update(
-                DatabaseContract.ProducerEntry.CONTENT_URI,
-                DatabaseHelper.buildProducerValues(
+    private void updateData(String producerName) {
+        Uri singleProducerUri = Utils.calcSingleProducerUri(mContentUri);
+        new UpdateEntryTask(getActivity(), singleProducerUri, mProducerName, mRootView)
+                .execute(DatabaseHelper.buildProducerValues(
                         mProducerId,
                         producerName,
                         mEditProducerDescription.getText().toString(),
                         mEditProducerWebsite.getText().toString(),
-                        mEditProducerLocation.getText().toString()),
-                where,
-                selectionArgs);
-
-        if (rows < 1) {
-            return null;
-        } else {
-            return mContentUri;
-        }
+                        mEditProducerLocation.getText().toString()));
     }
 
     void saveData() {
 
         String producerName = mEditProducerName.getText().toString();
 
-        Uri producerUri;
         if (mContentUri != null) { //update
-            producerUri = updateData(producerName);
-        } else { // insert
-            producerUri = insertData(producerName);
-        }
 
-        if (producerUri != null) {
-            Intent output = new Intent();
-            output.setData(producerUri);
-            getActivity().setResult(AddProducerActivity.RESULT_OK, output);
-            getActivity().finish();
-        } else {
-            if (mContentUri != null) {
-                Snackbar.make(mRootView, "Updating producer " + producerName + " didn't work...",
-                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-            } else {
-                Snackbar.make(mRootView, "Creating new producer " + producerName + " didn't work...",
-                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-            }
+            updateData(producerName);
+
+        } else { // insert
+
+            insertData(producerName);
         }
 
     }
@@ -321,6 +293,5 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
 
     }
-
 
 }

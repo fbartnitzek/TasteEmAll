@@ -27,13 +27,19 @@ import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
-import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.QueryEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddDrinkFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>,CompletionTextViewAdapter.CompletionAdapterUpdateHandler {
+public class AddDrinkFragment extends Fragment implements View.OnClickListener,
+        AdapterView.OnItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor>,
+        CompletionTextViewAdapter.CompletionAdapterUpdateHandler,
+        QueryEntryTask.QueryEntryFoundHandler {
 
     public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
     private static final int EDIT_DRINK_LOADER_ID = 1234567;
@@ -63,7 +69,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     private String mProducerName;
     private int mProducer_Id;
     private String mProducerId;
-    private String mFilter = "";
+//    private String mFilter = "";
     private Uri mContentUri = null;
     private String mDrinkId = null;
     private ArrayAdapter<String> mDrinkTypeAdapter;
@@ -241,7 +247,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    //TODO: async task
+
     void saveData() {
         Log.v(LOG_TAG, "saveData, hashCode=" + this.hashCode() + ", " + "");
 
@@ -256,36 +262,19 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
             return;
         }
 
-        Uri drinkUri;
         if (mContentUri != null) {
-            drinkUri = updateData(drinkName);
+            updateData(drinkName);
         } else {
-            drinkUri = insertData(drinkName);
-        }
-
-        if (drinkUri != null) {
-            Intent output = new Intent();
-            output.setData(drinkUri);
-            getActivity().setResult(Activity.RESULT_OK, output);
-            getActivity().finish();
-        } else {
-            if (mContentUri != null) {
-                Snackbar.make(mRootView, "Updating drink " + drinkName + " didn't work ...",
-                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-            } else {
-                Snackbar.make(mRootView, "Creating new entry " + drinkName + " didn't work ...",
-                        Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-            }
-
+            insertData(drinkName);
         }
     }
 
-    private Uri updateData(String drinkName) {
-        String[] selectionArgs = new String[]{mDrinkId};
-        String where = DatabaseContract.DrinkEntry.TABLE_NAME + "." + Drink.DRINK_ID + " = ?";
-        int rows = getActivity().getContentResolver().update(
-                DatabaseContract.DrinkEntry.CONTENT_URI,
-                DatabaseHelper.buildDrinkValues(
+
+
+    private void updateData(String drinkName) {
+        Uri singleEntryUri = Utils.calcSingleDrinkUri(mContentUri);
+        new UpdateEntryTask(getActivity(), singleEntryUri, drinkName, mRootView)
+                .execute(DatabaseHelper.buildDrinkValues(
                         mDrinkId,
                         drinkName,
                         mEditDrinkSpecifics.getText().toString(),
@@ -293,22 +282,15 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                         mSpinnerDrinkType.getItemAtPosition(
                                 mSpinnerDrinkType.getSelectedItemPosition()).toString(),
                         mEditDrinkIngredients.getText().toString(),
-                        mProducerId),
-                where,
-                selectionArgs);
+                        mProducerId)
+                );
 
-        if (rows < 1) {
-            return null;
-        } else {
-            return mContentUri;
-        }
     }
 
-
-    private Uri insertData(String drinkName) {
-        return getActivity().getContentResolver().insert(
-                DatabaseContract.DrinkEntry.CONTENT_URI,
-                DatabaseHelper.buildDrinkValues(
+    private void insertData(String drinkName) {
+        new InsertEntryTask(
+                getActivity(), DatabaseContract.DrinkEntry.CONTENT_URI, mRootView, drinkName)
+                    .execute(DatabaseHelper.buildDrinkValues(
                         Utils.calcDrinkId(drinkName, mProducerId),
                         drinkName,
                         mEditDrinkSpecifics.getText().toString(),
@@ -316,9 +298,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
                         mSpinnerDrinkType.getItemAtPosition(
                                 mSpinnerDrinkType.getSelectedItemPosition()).toString(),
                         mEditDrinkIngredients.getText().toString(),
-                        mProducerId
-                )
-        );
+                        mProducerId));
     }
 
 
@@ -345,19 +325,23 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        // resets all to generic - but there is no better way...
-        String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
-        Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+        if (view.getId() == R.id.spinner_type) {
+            // resets all to generic - but there is no better way...
+            String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
+            Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
 
-        Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
-        int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
-        String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
+            Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
+            int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
+            String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
 
-        if (mContentUri == null) {  //just update for new drinks, ignore for edits
-            updateToolbar(readableDrinkType, null);
+            if (mContentUri == null) {  //just update for new drinks, ignore for edits
+                updateToolbar(readableDrinkType, null);
+            }
+
+            ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
+        } else {
+//            Log.e(LOG_TAG, "onItemSelected other item selected..., hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
         }
-
-        ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
 
     }
 
@@ -385,20 +369,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
     }
 
-    public void updateProvider(Uri producerUri) {
-
+    private void updateProvider(Uri producerUri) {
         Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
-        Cursor cursor = getActivity().getContentResolver().query(producerUri, DrinkFragmentHelper.PRODUCER_QUERY_COLUMNS, null, null, null);
-        if (cursor.moveToFirst()) {
-            mProducer_Id = cursor.getInt(DrinkFragmentHelper.COL_QUERY_PRODUCER__ID);
-            mProducerId = cursor.getString(DrinkFragmentHelper.COL_QUERY_PRODUCER_ID);
-            mProducerName = cursor.getString(DrinkFragmentHelper.COL_QUERY_PRODUCER_NAME);
-            Log.v(LOG_TAG, "updateProvider, mProducerName=" + mProducerName + ", hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
 
-            mEditCompletionProducerName.setText(mProducerName);
-            mEditCompletionProducerName.dismissDropDown();
-        }
-
+        new QueryEntryTask(getActivity(),
+                DatabaseContract.ProducerEntry.TABLE_NAME + "." + DatabaseContract.ProducerEntry._ID,
+                Producer.PRODUCER_ID,
+                Producer.NAME, this)
+            .execute(producerUri);
     }
 
     public void setContentUri(Uri contentUri) {
@@ -473,5 +451,16 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener, 
         mProducer_Id = entry_Id;
         mProducerId = entryId;
         mProducerName = entryName;
+    }
+
+    @Override
+    public void onFound(int entry_Id, String entryId, String entryName) {
+        Log.v(LOG_TAG, "onFound, hashCode=" + this.hashCode() + ", " + "entry_Id = [" + entry_Id + "], entryId = [" + entryId + "], entryName = [" + entryName + "]");
+        mProducer_Id = entry_Id;
+        mProducerId = entryId;
+        mProducerName = entryName;
+
+        mEditCompletionProducerName.setText(mProducerName);
+        mEditCompletionProducerName.dismissDropDown();
     }
 }

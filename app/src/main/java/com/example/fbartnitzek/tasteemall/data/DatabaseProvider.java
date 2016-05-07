@@ -49,6 +49,7 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final int DRINKS = 300;
     private static final int DRINKS_BY_NAME = 301;
+    private static final int DRINK_BY_ID = 302;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME = 310;
     private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE = 320;
@@ -116,7 +117,8 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/*", DRINKS_WITH_PRODUCER_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/*", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
-        matcher.addURI(authority, DatabaseContract.PATH_DRINK + "/#", DRINKS_WITH_PRODUCER_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK + "/#", DRINK_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER + "/#", DRINKS_WITH_PRODUCER_BY_ID);
 
         // TODO: all beers of certain brewery, of breweries in certain location / area
 
@@ -185,6 +187,12 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
+            case DRINK_BY_ID:
+                Log.v(LOG_TAG, "query - DRINK_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+                cursor = db.query(DrinkEntry.TABLE_NAME, projection,
+                        DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
             case DRINKS_WITH_PRODUCER_BY_NAME:
                 Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
                 pattern = DrinkEntry.getSearchString(uri, false);
@@ -236,28 +244,7 @@ public class DatabaseProvider extends ContentProvider {
                         + ProducerEntry.TABLE_NAME + "." + Producer.PRODUCER_ID);
     }
 
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
 
-        switch (mUriMatcher.match(uri)) {
-            case PRODUCERS:
-                return ProducerEntry.CONTENT_TYPE;
-            case PRODUCERS_BY_NAME:
-                return ProducerEntry.CONTENT_TYPE;
-            case PRODUCER_BY_ID:
-                return ProducerEntry.CONTENT_ITEM_TYPE;
-            case DRINKS:
-                return DrinkEntry.CONTENT_TYPE;
-            case DRINKS_BY_NAME:
-                return DrinkEntry.CONTENT_TYPE;
-            case REVIEWS:
-                return ReviewEntry.CONTENT_TYPE;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-    }
 
     @Nullable
     @Override
@@ -394,8 +381,18 @@ public class DatabaseProvider extends ContentProvider {
             case PRODUCERS:
                 impactedRows = db.update(ProducerEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
+            case PRODUCER_BY_ID:
+                impactedRows = db.update(ProducerEntry.TABLE_NAME, values,
+                        ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             case DRINKS:
                 impactedRows = db.update(DrinkEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case DRINK_BY_ID:
+                impactedRows = db.update(DrinkEntry.TABLE_NAME, values,
+                        DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
                 break;
             case REVIEWS:
                 impactedRows = db.update(ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -407,5 +404,38 @@ public class DatabaseProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return impactedRows;
+    }
+
+    @Nullable
+    @Override
+    public String getType(Uri uri) {
+        Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
+
+        switch (mUriMatcher.match(uri)) {
+            case PRODUCERS:
+                return ProducerEntry.CONTENT_TYPE;
+            case PRODUCERS_BY_NAME:
+                return ProducerEntry.CONTENT_TYPE;
+            case PRODUCERS_BY_PATTERN:
+                return ProducerEntry.CONTENT_TYPE;
+            case PRODUCER_BY_ID:
+                return ProducerEntry.CONTENT_ITEM_TYPE;
+            case DRINKS:
+                return DrinkEntry.CONTENT_TYPE;
+            case DRINKS_BY_NAME:
+                return DrinkEntry.CONTENT_TYPE;
+            case DRINK_BY_ID:
+                return DrinkEntry.CONTENT_ITEM_TYPE;
+            case DRINKS_WITH_PRODUCER_BY_NAME:
+                return DrinkEntry.CONTENT_TYPE;
+            case DRINKS_WITH_PRODUCER_BY_ID:
+                return DrinkEntry.CONTENT_ITEM_TYPE;
+            case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
+                return DrinkEntry.CONTENT_TYPE;
+            case REVIEWS:
+                return ReviewEntry.CONTENT_TYPE;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
     }
 }

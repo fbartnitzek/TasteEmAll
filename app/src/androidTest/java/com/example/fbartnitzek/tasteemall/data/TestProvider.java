@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
+import com.example.fbartnitzek.tasteemall.ProducerFragmentHelper;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -216,6 +218,36 @@ public class TestProvider extends AndroidTestCase {
         assertTrue("query with type failed", cursor.getCount() > 0);
         cursor.close();
 
+
+        // update distillery
+        int rows = mContext.getContentResolver().update(ProducerEntry.buildUri(2),
+                TestUtils.updateDistilleryLaphroaig(), null, null);
+        assertTrue("update of distillery failed", rows == 1);
+        cursor = mContext.getContentResolver().query(ProducerEntry.buildUri(2),
+                ProducerFragmentHelper.DETAIL_COLUMNS, null, null, null);
+        assertTrue("query after update of distillery failed", cursor.getCount() == 1);
+        cursor.moveToFirst();
+        String prodDescription = cursor.getString(ProducerFragmentHelper.COL_PRODUCER_DESCRIPTION);
+        assertTrue("update of distillery-description failed", TestUtils.NEW_PRODUCER_LAPHROAIG_DESCRIPTION.equals(prodDescription));
+        cursor.close();
+
+        // update beer
+        rows = mContext.getContentResolver().update(DrinkEntry.buildUri(1),
+                TestUtils.updateBeerGose(), null, null);
+        assertTrue("update of beer failed", rows == 1);
+        final String[] DETAIL_COLUMNS = {
+                DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursurAdapter doesn't work
+                Drink.NAME,
+                Drink.DRINK_ID,
+                Drink.INGREDIENTS};
+        cursor = mContext.getContentResolver().query(DrinkEntry.buildUri(1),
+                DETAIL_COLUMNS, null, null, null);
+        assertTrue("query after update of distillery failed", cursor.getCount() == 1);
+        cursor.moveToFirst();
+        String drinkIngredients = cursor.getString(3);
+        assertTrue("update of beer-ingredients failed",
+                TestUtils.NEW_BEER_GOSE_INGREDIENTS.equals(drinkIngredients));
+        cursor.close();
 
 
 //        // user

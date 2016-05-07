@@ -3,8 +3,10 @@ package com.example.fbartnitzek.tasteemall;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 
+import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -50,6 +52,24 @@ public class Utils {
 
     public static String calcDrinkId(String drinkName, String producerId) {
         return producerId + "_;drink_" + drinkName;
+    }
+
+    public static Uri calcSingleDrinkUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
+        if (uri != null) {
+            int id = DatabaseContract.getIdFromUri(uri);
+            return DatabaseContract.DrinkEntry.buildUri(id);
+        } else {
+            return null;
+        }
+    }
+
+    public static Uri calcSingleProducerUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
+        if (uri != null) {
+            int id = DatabaseContract.getIdFromUri(uri);
+            return DatabaseContract.ProducerEntry.buildUri(id);
+        } else {
+            return null;
+        }
     }
 
     public static int getDrinkTypeIndexFromSharedPrefs(Context context, boolean isFilter) {

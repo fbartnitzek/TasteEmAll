@@ -30,6 +30,7 @@ public class DatabaseContract {
     public static final String PATH_PRODUCER_BY_PATTERN = "producer_by_pattern";
     public static final String PATH_DRINK_BY_NAME = "drink_by_name";
     public static final String PATH_DRINK = "drink";
+    public static final String PATH_DRINK_WITH_PRODUCER = "drink_with_producer";
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME = "drink_with_producer_by_name";
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE = "drink_with_producer_by_name_and_type";
 
@@ -90,6 +91,12 @@ public class DatabaseContract {
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+        public static Uri buildUriIncludingProducer(long id) {
+//            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER)
+                    .appendPath(Long.toString(id)).build();
         }
 
         public static Uri buildUriWithName(String searchString) {
