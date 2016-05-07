@@ -16,13 +16,13 @@
             android:id="@+id/list_item_producer_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="THE Brewery"/>
+            android:text="@string/example_brewery"/>
 
         <TextView
             android:id="@+id/list_item_drink_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="some drink"/>
+            android:text="@string/example_drink_name"/>
     </LinearLayout>
 
     <LinearLayout
@@ -36,13 +36,13 @@
             android:id="@+id/list_item_drink_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="beer"/>
+            android:text="@string/example_drink_type"/>
 
         <TextView
             android:id="@+id/list_item_drink_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="IPA"/>
+            android:text="@string/example_drink_style"/>
     </LinearLayout>
 
 </LinearLayout>

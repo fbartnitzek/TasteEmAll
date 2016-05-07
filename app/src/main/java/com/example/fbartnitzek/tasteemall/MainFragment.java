@@ -12,6 +12,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
@@ -49,14 +49,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final String STATE_SEARCH_PATTERN = "STATE_SEARCH_PATTERN";
 
 
-    private RecyclerView mProducerRecyclerView;
-    private RecyclerView mDrinkRecyclerView;
-    private int mProducerPosition = ListView.INVALID_POSITION;
     private ProducerAdapter mProducerAdapter;
     private DrinkAdapter mDrinkAdapter;
 
     private static final String[] PRODUCER_QUERY_COLUMNS = {
-            ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,  // without the CursurAdapter doesn't work
+            ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,
             Producer.NAME,
             Producer.DESCRIPTION,
             Producer.LOCATION};
@@ -67,7 +64,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_QUERY_PRODUCER_LOCATION = 3;
 
     private static final String[] DRINK_WITH_PRODUCER_QUERY_COLUMNS = {
-            DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,  // without the CursurAdapter doesn't work
+            DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,
             Drink.NAME,
             Drink.PRODUCER_ID,
             Drink.TYPE,
@@ -88,7 +85,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private String mDrinkType;
     private View mRootView;
     private String mSearchPattern;
-    private SearchView mSearchView;
     private Spinner mSpinnerType;
 
     private CustomSpinnerAdapter mSpinnerAdapter;
@@ -154,12 +150,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             }
         });
 
-        mProducerRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_producer);
+        RecyclerView mProducerRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_producer);
         mProducerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mProducerRecyclerView.setAdapter(mProducerAdapter);
 
-        mDrinkRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_drink);
+        RecyclerView mDrinkRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_drink);
         mDrinkRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mDrinkRecyclerView.setAdapter(mDrinkAdapter);
 
@@ -175,7 +171,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         inflater.inflate(R.menu.menu_main_fragment, menu);
         final MenuItem item = menu.findItem(R.id.search_all);
 
-        mSearchView = (SearchView) MenuItemCompat.getActionView(item);
+        SearchView mSearchView = (SearchView) MenuItemCompat.getActionView(item);
         if (mSearchView == null) {
             Log.e(LOG_TAG, "onCreateOptionsMenu - searchView not found!!, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "], inflater = [" + inflater + "]");
             return;
@@ -214,9 +210,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
             // MainFragment is home!
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            activity.getSupportActionBar().setHomeButtonEnabled(false);
-            activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar == null) {
+                Log.e(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
+                return;
+            }
+            supportActionBar.setDisplayHomeAsUpEnabled(false);
+            supportActionBar.setHomeButtonEnabled(false);
+            supportActionBar.setDisplayShowTitleEnabled(false);
 
             //        //TODO: when might i not need that...?
 //        if (true) {
@@ -354,10 +355,16 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
-        mDrinkType = parent.getItemAtPosition(position).toString();
-        Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
-        restartLoaders();
+
+        if (mSpinnerAdapter == parent.getAdapter()) {
+            Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+            mDrinkType = parent.getItemAtPosition(position).toString();
+            Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
+            restartLoaders();
+        } else {
+//            Log.v(LOG_TAG, "onItemSelected anywhere else..., hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+        }
+
     }
 
     @Override

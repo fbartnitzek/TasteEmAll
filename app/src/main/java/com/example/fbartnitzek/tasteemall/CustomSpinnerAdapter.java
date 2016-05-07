@@ -26,12 +26,12 @@ import java.util.ArrayList;
  * limitations under the License.
  */
 
-public class CustomSpinnerAdapter extends ArrayAdapter<String> {
+class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
-    private Context context;
-    private ArrayList<String> data;
+    private final Context context;
+    private final ArrayList<String> data;
     public Resources res;
-    LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
 
     public CustomSpinnerAdapter(Context context, ArrayList<String> objects) {
@@ -56,7 +56,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private View getCustomView(int position, View convertView, ViewGroup parent) {
         View row = inflater.inflate(R.layout.spinner_row, parent, false);
         TextView tvType = (TextView) row.findViewById(R.id.tvType);
-        tvType.setText(data.get(position).toString());
+        tvType.setText(data.get(position));
         return row;
     }
 }

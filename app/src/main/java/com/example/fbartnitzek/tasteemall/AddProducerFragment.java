@@ -1,6 +1,5 @@
 package com.example.fbartnitzek.tasteemall;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -118,22 +118,27 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         return mRootView;
     }
 
-    public void createToolbar() {
+    private void createToolbar() {
         Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar == null) {
+                Log.v(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
+                return;
+            }
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
             String readableProducer = getString(Utils.getProducerName(drinkType));
             if (mContentUri != null) {
-                activity.getSupportActionBar().setTitle(
+                supportActionBar.setTitle(
                         getString(R.string.title_edit_producer_activity_preview,
                                 readableProducer));
             } else {
-                activity.getSupportActionBar().setTitle(
+                supportActionBar.setTitle(
                         getString(R.string.title_add_drink_activity,
                                 readableProducer));
             }
@@ -172,16 +177,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         }
     }
 
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -242,11 +237,11 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         return mProducerName;
     }
 
-    public void setProducerName(String producerName) {
+    private void setProducerName(String producerName) {
         this.mProducerName = producerName;
     }
 
-    public void setContentUri(Uri contentUri) {
+    private void setContentUri(Uri contentUri) {
         this.mContentUri = contentUri;
     }
 

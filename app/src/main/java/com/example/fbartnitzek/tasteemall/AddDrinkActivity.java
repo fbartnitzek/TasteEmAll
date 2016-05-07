@@ -39,11 +39,11 @@ public class AddDrinkActivity extends AppCompatActivity {
                         .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
                         .commit();
             } else {
-                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + "]");
         }
 
         // add toolbar from fragment (when view is initialized)

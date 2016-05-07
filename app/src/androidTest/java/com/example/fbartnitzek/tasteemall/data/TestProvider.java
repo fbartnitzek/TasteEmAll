@@ -236,7 +236,7 @@ public class TestProvider extends AndroidTestCase {
                 TestUtils.updateBeerGose(), null, null);
         assertTrue("update of beer failed", rows == 1);
         final String[] DETAIL_COLUMNS = {
-                DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursurAdapter doesn't work
+                DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,
                 Drink.NAME,
                 Drink.DRINK_ID,
                 Drink.INGREDIENTS};

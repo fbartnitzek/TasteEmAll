@@ -28,7 +28,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final String LOG_TAG = ShowDrinkFragment.class.getName();
 
-    public static final int SHOW_DRINK_LOADER_ID = 21;
+    private static final int SHOW_DRINK_LOADER_ID = 21;
 
     private TextView mProducerLabelView;
     private TextView mProducerNameView;
@@ -92,19 +92,24 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         return mRootView;
     }
 
-    public void createToolbar() {
+    private void createToolbar() {
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar == null) {
+                Log.e(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
+                return;
+            }
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
         } else {
             Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
     }
 
-    public void updateToolbar() {
+    private void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();

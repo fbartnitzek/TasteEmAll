@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="list of drinks"/>
+            android:text="@string/title_list_of_drinks"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_drink"
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="list of producers"/>
+            android:text="@string/list_of_producers"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_producer"

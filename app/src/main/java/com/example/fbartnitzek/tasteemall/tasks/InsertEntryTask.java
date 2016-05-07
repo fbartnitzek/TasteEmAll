@@ -9,6 +9,8 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import java.util.Arrays;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -28,10 +30,10 @@ import android.view.View;
 public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
 
     private static final String LOG_TAG = InsertEntryTask.class.getName();
-    private Activity mActivity;
-    private View mRootView;
-    private String mEntryName;
-    private Uri mContentUri;
+    private final Activity mActivity;
+    private final View mRootView;
+    private final String mEntryName;
+    private final Uri mContentUri;
 
     public InsertEntryTask(Activity mActivity, Uri contentUri, View rootView, String entryName) {
         Log.v(LOG_TAG, "InsertEntryTask, hashCode=" + this.hashCode() + ", " + "mActivity = [" + mActivity + "], rootView = [" + rootView + "], entryName = [" + entryName + "]");
@@ -43,7 +45,7 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
 
     @Override
     protected Uri doInBackground(ContentValues... params) {
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
+        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + Arrays.toString(params) + "]");
         if (params.length == 0) {
             return null;
         }

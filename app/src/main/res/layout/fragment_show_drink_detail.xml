@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:gravity="center"
-            android:text="producer details"/>
+            android:text="@string/title_producer_details"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,14 +35,14 @@
                 android:layout_gravity="center"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Producer"/>
+                android:text="@string/label_producer"/>
 
             <TextView
                 android:id="@+id/producer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="testName"/>
+                android:text="@string/example_brewery"/>
         </LinearLayout>
 
         <LinearLayout
@@ -57,13 +57,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Location"/>
+                android:text="@string/location"/>
 
             <TextView
                 android:id="@+id/producer_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TestLocation"/>
+                android:text="@string/example_location"/>
         </LinearLayout>
 
 
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:gravity="center"
-            android:text="drink details"/>
+            android:text="@string/label_drink_details"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -88,14 +88,14 @@
                 android:layout_gravity="center"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Drink"/>
+                android:text="@string/label_drink_name"/>
 
             <TextView
                 android:id="@+id/drink_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="testDrinkName"/>
+                android:text="@string/example_drink_name"/>
         </LinearLayout>
 
         <LinearLayout
@@ -110,13 +110,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Type"/>
+                android:text="@string/label_drink_type"/>
 
             <TextView
                 android:id="@+id/drink_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="generic"/>
+                android:text="@string/example_drink_type"/>
         </LinearLayout>
 
         <LinearLayout
@@ -132,14 +132,14 @@
                 android:layout_gravity="center"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Style"/>
+                android:text="@string/label_drink_style"/>
 
             <TextView
                 android:id="@+id/drink_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="some style"/>
+                android:text="@string/example_drink_style"/>
         </LinearLayout>
 
         <LinearLayout
@@ -154,13 +154,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Specifics"/>
+                android:text="@string/label_drink_specifics"/>
 
             <TextView
                 android:id="@+id/drink_specifics"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="some specifics"/>
+                android:text="@string/example_drink_specifics"/>
         </LinearLayout>
 
         <LinearLayout
@@ -175,13 +175,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="ingredients"/>
+                android:text="@string/label_drink_ingredients"/>
 
             <TextView
                 android:id="@+id/drink_ingredients"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="some ingredients"/>
+                android:text="@string/example_drink_ingredients"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -57,7 +57,7 @@ public class SettingsActivity extends PreferenceActivity {
         private void setPreferenceSummary(Preference preference, Object value) {
             Log.v(LOG_TAG, "setPreferenceSummary, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "], value = [" + value + "]");
             String stringValue = value.toString();
-            String key = preference.getKey();
+//            String key = preference.getKey();
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in

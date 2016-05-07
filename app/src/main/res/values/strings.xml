@@ -13,7 +13,6 @@
 
     <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
     <string name="search_title">search</string>
-    <string name="search_hint">you may search a drink,, a producer or a producer-location</string>
 
     <string name="drink_show_generic">Drink</string>
     <string name="drink_show_coffee">Coffee</string>
@@ -39,8 +38,47 @@
     <!--<string name="title_show_producer"><xliff:g id="producerType">%1$s</xliff:g>: <xliff:g id="producer">%2$s</xliff:g></string>-->
     <string name="title_show_producer"><xliff:g id="producer">%1$s</xliff:g></string>
 
+    <string name="title_producer_details">producer details</string>
     <string name="producer_details_label"><xliff:g id="producer">%1$s</xliff:g> details</string>
+    <string name="title_list_of_drinks">list of drinks</string>
     <string name="drink_details_label"><xliff:g id="drink">%1$s</xliff:g> details</string>
+    <string name="hint_drink_name">name of the drink</string>
+    <string name="hint_drink_style">style of the type of drink</string>
+    <string name="hint_drink_ingredients">ingredients of the drink</string>
+    <string name="hint_drink_specifics">other specifics of the drink (like mixture of coffee-beans or ABV of an alcoholic drink</string>
+    <string name="hint_producer_name">name of the producer</string>
+    <string name="hint_producer_location">location of the producer</string>
+    <string name="hint_producer_website">website of the producer</string>
+    <string name="hint_producer_description">description of the producer</string>
+    <string name="menu_action_save">save</string>
+    <string name="menu_action_edit">edit</string>
+    <string name="example_brewery">THE Brewery</string>
+    <string name="example_producer_description">since 1666</string>
+    <string name="text_choose_a_producer">choose a producer</string>
+    <string name="label_producer">Producer</string>
+    <string name="example_drink_name">some drink</string>
+    <string name="label_producer_name">Name</string>
+    <string name="list_of_producers">list of producers</string>
+    <string name="example_drink_type">beer</string>
+    <string name="example_country">some country</string>
+    <string name="example_drink_style">IPA</string>
+    <string name="example_producer_location">some town</string>
+    <string name="description_add_a_new_producer">create a new producer</string>
+    <string name="text_plus">+</string>
+    <string name="location">Location</string>
+    <string name="example_location">TestLocation</string>
+    <string name="drink_label">Drink</string>
+    <string name="label_website">Website</string>
+    <string name="example_website">NO website</string>
+    <string name="label_drink_name">Name</string>
+    <string name="label_drink_details">drink details</string>
+    <string name="label_producer_description">description</string>
+    <string name="label_drink_type">Type</string>
+    <string name="label_drink_style">Style</string>
+    <string name="label_drink_ingredients">Ingredients</string>
+    <string name="label_drink_specifics">Specifics</string>
+    <string name="example_drink_specifics">some specifics</string>
+    <string name="example_drink_ingredients">some ingredients</string>
 
 
 </resources>

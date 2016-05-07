@@ -128,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insertTestData(SQLiteDatabase db) {
+    private void insertTestData(SQLiteDatabase db) {
         db.insert(DatabaseContract.ProducerEntry.TABLE_NAME, null,
                 DatabaseHelper.buildProducerValues("producer_Brewdog",
                         "Brewdog", "#independenceordeath", "brewdog.com", "Aberdeen"));

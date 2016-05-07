@@ -38,14 +38,14 @@ public class ShowDrinkActivity extends AppCompatActivity {
                 args.putParcelable(EXTRA_DRINK_URI, mContentUri);
                 fragment.setArguments(args);
             } else {
-                Log.e(LOG_TAG, "onCreate - without intentData???, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+                Log.e(LOG_TAG, "onCreate - without intentData???, hashCode=" + this.hashCode() + "]");
             }
 
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, fragment, FRAGMENT_TAG)
                     .commit();
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + "]");
         }
 
         //init toolbar in fragment

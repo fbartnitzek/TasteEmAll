@@ -31,7 +31,7 @@ import java.util.Properties;
 
 public class Util {
 
-    public static String readApiKey() {
+    private static String readApiKey() {
         Properties properties = new Properties();
         String path = System.getProperty("user.home") + "/.gradle/gradle.properties";
         try {
@@ -109,8 +109,7 @@ public class Util {
     }
 
     public static <V> ArrayList<V> map2List(Map<String, V> map) {
-        ArrayList<V> valuesList = new ArrayList<V>(map.values());
-        return valuesList;
+        return new ArrayList<>(map.values());
     }
 
 }

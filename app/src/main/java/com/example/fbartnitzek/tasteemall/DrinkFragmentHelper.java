@@ -20,10 +20,10 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
  * limitations under the License.
  */
 
-public class DrinkFragmentHelper {
+class DrinkFragmentHelper {
 
     static final String[] DETAIL_COLUMNS = {
-            DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursurAdapter doesn't work
+            DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursorAdapter doesn't work
             Drink.NAME,
             Drink.DRINK_ID,
             Drink.PRODUCER_ID,

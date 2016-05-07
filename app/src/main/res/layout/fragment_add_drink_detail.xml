@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="8dp"
-            android:text="choose a producer"/>
+            android:text="@string/text_choose_a_producer"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="Name"/>
+                android:text="@string/label_producer_name"/>
 
             <AutoCompleteTextView
                 android:id="@+id/producer_name"
@@ -48,8 +48,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="create a new producer"
-                android:text="+"/>
+                android:contentDescription="@string/description_add_a_new_producer"
+                android:text="@string/text_plus"/>
 
         </LinearLayout>
 
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="8dp"
-            android:text="Drink"/>
+            android:text="@string/drink_label"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -72,10 +72,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Name"/>
+                android:text="@string/label_drink_name"/>
 
             <EditText
                 android:id="@+id/drink_name"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_drink_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -91,13 +93,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Type"/>
+                android:text="@string/label_drink_type"/>
 
             <Spinner
                 android:id="@+id/drink_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="generic"/>
+                android:text="@string/example_drink_type"/>
         </LinearLayout>
 
         <LinearLayout
@@ -110,10 +112,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Style"/>
+                android:text="@string/label_drink_style"/>
 
             <EditText
                 android:id="@+id/drink_style"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_drink_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -129,10 +133,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Ingredients"/>
+                android:text="@string/label_drink_ingredients"/>
 
             <EditText
                 android:id="@+id/drink_ingredients"
+                android:hint="@string/hint_drink_ingredients"
+                android:inputType="textCapWords"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -148,10 +154,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Specifics"/>
+                android:text="@string/label_drink_specifics"/>
 
             <EditText
                 android:id="@+id/drink_specifics"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_drink_specifics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -41,7 +42,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         CompletionTextViewAdapter.CompletionAdapterUpdateHandler,
         QueryEntryTask.QueryEntryFoundHandler {
 
-    public static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
+    private static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
     private static final int EDIT_DRINK_LOADER_ID = 1234567;
 
     private static final String STATE_PRODUCER_NAME = "STATE_PRODUCER_NAME";
@@ -61,8 +62,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     private static EditText mEditDrinkIngredients;
     private static EditText mEditDrinkSpecifics;
     private static View mRootView;
-
-    private static final int PRODUCER_COMPLETION_LOADER_ID = 124;
 
     private static final String LOG_TAG = AddDrinkFragment.class.getName();
 
@@ -125,7 +124,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
         String[] drinkTypes = getActivity().getResources().getStringArray(R.array.pref_type_values);
 
-        mDrinkTypeAdapter = new ArrayAdapter<String>(
+        mDrinkTypeAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,
                 drinkTypes);
@@ -181,25 +180,30 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         super.onSaveInstanceState(outState);
     }
 
-    public void createToolbar() {
+    private void createToolbar() {
         Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar == null) {
+                Log.e(LOG_TAG, "createToolbar - no actionbar found..., hashCode=" + this.hashCode() + ", " + "");
+                return;
+            }
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
             String readableDrink = getString(Utils.getDrinkName(drinkType));
 
             if (mContentUri != null) {
                 Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
-                activity.getSupportActionBar().setTitle(
+                supportActionBar.setTitle(
                         getString(R.string.title_edit_drink_activity_preview,
                                 readableDrink));
             } else {
                 Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
-                activity.getSupportActionBar().setTitle(
+                supportActionBar.setTitle(
                         getString(R.string.title_add_drink_activity,
                                 readableDrink));
             }
@@ -325,7 +329,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        if (view.getId() == R.id.spinner_type) {
+        if (mDrinkTypeAdapter == parent.getAdapter()) {
             // resets all to generic - but there is no better way...
             String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
             Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
@@ -379,7 +383,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             .execute(producerUri);
     }
 
-    public void setContentUri(Uri contentUri) {
+    private void setContentUri(Uri contentUri) {
         this.mContentUri = contentUri;
     }
 

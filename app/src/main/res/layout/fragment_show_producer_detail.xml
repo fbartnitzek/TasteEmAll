@@ -26,7 +26,7 @@
                 android:paddingBottom="8dp"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Producer"/>
+                android:text="@string/label_producer"/>
 
             <TextView
                 android:id="@+id/producer_name"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingBottom="8dp"
-                android:text="testName"/>
+                android:text="@string/example_brewery"/>
         </LinearLayout>
 
         <LinearLayout
@@ -49,13 +49,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Location"/>
+                android:text="@string/location"/>
 
             <TextView
                 android:id="@+id/producer_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TestLocation"/>
+                android:text="@string/example_location"/>
         </LinearLayout>
 
         <LinearLayout
@@ -70,13 +70,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Website"/>
+                android:text="@string/label_website"/>
 
             <TextView
                 android:id="@+id/producer_website"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="NO website"/>
+                android:text="@string/example_website"/>
 
         </LinearLayout>
 
@@ -92,13 +92,13 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="Description"/>
+                android:text="@string/label_producer_description"/>
 
             <TextView
                 android:id="@+id/producer_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="EMPTY description"/>
+                android:text="@string/example_producer_description"/>
         </LinearLayout>
 
     </LinearLayout>

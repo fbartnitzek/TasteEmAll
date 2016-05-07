@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-                return;
             }
 
         } else {

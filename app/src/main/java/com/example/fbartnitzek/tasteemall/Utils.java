@@ -30,7 +30,7 @@ import com.google.maps.model.GeocodingResult;
  * limitations under the License.
  */
 
-public class Utils {
+class Utils {
     // to confusing for now...
 //    public static String calcDegreesPlato(double stammwuerze) {
 //        //https://de.wikipedia.org/wiki/Stammw%C3%BCrze#Umrechnung_zwischen_Grad_Plato_und_Massendichte

@@ -88,14 +88,14 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView nameView;
         public final TextView descriptionView;
-        public final TextView websiteView;
+        // --Commented out by Inspection (07.05.16 22:46):public final TextView websiteView;
         public final TextView locationView;
 
         public ViewHolder(View view) {
             super(view);
             this.nameView = (TextView) view.findViewById(R.id.list_item_producer_name);
             this.descriptionView = (TextView) view.findViewById(R.id.list_item_producer_description);
-            this.websiteView = (TextView) view.findViewById(R.id.list_item_producer_website);;
+//            this.websiteView = (TextView) view.findViewById(R.id.list_item_producer_website);;
             this.locationView = (TextView) view.findViewById(R.id.list_item_producer_location);
 
             // as a start - just click for whole producer

@@ -24,7 +24,7 @@ import android.util.Log;
  * limitations under the License.
  */
 
-public class TestUtils {
+class TestUtils {
 
     private static final String LOG_TAG = TestUtils.class.getName();
 
@@ -76,7 +76,7 @@ public class TestUtils {
         return cvs;
     }
 
-    public static void printCurrentCursorEntry(Cursor cursor) {
+    private static void printCurrentCursorEntry(Cursor cursor) {
         String result = "";
         for (int i = 0 ; i < cursor.getColumnCount() ; ++i) {
             result += i + ": " + cursor.getString(i) + ", ";
@@ -96,10 +96,10 @@ public class TestUtils {
                 "http://www.laphroaig.com", "Port Ellen, Isle of Islay");
     }
 
-    public static String OLD_BEER_GOSE_INGREDIENTS = "usual + salt + coriander";
-    public static String NEW_BEER_GOSE_INGREDIENTS = "water + hops + barleyMalt + salt + coriander";
+    private static final String OLD_BEER_GOSE_INGREDIENTS = "usual + salt + coriander";
+    public static final String NEW_BEER_GOSE_INGREDIENTS = "water + hops + barleyMalt + salt + coriander";
 
-    public static String NEW_PRODUCER_LAPHROAIG_DESCRIPTION = "The absolutely most richly flavoured of all Scotch whiskies";
+    public static final String NEW_PRODUCER_LAPHROAIG_DESCRIPTION = "The absolutely most richly flavoured of all Scotch whiskies";
 
     public static ContentValues updateBeerGose() {
         return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", NEW_BEER_GOSE_INGREDIENTS, "1");

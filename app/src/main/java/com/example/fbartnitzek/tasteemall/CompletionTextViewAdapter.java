@@ -24,7 +24,7 @@ import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
  * limitations under the License.
  */
 
-public class CompletionTextViewAdapter extends SimpleCursorAdapter {
+class CompletionTextViewAdapter extends SimpleCursorAdapter {
 
     private final CompletionAdapterUpdateHandler mUpdateHandler;
     private final Activity mActivity;

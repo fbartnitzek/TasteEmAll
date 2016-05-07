@@ -20,9 +20,9 @@ import java.util.List;
 
 public class Data {
 
-    List<Producer> producers;
-    List<Drink> drinks;
-    List<Review> reviews;
+    private List<Producer> producers;
+    private List<Drink> drinks;
+    private List<Review> reviews;
     // String user;
 
     public Data(List<Drink> drinks, List<Producer> producers, List<Review> reviews) {

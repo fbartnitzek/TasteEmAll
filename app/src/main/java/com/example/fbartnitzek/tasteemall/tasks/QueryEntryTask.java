@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.Arrays;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -23,11 +25,11 @@ import android.util.Log;
  */
 
 public class QueryEntryTask  extends AsyncTask<Uri, Void, Object[]>{
-    private Activity mActivity;
-    private String mColumnNameEntry_Id;
-    private String mColumnNameEntryId;
-    private String mColumnNameEntryName;
-    private QueryEntryFoundHandler mFoundHandler;
+    private final Activity mActivity;
+    private final String mColumnNameEntry_Id;
+    private final String mColumnNameEntryId;
+    private final String mColumnNameEntryName;
+    private final QueryEntryFoundHandler mFoundHandler;
 
     private static final String LOG_TAG = QueryEntryTask.class.getName();
 
@@ -46,7 +48,7 @@ public class QueryEntryTask  extends AsyncTask<Uri, Void, Object[]>{
 
     @Override
     protected Object[] doInBackground(Uri... params) {
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
+        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + Arrays.toString(params) + "]");
         if (params.length == 0) {
             return null;
         }
@@ -56,7 +58,10 @@ public class QueryEntryTask  extends AsyncTask<Uri, Void, Object[]>{
                 params[0], queryColumns, null, null, null);
 
         Object[] objects;
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor == null) {
+            return null;
+        }
+        if (cursor.moveToFirst()) {
             objects = new Object[]{cursor.getInt(0), cursor.getString(1), cursor.getString(2)};
         } else {
             objects = null;

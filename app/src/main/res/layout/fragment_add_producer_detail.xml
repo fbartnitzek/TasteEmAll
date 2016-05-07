@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="8dp"
-            android:text="Producer"/>
+            android:text="@string/label_producer"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,10 +32,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Name"/>
+                android:text="@string/label_producer_name"/>
 
             <EditText
                 android:id="@+id/producer_name"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_producer_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -50,10 +52,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Location"/>
+                android:text="@string/location"/>
 
             <EditText
                 android:id="@+id/producer_location"
+                android:inputType="textCapWords"
+                android:hint="@string/hint_producer_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -67,10 +71,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="Website"/>
+                android:text="@string/label_website"/>
 
             <EditText
                 android:id="@+id/producer_website"
+                android:inputType="textUri"
+                android:hint="@string/hint_producer_website"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -85,10 +91,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="description"/>
+                android:text="@string/label_producer_description"/>
 
             <EditText
                 android:id="@+id/producer_description"
+                android:inputType="textMultiLine"
+                android:hint="@string/hint_producer_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

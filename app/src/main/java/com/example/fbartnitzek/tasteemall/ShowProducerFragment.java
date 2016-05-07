@@ -33,7 +33,7 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
     private TextView mProducerWebsiteView;
     private Uri mUri;
     private View mRootView;
-    private int mDrinkTypeIndex;
+    // --Commented out by Inspection (07.05.16 22:47):private int mDrinkTypeIndex;
 
     public ShowProducerFragment() {
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
@@ -82,8 +82,13 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             activity.setSupportActionBar(toolbar);
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            activity.getSupportActionBar().setHomeButtonEnabled(true);
+            ActionBar supportActionBar = activity.getSupportActionBar();
+            if (supportActionBar == null) {
+                Log.e(LOG_TAG, "createToolbar - no supportActionBar found, hashCode=" + this.hashCode() + ", " + "");
+                return;
+            }
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
         } else {
             Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
