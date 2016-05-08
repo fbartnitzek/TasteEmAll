@@ -83,11 +83,19 @@ public class DatabaseProvider extends ContentProvider {
     private static final String DRINKS_BY_NAME_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'";
 
+    private static final String DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
+            DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
+                + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
+
 
     private static final String DRINKS_BY_NAME_AND_TYPE_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? AND "
             + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
 
+    private static final String DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
+            "(" + DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
+                + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?)" +
+                    " AND " + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
 
     private static final String PRODUCER_BY_ID_SELECTION =
             ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
@@ -198,24 +206,22 @@ public class DatabaseProvider extends ContentProvider {
             case DRINKS_WITH_PRODUCER_BY_NAME:
                 Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 pattern = DrinkEntry.getSearchString(uri, false);
-                mySelectionArgs = new String[]{pattern + "%"};
-//                cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
-//                        mySelectionArgs, null, null, sortOrder);
+                mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
-                        projection, DRINKS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                        projection, DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
                 break;
             case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
                 pattern = DrinkEntry.getSearchString(uri, true);
                 drinkType = DrinkEntry.getDrinkType(uri);
                 Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 if (Drink.TYPE_ALL.equals(drinkType)){
-                    mySelectionArgs = new String[]{pattern + "%"};
+                    mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
-                            projection, DRINKS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                            projection, DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
                 } else {
-                    mySelectionArgs = new String[]{pattern + "%", drinkType};
+                    mySelectionArgs = new String[]{pattern + "%", pattern + "%", drinkType};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
-                            projection, DRINKS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
+                            projection, DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
                 }
 
                 break;
