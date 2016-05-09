@@ -15,14 +15,30 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/heading_reviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/title_list_of_reviews"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_reviews"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="250dp">
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
             android:id="@+id/heading_drinks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/title_list_of_drinks"/>
 
+        <!-- TODO: dynamically shrinking size if less results? -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_drink"
+            android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="250dp">
         </android.support.v7.widget.RecyclerView>
@@ -37,6 +53,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_producer"
             android:layout_width="match_parent"
+            android:scrollbars="vertical"
             android:layout_height="250dp">
         </android.support.v7.widget.RecyclerView>
 

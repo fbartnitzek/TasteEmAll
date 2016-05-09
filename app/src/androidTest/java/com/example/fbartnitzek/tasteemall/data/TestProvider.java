@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
-import com.example.fbartnitzek.tasteemall.ProducerFragmentHelper;
+import com.example.fbartnitzek.tasteemall.QueryColumns;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
@@ -224,10 +224,10 @@ public class TestProvider extends AndroidTestCase {
                 TestUtils.updateDistilleryLaphroaig(), null, null);
         assertTrue("update of distillery failed", rows == 1);
         cursor = mContext.getContentResolver().query(ProducerEntry.buildUri(2),
-                ProducerFragmentHelper.DETAIL_COLUMNS, null, null, null);
+                QueryColumns.ProducerFragment.DETAIL_COLUMNS, null, null, null);
         assertTrue("query after update of distillery failed", cursor.getCount() == 1);
         cursor.moveToFirst();
-        String prodDescription = cursor.getString(ProducerFragmentHelper.COL_PRODUCER_DESCRIPTION);
+        String prodDescription = cursor.getString(QueryColumns.ProducerFragment.COL_PRODUCER_DESCRIPTION);
         assertTrue("update of distillery-description failed", TestUtils.NEW_PRODUCER_LAPHROAIG_DESCRIPTION.equals(prodDescription));
         cursor.close();
 
@@ -282,6 +282,44 @@ public class TestProvider extends AndroidTestCase {
                 null, null, null, null);
         assertTrue("missing review after insert", cursor.getCount() > 0);
 //        TestUtils.printAllCursorEntries(cursor, "1 review should be inserted");
+        cursor.close();
+
+        //query provider with all...
+//        cursor = mContext.getContentResolver().query(DrinkEntry.buildUriWithName(""),
+//                null, null, null, null);
+//        assertTrue("joined drink query failed", cursor.getCount() > 0
+//                && cursor.getColumnCount() == TestUtils.createBeerGose().size()
+//                + TestUtils.createBreweryBayrischerBahnhof().size() + 2);   //all attributes + id each
+        cursor = mContext.getContentResolver().query(ReviewEntry.buildUriForShowReview(1),
+                null, null, null, null);
+        assertTrue("joined query on review did not work", cursor.getCount() > 0);
+        cursor.close();
+
+        // complicated joined review-query
+        cursor = mContext.getContentResolver().query(
+                ReviewEntry.buildUriForShowReviewWithPatternAndType("z", Drink.TYPE_ALL),
+                null, null, null, null);
+        assertTrue("joined query on review ALL containing z", cursor.getCount() == 0);
+        cursor.close();
+        cursor = mContext.getContentResolver().query(
+                ReviewEntry.buildUriForShowReviewWithPatternAndType("se", "beer"),
+                null, null, null, null);
+        assertTrue("joined query on review Beer containing se", cursor.getCount() == 1);
+        cursor.close();
+        cursor = mContext.getContentResolver().query(
+                ReviewEntry.buildUriForShowReviewWithPatternAndType("se", "wine"),
+                null, null, null, null);
+        assertTrue("joined query on review Wine containing se", cursor.getCount() == 0);
+        cursor.close();
+        cursor = mContext.getContentResolver().query(
+                ReviewEntry.buildUriForShowReviewWithPatternAndType("hof", "wine"),
+                null, null, null, null);
+        assertTrue("joined query on review Wine containing ig", cursor.getCount() == 0);
+        cursor.close();
+        cursor = mContext.getContentResolver().query(
+                ReviewEntry.buildUriForShowReviewWithPatternAndType("hof", "beer"),
+                null, null, null, null);
+        assertTrue("joined query on review Beer containing ig", cursor.getCount() > 0);
         cursor.close();
 
         // bulk insert reviews

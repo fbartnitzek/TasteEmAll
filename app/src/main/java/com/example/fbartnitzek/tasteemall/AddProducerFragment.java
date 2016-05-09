@@ -26,8 +26,6 @@ import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 /**
  * A simple {@link Fragment} subclass.
  * to handle interaction events.
- * Use the {@link AddProducerFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class AddProducerFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -51,31 +49,9 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
     public AddProducerFragment() {
         // Required empty public constructor
+        mProducerName = "";
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * @return A new instance of fragment AddProducerFragment.
-     */
-
-    public static AddProducerFragment newInstance() {
-        AddProducerFragment fragment = new AddProducerFragment();
-        fragment.setProducerName("");
-        return fragment;
-    }
-
-    public static AddProducerFragment newInstance(String producerName) {
-        AddProducerFragment fragment = new AddProducerFragment();
-        fragment.setProducerName(producerName);
-        return fragment;
-    }
-
-    public static AddProducerFragment newInstance(Uri contentUri) {
-        AddProducerFragment fragment = new AddProducerFragment();
-        fragment.setContentUri(contentUri);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -237,11 +213,11 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         return mProducerName;
     }
 
-    private void setProducerName(String producerName) {
+    public void setProducerName(String producerName) {
         this.mProducerName = producerName;
     }
 
-    private void setContentUri(Uri contentUri) {
+    public void setContentUri(Uri contentUri) {
         this.mContentUri = contentUri;
     }
 
@@ -252,7 +228,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             return new CursorLoader(
                     getActivity(),
                     mContentUri,
-                    ProducerFragmentHelper.DETAIL_COLUMNS,
+                    QueryColumns.ProducerFragment.DETAIL_COLUMNS,
                     null,
                     null,
                     null);
@@ -266,15 +242,15 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
         if (data != null && data.moveToFirst()) {
             // variables not really needed - optimize later...
-            String name = data.getString(ProducerFragmentHelper.COL_PRODUCER_NAME);
+            String name = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_NAME);
             mEditProducerName.setText(name);
-            String location = data.getString(ProducerFragmentHelper.COL_PRODUCER_LOCATION);
+            String location = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_LOCATION);
             mEditProducerLocation.setText(location);
-            String website = data.getString(ProducerFragmentHelper.COL_PRODUCER_WEBSITE);
+            String website = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_WEBSITE);
             mEditProducerWebsite.setText(website);
-            String description = data.getString(ProducerFragmentHelper.COL_PRODUCER_DESCRIPTION);
+            String description = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_DESCRIPTION);
             mEditProducerDescription.setText(description);
-            mProducerId = data.getString(ProducerFragmentHelper.COL_PRODUCER_ID);
+            mProducerId = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_ID);
 
             updateToolbar(name);
 

@@ -15,7 +15,7 @@
 
 
     <TextView
-        android:id="@+id/list_item_producer_location"
+        android:id="@+id/list_item_location_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_completion_side"/>

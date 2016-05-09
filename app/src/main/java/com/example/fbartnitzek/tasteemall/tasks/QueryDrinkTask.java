@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.fbartnitzek.tasteemall.QueryColumns;
+import com.example.fbartnitzek.tasteemall.Utils;
+
 import java.util.Arrays;
 
 /**
@@ -24,45 +27,44 @@ import java.util.Arrays;
  * limitations under the License.
  */
 
-public class QueryEntryTask  extends AsyncTask<Uri, Void, Object[]>{
+public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
     private final Activity mActivity;
-    private final String mColumnNameEntry_Id;
-    private final String mColumnNameEntryId;
-    private final String mColumnNameEntryName;
-    private final QueryEntryFoundHandler mFoundHandler;
+    private final QueryDrinkFoundHandler mFoundHandler;
 
-    private static final String LOG_TAG = QueryEntryTask.class.getName();
+    private static final String LOG_TAG = QueryDrinkTask.class.getName();
 
-    public interface QueryEntryFoundHandler {
-        void onFound(int entry_Id, String entryId, String entryName);
+    public interface QueryDrinkFoundHandler {
+        void onFoundDrink(int drink_Id, String drinkName, String drinkId, String producerName);
     }
 
-    public QueryEntryTask(Activity mActivity, String mColumnNameEntry_Id, String mColumnNameEntryId,
-                          String mColumnNameEntryName, QueryEntryFoundHandler mFoundHandler) {
+    public QueryDrinkTask(Activity mActivity, QueryDrinkFoundHandler mFoundHandler) {
         this.mActivity = mActivity;
-        this.mColumnNameEntry_Id = mColumnNameEntry_Id;
-        this.mColumnNameEntryId = mColumnNameEntryId;
-        this.mColumnNameEntryName = mColumnNameEntryName;
         this.mFoundHandler = mFoundHandler;
     }
 
     @Override
     protected Object[] doInBackground(Uri... params) {
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + Arrays.toString(params) + "]");
+        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", "
+                + "params = [" + Arrays.toString(params) + "]");
         if (params.length == 0) {
             return null;
         }
-        final String[] queryColumns = {mColumnNameEntry_Id, mColumnNameEntryId, mColumnNameEntryName};
+
+        Uri uri = Utils.calcDrinkIncludingProducerUri(params[0]);
 
         Cursor cursor = mActivity.getContentResolver().query(
-                params[0], queryColumns, null, null, null);
+                uri, QueryColumns.ReviewFragment.DRINK_QUERY_COLUMNS, null, null, null);
 
         Object[] objects;
         if (cursor == null) {
             return null;
         }
         if (cursor.moveToFirst()) {
-            objects = new Object[]{cursor.getInt(0), cursor.getString(1), cursor.getString(2)};
+            objects = new Object[]{
+                    cursor.getInt(QueryColumns.ReviewFragment.COL_QUERY_DRINK__ID),
+                    cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_DRINK_NAME),
+                    cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_DRINK_ID),
+                    cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_PRODUCER_NAME)};
         } else {
             objects = null;
         }
@@ -74,7 +76,8 @@ public class QueryEntryTask  extends AsyncTask<Uri, Void, Object[]>{
     @Override
     protected void onPostExecute(Object[] objects) {
         if (objects != null) {
-            mFoundHandler.onFound((int) objects[0], (String) objects[1], (String) objects[2]);
+            mFoundHandler.onFoundDrink((int) objects[0], (String) objects[1],
+                    (String) objects[2], (String) objects[3]);
         }
     }
 }

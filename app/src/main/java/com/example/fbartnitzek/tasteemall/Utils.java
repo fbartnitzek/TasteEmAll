@@ -14,6 +14,11 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * Copyright 2015.  Frank Bartnitzek
  *
@@ -30,7 +35,7 @@ import com.google.maps.model.GeocodingResult;
  * limitations under the License.
  */
 
-class Utils {
+public class Utils {
     // to confusing for now...
 //    public static String calcDegreesPlato(double stammwuerze) {
 //        //https://de.wikipedia.org/wiki/Stammw%C3%BCrze#Umrechnung_zwischen_Grad_Plato_und_Massendichte
@@ -45,6 +50,8 @@ class Utils {
 //        );
 //    }
 
+    static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     // TODO: might use some hash-function later...
     public static String calcProducerId(String producerName) {
         return "producer_" + producerName;
@@ -54,10 +61,23 @@ class Utils {
         return producerId + "_;drink_" + drinkName;
     }
 
+    public static String calcReviewId(String userName, String mDrinkId, String date) {
+        return "review_user_" + userName + "_;_date_" + date + "_;_" + mDrinkId;
+    }
+
     public static Uri calcSingleDrinkUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
         if (uri != null) {
             int id = DatabaseContract.getIdFromUri(uri);
             return DatabaseContract.DrinkEntry.buildUri(id);
+        } else {
+            return null;
+        }
+    }
+
+    public static Uri calcDrinkIncludingProducerUri(Uri uri) {    //if called with drink-id...
+        if (uri != null) {
+            int id = DatabaseContract.getIdFromUri(uri);
+            return DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
         } else {
             return null;
         }
@@ -87,6 +107,7 @@ class Utils {
     }
 
     public static int getDrinkTypeIndex(Context context, String drinkType) {
+        //TODO: generic solution - based only on string/array-values
         if (context.getString(R.string.drink_key_beer).equals(drinkType)) {
             return R.string.drink_key_beer;
         } else if (context.getString(R.string.drink_key_coffee).equals(drinkType)) {
@@ -124,6 +145,39 @@ class Utils {
                 producer.getProducerId(), producer.getName(), producer.getDescription(),
                 producer.getWebsite(), producer.getLocation()
         );
+    }
+
+    public static String getCurrentLocalIso8601Time() {
+        return iso8601Format.format(new java.util.Date());
+    }
+
+    public static String formatDateTime(Context context, String timeToFormat) {
+
+        String finalDateTime = "";
+
+//        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date date = null;
+        if (timeToFormat != null) {
+            try {
+                date = iso8601Format.parse(timeToFormat);
+            } catch (ParseException e) {
+                date = null;
+            }
+
+            if (date != null) {
+                long when = date.getTime();
+                int flags = 0;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
+                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
+                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
+
+                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
+                        when + TimeZone.getDefault().getOffset(when), flags);
+            }
+        }
+        return finalDateTime;
     }
 
     public static String queryLocation(String locationString) {
@@ -200,4 +254,6 @@ class Utils {
                 return R.string.producer_show_generic;
         }
     }
+
+
 }

@@ -18,19 +18,20 @@ package com.example.fbartnitzek.tasteemall.data.pojo;
 
 public class Review {
 
+
     public static final String REVIEW_ID = "review_id";
     public static final String RATING = "review_rating";
     public static final String DESCRIPTION = "review_description";
-    public static final String DATE = "review_date";
+    public static final String READABLE_DATE = "review_readable_date";
+//    public static final String CREATION_DATE = "review_creation_date";
+//    public static final String UPDATE_DATE = "review_update_date";
+
     public static final String LOCATION = "review_location";
+    public static final String RECOMMENDED_SIDES = "review_recommended_sides";
 
-    //TODO: more description, recommended sides, user?
-
-    //    public static final String LOOK = "review_look";    // bottle-design, color, foam, ...
-//    public static final String SMELL = "review_smell";  // ipa :-)
-//    public static final String TASTE = "review_taste";  // taste = antrunk, frische, abgang - bitter/malzig/...
-
+    public static final String USER_NAME = "review_user_name";
 //    public static final String USER_ID = "review_user_id";
+
     public static final String DRINK_ID = "review_drink_id";
 
 
@@ -41,38 +42,34 @@ public class Review {
 //    private String look;
 //    private String smell;
 //    private String taste;
-    private String date;
+
+
+    /**
+     * notes on timestamps:
+     * for reviews the readableDate is most important - as it's the time in the timezone when the user created the review on the given location
+     * creation and updateDates are just for internal stuff and should be utc - later
+     */
+    private String readableDate;
+//    private String creationDate;
+//    private String updateDate;
+    private String recommendedSides;
+    private String userName;
 //    private String userId;
+
     private String drinkId;
     private String location;
 
-    public Review(Drink drink, String description, String location, String rating, String reviewId, String date) {
-        this.drinkId = drink.getDrinkId();
+
+    public Review(String description, String drinkId, String location, String rating,
+                  String readableDate, String recommendedSides, String reviewId, String userName) {
         this.description = description;
+        this.drinkId = drinkId;
         this.location = location;
         this.rating = rating;
+        this.readableDate = readableDate;
+        this.recommendedSides = recommendedSides;
         this.reviewId = reviewId;
-        this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "Review{" +
-                "date='" + date + '\'' +
-                ", reviewId='" + reviewId + '\'' +
-                ", rating='" + rating + '\'' +
-                ", description='" + description + '\'' +
-                ", drinkId='" + drinkId + '\'' +
-                ", location='" + location + '\'' +
-                '}';
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
+        this.userName = userName;
     }
 
     public String getDescription() {
@@ -107,11 +104,35 @@ public class Review {
         this.rating = rating;
     }
 
+    public String getReadableDate() {
+        return readableDate;
+    }
+
+    public void setReadableDate(String readableDate) {
+        this.readableDate = readableDate;
+    }
+
+    public String getRecommendedSides() {
+        return recommendedSides;
+    }
+
+    public void setRecommendedSides(String recommendedSides) {
+        this.recommendedSides = recommendedSides;
+    }
+
     public String getReviewId() {
         return reviewId;
     }
 
     public void setReviewId(String reviewId) {
         this.reviewId = reviewId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

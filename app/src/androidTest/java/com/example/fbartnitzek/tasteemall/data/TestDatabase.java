@@ -96,7 +96,7 @@ public class TestDatabase extends AndroidTestCase {
 
             // Move the cursor to a valid database row
             assertTrue("Error: No Records returned from brewery query", cursor.moveToFirst());
-            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
+            assertTrue("wrong entry count...? ", cursor.getCount() > 0);    // with brewdog from testInsert
             cursor.close();
         }
 
@@ -111,7 +111,7 @@ public class TestDatabase extends AndroidTestCase {
 
             // Move the cursor to a valid database row
             assertTrue("Error: No Records returned from beer query", cursor.moveToFirst());
-            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
+            assertTrue("wrong entry count...? ", cursor.getCount() > 1);    // with brewdog from testInsert
             cursor.close();
         }
 
@@ -141,7 +141,7 @@ public class TestDatabase extends AndroidTestCase {
 
             // Move the cursor to a valid database row
             assertTrue("Error: No Records returned from review query", cursor.moveToFirst());
-            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
+            assertTrue("wrong entry count...? ", cursor.getCount() > 0);       // with brewdog from testInsert
             cursor.close();
         }
 

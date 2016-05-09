@@ -61,16 +61,16 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         mCursor.moveToPosition(position);
 
         viewHolder.nameView.setText(
-                mCursor.getString(MainFragment.COL_QUERY_PRODUCER_NAME)
+                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME)
         );
 
         //TODO later with flag :-)
         viewHolder.locationView.setText(
-                mCursor.getString(MainFragment.COL_QUERY_PRODUCER_LOCATION)
+                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_LOCATION)
         );
 
         viewHolder.descriptionView.setText(
-                mCursor.getString(MainFragment.COL_QUERY_PRODUCER_DESCRIPTION)
+                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_DESCRIPTION)
         );
 
     }
@@ -96,7 +96,7 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
             this.nameView = (TextView) view.findViewById(R.id.list_item_producer_name);
             this.descriptionView = (TextView) view.findViewById(R.id.list_item_producer_description);
 //            this.websiteView = (TextView) view.findViewById(R.id.list_item_producer_website);;
-            this.locationView = (TextView) view.findViewById(R.id.list_item_producer_location);
+            this.locationView = (TextView) view.findViewById(R.id.list_item_location_name);
 
             // as a start - just click for whole producer
             view.setOnClickListener(this);
@@ -106,11 +106,11 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         public void onClick(View view) {
             mCursor.moveToPosition(getAdapterPosition());
             Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
-            int producerId = mCursor.getInt(MainFragment.COL_QUERY_PRODUCER__ID);
+            int producerId = mCursor.getInt(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER__ID);
             Uri contentUri = DatabaseContract.ProducerEntry.buildUri(producerId);
             Log.v(LOG_TAG, "onClick, producerId=" + producerId + ", contentUri= " +  contentUri + ", hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
             mClickHandler.onClick(
-                    mCursor.getString(MainFragment.COL_QUERY_PRODUCER_NAME),
+                    mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME),
                     contentUri,
                     this
             );

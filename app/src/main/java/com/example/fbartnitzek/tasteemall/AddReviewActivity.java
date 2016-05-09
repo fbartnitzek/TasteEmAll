@@ -6,20 +6,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class AddProducerActivity extends AppCompatActivity {
+public class AddReviewActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = AddProducerActivity.class.getName();
-    public static final String PRODUCER_NAME_EXTRA = "producer_name_extra";
-    private static final String ADD_PRODUCER_FRAGMENT_TAG = "ADD_PRODUCER_FRAGMENT_TAG";
-
+    private static final String LOG_TAG = AddReviewActivity.class.getName();
+    private static final String ADD_REVIEW_FRAGMENT_TAG = "ADD_REVIEW_FRAGMENT_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_producer);
+        setContentView(R.layout.activity_add_review);
 
-        // explicitly add fragment with pattern
+        // explicitly add fragment, toolbar from fragment...
         if (findViewById(R.id.fragment_container) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
@@ -27,28 +25,31 @@ public class AddProducerActivity extends AppCompatActivity {
                 return;
             }
 
-            AddProducerFragment fragment = getFragment();
-
-            // use name from calling activity
+            // edit or add
+            AddReviewFragment fragment = getFragment();
             if (fragment == null) {
-                fragment = new AddProducerFragment();
-                if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
-                    fragment.setProducerName(getIntent().getStringExtra(PRODUCER_NAME_EXTRA));
-                } else if (getIntent().getData() != null) {
-                    fragment.setContentUri(getIntent().getData());;
+
+                fragment = new AddReviewFragment();
+                if (getIntent().getData() != null) {
+                    fragment.setmContentUri(getIntent().getData());
                 }
+
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, fragment, ADD_REVIEW_FRAGMENT_TAG)
+                        .commit();
+            } else {
+                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, ADD_PRODUCER_FRAGMENT_TAG)
-                    .commit();
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + "]");
         }
 
         // add toolbar from fragment (when view is initialized)
+    }
 
+    private AddReviewFragment getFragment() {
+        return (AddReviewFragment) getSupportFragmentManager().findFragmentByTag(ADD_REVIEW_FRAGMENT_TAG);
     }
 
     @Override
@@ -58,26 +59,22 @@ public class AddProducerActivity extends AppCompatActivity {
         return true;
     }
 
-    private AddProducerFragment getFragment() {
-        return (AddProducerFragment) getSupportFragmentManager().findFragmentByTag(ADD_PRODUCER_FRAGMENT_TAG);
-    }
-
     // TODO: might be better directly in fragment...
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.action_save:
-                AddProducerFragment fragment = getFragment();
+                AddReviewFragment fragment = getFragment();
                 if (fragment != null) {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
                 }
                 break;
             default:
-                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

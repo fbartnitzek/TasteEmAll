@@ -10,13 +10,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -25,8 +25,8 @@
             android:name=".data.DatabaseProvider"
             android:authorities="fbartnitzek.tasteemall"/>
 
-         <!--bugfix for editText hides nestedScrollView:-->
-        <!--    android:windowSoftInputMode="adjustResize" -->
+        <!-- bugfix for editText hides nestedScrollView: -->
+        <!-- android:windowSoftInputMode="adjustResize" -->
         <activity
             android:name=".AddProducerActivity"
             android:label="@string/title_add_producer_activity"
@@ -38,9 +38,13 @@
             android:label="@string/title_add_drink_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
-
         </activity>
-
+        <activity
+            android:name=".AddReviewActivity"
+            android:label="@string/title_add_review_activity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
         <activity
             android:name=".ShowProducerActivity"
             android:label="@string/title_activity_producer"
@@ -57,7 +61,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
-
         <activity android:name=".SettingsActivity">
         </activity>
     </application>

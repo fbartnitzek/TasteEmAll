@@ -10,6 +10,7 @@ public class AddDrinkActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = AddDrinkActivity.class.getName();
     private static final String ADD_DRINK_FRAGMENT_TAG = "ADD_DRINK_FRAGMENT_TAG";
+    public static final String PATTERN_EXTRA = "EXTRA_PRE_FILLED_PATTERN";
 
 
     @Override
@@ -29,10 +30,13 @@ public class AddDrinkActivity extends AppCompatActivity {
             // edit or add
             AddDrinkFragment fragment = getFragment();
             if (fragment == null) {
+                fragment = new AddDrinkFragment();
                 if (getIntent().getData() != null) {
-                    fragment = AddDrinkFragment.newInstance(getIntent().getData());
-                } else {
-                    fragment = AddDrinkFragment.newInstance();
+//                    fragment = AddDrinkFragment.newInstance(getIntent().getData());
+                    fragment.setContentUri(getIntent().getData());
+                } else if (getIntent().hasExtra(PATTERN_EXTRA)) {
+                    fragment.setmPreFilledPattern(getIntent().getStringExtra(PATTERN_EXTRA));
+//                    fragment = AddDrinkFragment.newInstance();
                 }
 
                 getSupportFragmentManager().beginTransaction()
@@ -60,6 +64,7 @@ public class AddDrinkActivity extends AppCompatActivity {
         return (AddDrinkFragment) getSupportFragmentManager().findFragmentByTag(ADD_DRINK_FRAGMENT_TAG);
     }
 
+    // TODO: might be better directly in fragment...
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

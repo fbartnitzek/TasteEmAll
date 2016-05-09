@@ -132,15 +132,27 @@ public class CsvFileReader {
                     }
 
                     reviews.add(new Review(
-                            drink,
                             Util.getRecord(record, Review.DESCRIPTION),
-                            reviewLocation,
-                            Util.getRecord(record, Review.RATING),
-                            //TODO: locally at first...
-//                            "Review_" + userName + "_" + ++reviewId,
+                            drink.getDrinkId(),
+                            Util.getRecord(record, Review.LOCATION),
+                            "++",
+                            "some_date",
+                            "some_sides",
                             "Review_" + ++reviewId,
-                            Util.readTimestamp(Util.getRecord(record, Review.DATE))
+                            "user1"
                     ));
+//                    reviews.add(new Review(
+//                            Util.getRecord(record, Review.DESCRIPTION),
+//                            drink,
+//                            reviewLocation,
+//                            Util.getRecord(record, Review.RATING),
+//                            //TODO: locally at first...
+////                            "Review_" + userName + "_" + ++reviewId,
+//                            "Review_" + ++reviewId,
+////                            Util.readTimestamp(Util.getRecord(record, Review.DATE)
+//                            Util.getRecord(record, Review.READABLE_DATE)
+//                            )
+//                    ));
 
                 } else {
                     empty++;

@@ -35,6 +35,8 @@ public class DatabaseContract {
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE = "drink_with_producer_by_name_and_type";
 
     public static final String PATH_REVIEW = "review";
+    public static final String PATH_REVIEW_WITH_ALL = "review_with_all";
+    public static final String PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE = "review_with_all_by_name_and_type";
 
 //    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
@@ -43,7 +45,7 @@ public class DatabaseContract {
 
     public static final class ProducerEntry implements BaseColumns {
         public static final String TABLE_NAME = "producer";
-        public static final String PATH_PATTERN = "pattern";
+        public static final String ALIAS = "p";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRODUCER).build();
@@ -79,6 +81,7 @@ public class DatabaseContract {
 
     public static final class DrinkEntry implements BaseColumns {
         public static final String TABLE_NAME = "drink";
+        public static final String ALIAS = "d";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK).build();
@@ -94,7 +97,6 @@ public class DatabaseContract {
         }
 
         public static Uri buildUriIncludingProducer(long id) {
-//            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER)
                     .appendPath(Long.toString(id)).build();
         }
@@ -124,7 +126,6 @@ public class DatabaseContract {
                     return "";
                 }
             }
-
         }
 
         public static String getDrinkType(Uri uri) {
@@ -146,6 +147,7 @@ public class DatabaseContract {
 
     public static final class ReviewEntry implements BaseColumns {
         public static final String TABLE_NAME = "reviews";
+        public static final String ALIAS = "r";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
@@ -157,6 +159,44 @@ public class DatabaseContract {
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+        public static Uri buildUriForShowReview(int reviewId) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW_WITH_ALL)
+                    .appendPath(Long.toString(reviewId)).build();
+        }
+
+        public static Uri buildUriForShowReviewWithPatternAndType(String pattern, String type) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE)
+                    .appendPath(type)
+                    .appendPath(pattern)
+                    .build();
+        }
+
+        public static String getSearchString(Uri uri, boolean withDrink) {
+            // may also be empty
+            if (withDrink) {
+                if (uri.getPathSegments().size()>2){
+                    return uri.getPathSegments().get(2);
+                } else {
+                    return "";
+                }
+            } else {
+                if (uri.getPathSegments().size()>1){
+                    return uri.getPathSegments().get(uri.getPathSegments().size()-1);
+                } else {
+                    return "";
+                }
+            }
+        }
+
+        public static String getDrinkType(Uri uri) {
+            // should never be empty - how might that work...?
+            if (uri.getPathSegments().size()>1){
+                return uri.getPathSegments().get(1);
+            } else {
+                return "";
+            }
         }
     }
 

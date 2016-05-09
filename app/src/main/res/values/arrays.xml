@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- TODO generic solution (additions just by xml-files) everywhere -->
     <string-array name="pref_type_filter_titles">
-        <item>All</item>
-        <item>Beer</item>
-        <item>Wine</item>
-        <item>Whisk(e)y</item>
-        <item>Coffee</item>
-        <item>Generic</item>
+        <!--<item>All</item>-->
+        <item>@string/drink_show_all</item>
+        <!--<item>Beer</item>-->
+        <item>@string/drink_show_beer</item>
+        <!--<item>Wine</item>-->
+        <item>@string/drink_show_wine</item>
+        <!--<item>Whisk(e)y</item>-->
+        <item>@string/drink_show_whisky</item>
+        <!--<item>Coffee</item>-->
+        <item>@string/drink_show_coffee</item>
+        <!--<item>Generic</item>-->
+        <item>@string/drink_show_generic</item>
     </string-array>
 
     <string-array name="pref_type_filter_values">
@@ -24,6 +32,18 @@
         <item>whisky</item>
         <item>coffee</item>
         <item>generic</item>
+    </string-array>
+
+    <string-array name="pref_rating_values">
+        <item>@string/pre_filled_rating</item>
+        <item>++</item>
+        <item>+/++</item>
+        <item>+</item>
+        <item>0/+</item>
+        <item>0</item>
+        <item>-/0</item>
+        <item>-</item>
+        <item>--</item>
     </string-array>
 
 </resources>

@@ -8,4 +8,6 @@
         android:key="@string/pref_type_key"
         android:title="@string/pref_type_label" />
 
+    <!-- TODO: default-userName -->
+
 </PreferenceScreen>

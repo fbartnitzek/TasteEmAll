@@ -109,7 +109,7 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    ProducerFragmentHelper.DETAIL_COLUMNS,
+                    QueryColumns.ProducerFragment.DETAIL_COLUMNS,
                     null,
                     null,
                     null);
@@ -140,13 +140,13 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
 
         if (data != null && data.moveToFirst()) {
             // variables not really needed - optimize later...
-            String name = data.getString(ProducerFragmentHelper.COL_PRODUCER_NAME);
+            String name = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_NAME);
             mProducerNameView.setText(name);
-            String location = data.getString(ProducerFragmentHelper.COL_PRODUCER_LOCATION);
+            String location = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_LOCATION);
             mProducerLocationView.setText(location);
-            String website = data.getString(ProducerFragmentHelper.COL_PRODUCER_WEBSITE);
+            String website = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_WEBSITE);
             mProducerWebsiteView.setText(website);
-            String description = data.getString(ProducerFragmentHelper.COL_PRODUCER_DESCRIPTION);
+            String description = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_DESCRIPTION);
             mProducerDescriptionView.setText(description);
 
             updateToolbar();

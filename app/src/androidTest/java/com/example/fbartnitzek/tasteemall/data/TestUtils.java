@@ -61,8 +61,8 @@ class TestUtils {
 //    }
 
     public static ContentValues createReview1() {
-        return DatabaseHelper.buildReviewValues("1", "++", "lecker", "20151211T160000", "1",
-                "Leipzig, Bayrischer Platz 1");
+        return DatabaseHelper.buildReviewValues("1", "++", "lecker", "2015-12-11 16:00:00",
+                "Kartoffelbrot", "1", "Leipzig, Bayrischer Platz 1", "Frank");
     }
 
     public static ContentValues[] createBulkReviews(int n) {
@@ -71,7 +71,7 @@ class TestUtils {
             cvs[i] = DatabaseHelper.buildReviewValues(
                     "bulk_" + i, String.valueOf(i), "desc_" + i,
                     String.valueOf(System.currentTimeMillis()),
-                    "1", "Leipzig, Bayrischer Platz " + i);
+                    "side_" + i, "1", "Leipzig, Bayrischer Platz " + i, "user_" + i);
         }
         return cvs;
     }

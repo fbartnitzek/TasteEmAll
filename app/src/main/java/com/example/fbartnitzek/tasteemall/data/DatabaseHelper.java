@@ -66,7 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Producer.NAME + " TEXT NOT NULL, "
                 + Producer.DESCRIPTION + " TEXT,"
                 + Producer.WEBSITE + " TEXT,"
-                + Producer.LOCATION + " TEXT NOT NULL,"
+                + Producer.LOCATION + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
 
                 + "UNIQUE (" + Producer.PRODUCER_ID + ") ON CONFLICT REPLACE"
                 + " );";
@@ -109,11 +109,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Review.REVIEW_ID + " TEXT NOT NULL,"
                 + Review.RATING + " TEXT NOT NULL,"
                 + Review.DESCRIPTION + " TEXT,"
-                + Review.DATE + " TEXT NOT NULL,"
+                + Review.READABLE_DATE + " TEXT NOT NULL,"
+                + Review.RECOMMENDED_SIDES + " TEXT,"
 
                 + Review.DRINK_ID + " TEXT NOT NULL,"
                 + Review.LOCATION + " TEXT,"
-                // TODO: USER!
+                + Review.USER_NAME + " TEXT NOT NULL,"  // TODO: USER!
 
                 + "FOREIGN KEY (" + Review.DRINK_ID + ") REFERENCES "
                 + DrinkEntry.TABLE_NAME + " (" + Drink.DRINK_ID + "),"
@@ -172,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Producer.NAME, name);
         cv.put(Producer.DESCRIPTION, description);
         cv.put(Producer.WEBSITE, website);
-        cv.put(Producer.LOCATION, location);
+        cv.put(Producer.LOCATION, location);    //TODO: rawInput => formatted address, country
         return cv;
     }
 
@@ -202,15 +203,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //    }
 
     public static ContentValues buildReviewValues(String reviewId, String rating, String description,
-                                                  String date, String drinkId,
-                                                  String location) {
+                                                  String readableDate, String recommendedSides,
+                                                  String drinkId, String location, String userName) {
         ContentValues cv = new ContentValues();
         cv.put(Review.REVIEW_ID, reviewId);
         cv.put(Review.RATING, rating);
         cv.put(Review.DESCRIPTION, description);
-        cv.put(Review.DATE, date);
+        cv.put(Review.READABLE_DATE, readableDate);
+        cv.put(Review.RECOMMENDED_SIDES, recommendedSides);
         cv.put(Review.DRINK_ID, drinkId);
         cv.put(Review.LOCATION, location);
+        cv.put(Review.USER_NAME, userName);
         return cv;
     }
 }

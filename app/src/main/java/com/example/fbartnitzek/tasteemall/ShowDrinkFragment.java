@@ -140,7 +140,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    DrinkFragmentHelper.DETAIL_COLUMNS,
+                    QueryColumns.DrinkFragment.DETAIL_COLUMNS,
                     null,
                     null,
                     null);
@@ -152,7 +152,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            String drinkType = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_TYPE);
+            String drinkType = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_TYPE);
             mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
@@ -168,16 +168,16 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
                             getString(readableDrinkTypeIndex)));
             mDrinkNameLabelView.setText(readableDrinkTypeIndex);
 
-            String producerName = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_NAME);
+            String producerName = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_NAME);
             mProducerNameView.setText(producerName);
-            mProducerLocationView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_LOCATION));
+            mProducerLocationView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_LOCATION));
 
-            String drinkName = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_NAME);
+            String drinkName = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_NAME);
             mDrinkNameView.setText(drinkName);
 
-            mDrinkStyleView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_STYLE));
-            mDrinkSpecificsView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_SPECIFICS));
-            mDrinkIngredientsView.setText(data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_INGREDIENTS));
+            mDrinkStyleView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_STYLE));
+            mDrinkSpecificsView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_SPECIFICS));
+            mDrinkIngredientsView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_INGREDIENTS));
 
             updateToolbar();
         }

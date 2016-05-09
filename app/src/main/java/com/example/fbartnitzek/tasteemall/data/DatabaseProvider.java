@@ -17,6 +17,7 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.data.pojo.Review;
 
 import java.util.Arrays;
 
@@ -38,7 +39,6 @@ import java.util.Arrays;
 
 public class DatabaseProvider extends ContentProvider {
 
-
     private static DatabaseHelper mHelper;
     private static final String LOG_TAG = DatabaseProvider.class.getName();
 
@@ -58,6 +58,9 @@ public class DatabaseProvider extends ContentProvider {
 
 //    private static final int USERS = 400;
     private static final int REVIEWS = 500;
+//    private static final int REVIEW_WITH_ALL_BY_NAME = 502;
+    private static final int REVIEW_WITH_ALL_BY_ID = 510;
+    private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 //    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
@@ -87,6 +90,10 @@ public class DatabaseProvider extends ContentProvider {
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
                 + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
 
+    private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
+            DrinkEntry.ALIAS + "." + Drink.NAME + " LIKE ? OR "
+                    + ProducerEntry.ALIAS + "." + Producer.NAME + " LIKE ?";
+
 
     private static final String DRINKS_BY_NAME_AND_TYPE_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? AND "
@@ -96,6 +103,11 @@ public class DatabaseProvider extends ContentProvider {
             "(" + DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
                 + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?)" +
                     " AND " + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
+
+    private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
+            "(" + DrinkEntry.ALIAS + "." + Drink.NAME + " LIKE ? OR "
+                    + ProducerEntry.ALIAS + "." + Producer.NAME + " LIKE ?)" +
+                    " AND " + DrinkEntry.ALIAS + "." + Drink.TYPE + " = ?";
 
     private static final String PRODUCER_BY_ID_SELECTION =
             ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
@@ -138,7 +150,10 @@ public class DatabaseProvider extends ContentProvider {
 
         // all reviews
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW, REVIEWS);
-        // TODO: lots of stuff...
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL + "/#", REVIEW_WITH_ALL_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
+
 
         return matcher;
     }
@@ -168,7 +183,7 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case PRODUCERS_BY_NAME:
                 pattern = ProducerEntry.getSearchString(uri);
-                mySelectionArgs = new String[]{pattern + "%"};
+                mySelectionArgs = new String[]{"%" + pattern + "%"};
                 Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
 
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_BY_NAME_SELECTION,
@@ -182,7 +197,7 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case PRODUCERS_BY_PATTERN:
                 pattern = ProducerEntry.getSearchString(uri);
-                mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
+                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection,
                         PRODUCERS_BY_NAME_OR_LOCATION_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
@@ -193,7 +208,7 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case DRINKS_BY_NAME:
                 pattern = DrinkEntry.getSearchString(uri, false);
-                mySelectionArgs = new String[]{pattern + "%"};
+                mySelectionArgs = new String[]{"%" + pattern + "%"};
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, DRINKS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
@@ -206,7 +221,7 @@ public class DatabaseProvider extends ContentProvider {
             case DRINKS_WITH_PRODUCER_BY_NAME:
                 Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 pattern = DrinkEntry.getSearchString(uri, false);
-                mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
+                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
                         projection, DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
                 break;
@@ -215,11 +230,11 @@ public class DatabaseProvider extends ContentProvider {
                 drinkType = DrinkEntry.getDrinkType(uri);
                 Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 if (Drink.TYPE_ALL.equals(drinkType)){
-                    mySelectionArgs = new String[]{pattern + "%", pattern + "%"};
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
                             projection, DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
                 } else {
-                    mySelectionArgs = new String[]{pattern + "%", pattern + "%", drinkType};
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", drinkType};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
                             projection, DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
                 }
@@ -234,6 +249,35 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case REVIEW_WITH_ALL_BY_ID:
+                cursor = sReviewWithDrinkAndProducerQueryBuilder.query(
+                        db, projection,
+                        RA + "." + ReviewEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
+            case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
+                pattern = ReviewEntry.getSearchString(uri, true);
+                drinkType = ReviewEntry.getDrinkType(uri);
+                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+                // more complicated stuff should be customizable (not by default OR concatenated
+                if (Drink.TYPE_ALL.equals(drinkType)){
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
+                    cursor = sReviewWithDrinkAndProducerQueryBuilder.query(db,
+                            projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
+                } else {
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", drinkType};
+                    cursor = sReviewWithDrinkAndProducerQueryBuilder.query(db,
+                            projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
+                }
+                break;
+
+            // TODO: special review-searches    - advanced search Fragment...
+            //  ALL_COLUMNS, Selection- and SortOrder- Builder
+            //  - CONTAINS_STRING_IN_DESCRIPTION
+            //  - LOCATION (Country)
+            //  - TIME (last holiday)
+            //  - (other) USER
+            // f.e. best IPA in last years Canada-vacation ;-)
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -252,6 +296,20 @@ public class DatabaseProvider extends ContentProvider {
                         + ProducerEntry.TABLE_NAME + "." + Producer.PRODUCER_ID);
     }
 
+    private static final SQLiteQueryBuilder sReviewWithDrinkAndProducerQueryBuilder;
+    private static final String RA = ReviewEntry.ALIAS;   //ReviewAlias
+    private static final String DA = DrinkEntry.ALIAS;   //DrinkAlias
+    private static final String PA = ProducerEntry.ALIAS;   //ProducerAlias
+    static {
+        sReviewWithDrinkAndProducerQueryBuilder = new SQLiteQueryBuilder();
+        // JoinOfJoin: http://stackoverflow.com/questions/11105895/sqlite-left-outer-join-multiple-tables
+        sReviewWithDrinkAndProducerQueryBuilder.setTables(
+                ReviewEntry.TABLE_NAME + " " + RA + " INNER JOIN " + DrinkEntry.TABLE_NAME + " " + DA + " ON "
+                + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
+                + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
+                        + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID
+        );
+    }
 
 
     @Nullable
@@ -441,6 +499,10 @@ public class DatabaseProvider extends ContentProvider {
             case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
                 return DrinkEntry.CONTENT_TYPE;
             case REVIEWS:
+                return ReviewEntry.CONTENT_TYPE;
+            case REVIEW_WITH_ALL_BY_ID:
+                return ReviewEntry.CONTENT_ITEM_TYPE;
+            case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
                 return ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

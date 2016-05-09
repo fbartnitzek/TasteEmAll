@@ -28,9 +28,8 @@ import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
-import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
-import com.example.fbartnitzek.tasteemall.tasks.QueryEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.QueryProducerTask;
 import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
 /**
@@ -39,8 +38,8 @@ import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor>,
-        CompletionTextViewAdapter.CompletionAdapterUpdateHandler,
-        QueryEntryTask.QueryEntryFoundHandler {
+        CompletionProducerAdapter.CompletionProducerAdapterSelectHandler,
+        QueryProducerTask.QueryProducerFoundHandler {
 
     private static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
     private static final int EDIT_DRINK_LOADER_ID = 1234567;
@@ -66,6 +65,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     private static final String LOG_TAG = AddDrinkFragment.class.getName();
 
     private String mProducerName;
+    private String mPreFilledPattern;
     private int mProducer_Id;
     private String mProducerId;
 //    private String mFilter = "";
@@ -77,15 +77,15 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         // Required empty public constructor
     }
 
-    public static AddDrinkFragment newInstance() {
-        return new AddDrinkFragment();
-    }
-
-    public static AddDrinkFragment newInstance(Uri contentUri) {
-        AddDrinkFragment fragment = new AddDrinkFragment();
-        fragment.setContentUri(contentUri);
-        return fragment;
-    }
+//    public static AddDrinkFragment newInstance() {
+//        return new AddDrinkFragment();
+//    }
+//
+//    public static AddDrinkFragment newInstance(Uri contentUri) {
+//        AddDrinkFragment fragment = new AddDrinkFragment();
+//        fragment.setContentUri(contentUri);
+//        return fragment;
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,22 +96,24 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
         mEditCompletionProducerName = (AutoCompleteTextView) mRootView.findViewById(R.id.producer_name);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_PRODUCER_NAME)) {
-            mEditCompletionProducerName.setText(savedInstanceState.getString(STATE_PRODUCER_NAME));
+        if (savedInstanceState != null){
+            if (savedInstanceState.containsKey(STATE_PRODUCER_NAME)){   //just typed some letters
+                mEditCompletionProducerName.setText(savedInstanceState.getString(STATE_PRODUCER_NAME));
+            }
+            if (savedInstanceState.containsKey(STATE_PRODUCER_ID)) {    //found producer
+                mProducer_Id = savedInstanceState.getInt(STATE_PRODUCER__ID);
+                mProducerId = savedInstanceState.getString(STATE_PRODUCER_ID);
+            }
+        } else {
+            if (mPreFilledPattern != null) {
+                mEditCompletionProducerName.setText(mPreFilledPattern);
+            }
         }
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_PRODUCER_ID)) {
-            mProducer_Id = savedInstanceState.getInt(STATE_PRODUCER__ID);
-            mProducerId = savedInstanceState.getString(STATE_PRODUCER_ID);
-        }
+
 
         createToolbar();
 
-        CompletionTextViewAdapter completionAdapter = new CompletionTextViewAdapter(
-                getActivity(),
-                R.layout.list_item_producer_completion,
-                new String[]{Producer.NAME, Producer.LOCATION},
-                new int[]{R.id.list_item_producer_name, R.id.list_item_producer_location },
-                this);
+        CompletionProducerAdapter completionAdapter = new CompletionProducerAdapter(getActivity(), this);
 
         mEditCompletionProducerName.setAdapter(completionAdapter);
 
@@ -153,6 +155,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             mEditDrinkStyle.setText(savedInstanceState.getString(STATE_DRINK_STYLE));
             mEditDrinkIngredients.setText(savedInstanceState.getString(STATE_DRINK_INGREDIENTS));
             mEditDrinkSpecifics.setText(savedInstanceState.getString(STATE_DRINK_SPECIFICS));
+        } else {
+            if (mPreFilledPattern != null) {
+                mEditDrinkName.setText(mPreFilledPattern);
+            }
         }
 
         return mRootView;
@@ -376,14 +382,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     private void updateProvider(Uri producerUri) {
         Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
 
-        new QueryEntryTask(getActivity(),
-                DatabaseContract.ProducerEntry.TABLE_NAME + "." + DatabaseContract.ProducerEntry._ID,
-                Producer.PRODUCER_ID,
-                Producer.NAME, this)
-            .execute(producerUri);
+        new QueryProducerTask(getActivity(), this).execute(producerUri);
     }
 
-    private void setContentUri(Uri contentUri) {
+    public void setContentUri(Uri contentUri) {
         this.mContentUri = contentUri;
     }
 
@@ -396,7 +398,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     return new CursorLoader(
                             getActivity(),
                             mContentUri,
-                            DrinkFragmentHelper.DETAIL_COLUMNS,
+                            QueryColumns.DrinkFragment.DETAIL_COLUMNS,
                             null,
                             null,
                             null
@@ -415,14 +417,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             case EDIT_DRINK_LOADER_ID:
                 if (data != null && data.moveToFirst()) {
                     // variables not really needed - optimize later...
-                    mProducerName= data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_NAME);
-                    String drinkName= data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_NAME);
-                    mDrinkId = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_ID);
-                    mProducerId = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_PRODUCER_ID);
-                    String drinkStyle = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_STYLE);
-                    String drinkIngredients = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_INGREDIENTS);
-                    String drinkSpecifics = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_SPECIFICS);
-                    String drinkType = data.getString(DrinkFragmentHelper.COL_QUERY_DRINK_TYPE);
+                    mProducerName= data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_NAME);
+                    String drinkName= data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_NAME);
+                    mDrinkId = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_ID);
+                    mProducerId = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_ID);
+                    String drinkStyle = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_STYLE);
+                    String drinkIngredients = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_INGREDIENTS);
+                    String drinkSpecifics = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_SPECIFICS);
+                    String drinkType = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_TYPE);
 
                     mEditCompletionProducerName.setText(mProducerName);
                     mEditCompletionProducerName.dismissDropDown();
@@ -450,21 +452,34 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
+//    @Override
+//    public void onFoundProducer(int  producer_id, String producerName, String producer_Id) {
+//        mProducer_Id = producer_Id;
+//        mProducerId = producerId;
+//        mProducerName = producerName;
+//    }
+
     @Override
-    public void onUpdate(String entryName, String entryId, int entry_Id) {
-        mProducer_Id = entry_Id;
-        mProducerId = entryId;
-        mProducerName = entryName;
+    public void onFoundProducer(int producer_Id, String producerName, String producerId) {
+        Log.v(LOG_TAG, "onFoundProducer, hashCode=" + this.hashCode() + ", " + "producer_Id = [" + producer_Id + "], producerName = [" + producerName + "], producerId = [" + producerId + "]");
+        mProducer_Id = producer_Id;
+        mProducerId = producerId;
+        mProducerName = producerName;
+
+        if (!mEditCompletionProducerName.getText().toString().equals(mProducerName)){
+            mEditCompletionProducerName.setText(mProducerName);
+            mEditCompletionProducerName.dismissDropDown();
+        }
+    }
+
+    public void setmPreFilledPattern(String mPreFilledPattern) {
+        this.mPreFilledPattern = mPreFilledPattern;
     }
 
     @Override
-    public void onFound(int entry_Id, String entryId, String entryName) {
-        Log.v(LOG_TAG, "onFound, hashCode=" + this.hashCode() + ", " + "entry_Id = [" + entry_Id + "], entryId = [" + entryId + "], entryName = [" + entryName + "]");
-        mProducer_Id = entry_Id;
-        mProducerId = entryId;
-        mProducerName = entryName;
-
-        mEditCompletionProducerName.setText(mProducerName);
-        mEditCompletionProducerName.dismissDropDown();
+    public void onSelectedProducer(int producer_Id, String producerName, String producerId) {
+        mProducer_Id = producer_Id;
+        mProducerId = producerId;
+        mProducerName = producerName;
     }
 }

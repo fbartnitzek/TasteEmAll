@@ -11,14 +11,22 @@
     <string name="title_edit_drink_activity_preview">edit a <xliff:g id="drinkType">%1$s</xliff:g></string>
     <string name="title_edit_drink_activity">edit <xliff:g id="producerName">%2$s</xliff:g> - <xliff:g id="drinkName">%1$s</xliff:g></string>
 
-    <string name="location_completion_postfix">(<xliff:g id="location">%1$s</xliff:g>)</string>
+    <string name="title_add_review_activity_preview">add a <xliff:g id="drinkType">%1$s</xliff:g>-Review</string>
+    <string name="title_add_review_activity">add <xliff:g id="producerName">%2$s</xliff:g> - <xliff:g id="drinkName">%1$s</xliff:g>-Review</string>
+    <string name="title_edit_review_activity_preview">edit a <xliff:g id="drinkType">%1$s</xliff:g>-Review</string>
+    <string name="title_edit_review_activity">edit <xliff:g id="producerName">%2$s</xliff:g> - <xliff:g id="drinkName">%1$s</xliff:g>-Review</string>
+
+    <string name="completion_subentry_formatting">(<xliff:g id="subentry">%1$s</xliff:g>)</string>
+    <string name="completion_prefix_formatting"><xliff:g id="subentry">%1$s</xliff:g>: </string>
     <string name="search_title">search</string>
 
     <string name="drink_show_generic">Drink</string>
     <string name="drink_show_coffee">Coffee</string>
     <string name="drink_show_wine">Wine</string>
     <string name="drink_show_beer">Beer</string>
+    <string name="drink_show_all">All</string>
     <string name="drink_show_whisky">Whisk(e)y</string>
+    <string name="drink_key_all">all</string>
     <string name="drink_key_generic">generic</string>
     <string name="drink_key_coffee">coffee</string>
     <string name="drink_key_wine">wine</string>
@@ -42,6 +50,8 @@
     <string name="producer_details_label"><xliff:g id="producer">%1$s</xliff:g> details</string>
     <string name="title_list_of_drinks">list of drinks</string>
     <string name="drink_details_label"><xliff:g id="drink">%1$s</xliff:g> details</string>
+    <string name="title_list_of_reviews">list of reviews</string>
+
     <string name="hint_drink_name">name of the drink</string>
     <string name="hint_drink_style">style of the type of drink</string>
     <string name="hint_drink_ingredients">ingredients of the drink</string>
@@ -55,6 +65,7 @@
     <string name="example_brewery">THE Brewery</string>
     <string name="example_producer_description">since 1666</string>
     <string name="text_choose_a_producer">choose a producer</string>
+    <string name="text_choose_a_drink">choose a drink</string>
     <string name="label_producer">Producer</string>
     <string name="example_drink_name">some drink</string>
     <string name="label_producer_name">Name</string>
@@ -64,10 +75,12 @@
     <string name="example_drink_style">IPA</string>
     <string name="example_producer_location">some town</string>
     <string name="description_add_a_new_producer">create a new producer</string>
+    <string name="description_add_a_new_drink">create a new drink</string>
     <string name="text_plus">+</string>
     <string name="location">Location</string>
     <string name="example_location">TestLocation</string>
     <string name="drink_label">Drink</string>
+    <string name="review_label">Review</string>
     <string name="label_website">Website</string>
     <string name="example_website">NO website</string>
     <string name="label_drink_name">Name</string>
@@ -79,6 +92,27 @@
     <string name="label_drink_specifics">Specifics</string>
     <string name="example_drink_specifics">some specifics</string>
     <string name="example_drink_ingredients">some ingredients</string>
+
+    <string name="label_review_user_name">User</string>
+    <string name="hint_review_user_name">name of the reviewer</string>
+    <string name="label_review_rating">Rating</string>
+    <string name="example_review_rating">++</string>
+    <string name="description_help_review_rating">show explanation for the rating</string>
+    <string name="text_questionmark">\?</string>
+    <string name="label_review_description">Description</string>
+    <string name="hint_review_description">detailed review text</string>
+    <string name="example_review_description">great taste and smell</string>
+    <string name="label_review_recommended_sides">Recommended sides</string>
+    <string name="hint_review_recommended_sides">f.e. a matching meal</string>
+    <string name="label_review_readable_date">Date</string>
+    <string name="hint_review_readable_date">date of the review (local time)</string>
+    <string name="label_review_location">Location</string>
+    <string name="hint_review_location">location of the review</string>
+    <string name="pre_filled_rating">choose</string>
+    <string name="example_review_date">20160509</string>
+    <string name="label_review_details">review details</string>
+    <string name="example_review_user_name">example_user</string>
+    <string name="example_review_location">somewhere</string>
 
 
 </resources>
