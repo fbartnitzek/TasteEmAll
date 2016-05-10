@@ -59,6 +59,7 @@ public class DatabaseProvider extends ContentProvider {
 //    private static final int USERS = 400;
     private static final int REVIEWS = 500;
 //    private static final int REVIEW_WITH_ALL_BY_NAME = 502;
+    private static final int REVIEW_BY_ID = 503;
     private static final int REVIEW_WITH_ALL_BY_ID = 510;
     private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
 
@@ -150,6 +151,7 @@ public class DatabaseProvider extends ContentProvider {
 
         // all reviews
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW, REVIEWS);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW + "/#", REVIEW_BY_ID);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL + "/#", REVIEW_WITH_ALL_BY_ID);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
@@ -248,6 +250,11 @@ public class DatabaseProvider extends ContentProvider {
             case REVIEWS:
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
+                break;
+            case REVIEW_BY_ID:
+                cursor = db.query(ReviewEntry.TABLE_NAME, projection,
+                        ReviewEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
                 break;
             case REVIEW_WITH_ALL_BY_ID:
                 cursor = sReviewWithDrinkAndProducerQueryBuilder.query(
@@ -463,6 +470,11 @@ public class DatabaseProvider extends ContentProvider {
             case REVIEWS:
                 impactedRows = db.update(ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
+            case REVIEW_BY_ID:
+                impactedRows = db.update(ReviewEntry.TABLE_NAME, values,
+                        ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -500,6 +512,8 @@ public class DatabaseProvider extends ContentProvider {
                 return DrinkEntry.CONTENT_TYPE;
             case REVIEWS:
                 return ReviewEntry.CONTENT_TYPE;
+            case REVIEW_BY_ID:
+                return ReviewEntry.CONTENT_ITEM_TYPE;
             case REVIEW_WITH_ALL_BY_ID:
                 return ReviewEntry.CONTENT_ITEM_TYPE;
             case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:

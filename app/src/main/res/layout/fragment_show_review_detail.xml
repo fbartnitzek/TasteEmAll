@@ -15,8 +15,9 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!--Producer-->
         <TextView
-            android:id="@id/label_review"
+            android:id="@id/label_producer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
@@ -67,7 +68,7 @@
                 android:text="@string/example_location"/>
         </LinearLayout>
 
-<!-- drink -->
+        <!-- Drink -->
         <TextView
             android:id="@id/label_drink"
             android:layout_width="match_parent"
@@ -185,7 +186,7 @@
                 android:text="@string/example_drink_ingredients"/>
         </LinearLayout>
 
-
+        <!--Review-->
         <TextView
             android:id="@id/label_review"
             android:layout_width="match_parent"
@@ -261,6 +262,29 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/example_review_description"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/label_review_recommended_sides"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingEnd="40dp"
+                android:paddingRight="40dp"
+                android:text="@string/label_review_recommended_sides"/>
+
+            <TextView
+                android:id="@+id/review_recommended_sides"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/example_review_recommended_sides"/>
         </LinearLayout>
 
         <LinearLayout

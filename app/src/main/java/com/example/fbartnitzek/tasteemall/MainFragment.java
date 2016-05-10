@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
@@ -109,18 +108,17 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mReviewAdapter = new ReviewAdapter(new ReviewAdapter.ReviewAdapterClickHandler() {
             @Override
             public void onClick(Uri contentUri, ReviewAdapter.ViewHolder viewHolder) {
-                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
-//                Intent intent = new Intent(getActivity(), ShowReviewActivity.class)
-//                        .setData(contentUri);
-//                startActivity(intent);
-                Toast.makeText(getActivity(), "review clicked, opening with uri: " + contentUri, Toast.LENGTH_SHORT).show();
+//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
+                startActivity(
+                        new Intent(getActivity(), ShowReviewActivity.class)
+                                .setData(contentUri));
             }
         });
 
         mDrinkAdapter = new DrinkAdapter(new DrinkAdapter.DrinkAdapterClickHandler() {
             @Override
             public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder viewHolder) {
-                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
+//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)
                         .setData(contentUri);
                 startActivity(intent);
@@ -130,7 +128,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
             public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
-                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
+//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 Intent intent = new Intent(getActivity(), ShowProducerActivity.class)
                         .setData(contentUri);
                 startActivity(intent);
@@ -283,16 +281,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         String sortOrder;
         switch (id) {
             case PRODUCER_LOADER_ID:
-                //TODO: optionally second by location
-                sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + " ASC";
+                sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
+                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION;
                 return new CursorLoader(getActivity(),
                         ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern),
                         QueryColumns.MainFragment.ProducerQuery.COLUMNS,
                         null, null,
                         sortOrder);
             case DRINK_LOADER_ID:
-                //TODO: sort by producerName, DrinkName working?
-//                String sortOrder = DrinkEntry.TABLE_NAME + "." + Drink.NAME + " ASC";
                 sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", " +
                         DrinkEntry.TABLE_NAME + "." + Drink.NAME;
                 return new CursorLoader(getActivity(),
@@ -373,8 +369,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             mDrinkType = parent.getItemAtPosition(position).toString();
             Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
             restartLoaders();
-//        } else {
-//            Log.v(LOG_TAG, "onItemSelected anywhere else..., hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
         }
 
     }
@@ -400,18 +394,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 //        Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
 
         if (requestCode == ADD_REVIEW_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Uri reviewUri = data.getData();
-            Toast.makeText(getActivity(), "TODO: start ShowActivity, returned with reviewUri: " + reviewUri, Toast.LENGTH_SHORT).show();
-            // TODO start SRA
-
-
+            startActivity(
+                    new Intent(getActivity(), ShowDrinkActivity.class)
+                        .setData(data.getData()));
         } else if (requestCode == ADD_DRINK_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-
-            //TODO
-            Uri drinkUri = data.getData();
-            Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)
-                    .setData(drinkUri);
-            startActivity(intent);
+            startActivity(
+                    new Intent(getActivity(), ShowDrinkActivity.class)
+                        .setData(data.getData()));
         }
 
         super.onActivityResult(requestCode, resultCode, data);

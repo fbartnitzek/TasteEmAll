@@ -83,6 +83,24 @@ public class Utils {
         }
     }
 
+    public static Uri calcJoinedReviewUri(Uri uri) {
+        if (uri != null) {
+            int id = DatabaseContract.getIdFromUri(uri);
+            return DatabaseContract.ReviewEntry.buildUriForShowReview(id);
+        } else {
+            return null;
+        }
+    }
+
+    public static Uri calcSingleReviewUri(Uri uri) {
+        if (uri != null) {
+            int id = DatabaseContract.getIdFromUri(uri);
+            return DatabaseContract.ReviewEntry.buildUri(id);
+        } else {
+            return null;
+        }
+    }
+
     public static Uri calcSingleProducerUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
         if (uri != null) {
             int id = DatabaseContract.getIdFromUri(uri);
@@ -254,6 +272,5 @@ public class Utils {
                 return R.string.producer_show_generic;
         }
     }
-
 
 }

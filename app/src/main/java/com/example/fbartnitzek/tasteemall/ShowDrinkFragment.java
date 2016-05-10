@@ -1,17 +1,15 @@
 package com.example.fbartnitzek.tasteemall;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +22,7 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickListener {
 
     private static final String LOG_TAG = ShowDrinkFragment.class.getName();
 
@@ -45,17 +43,21 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     private Uri mUri;
     private View mRootView;
     private int mDrinkTypeIndex;
+    private int mProducer_Id;
 
     public ShowDrinkFragment() {
         Log.v(LOG_TAG, "ShowDrinkFragment, hashCode=" + this.hashCode() + ", " + "");
     }
 
-    private void calcCompleteUri() {    //if called with drink-only-id...
+    @Override
+    void calcCompleteUri() {    //if called with drink-only-id...
         if (mUri != null) {
             int id = DatabaseContract.getIdFromUri(mUri);
             mUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
         }
     }
+
+    //TODO: onSaveInstance?
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,7 +67,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
 
         Bundle args = getArguments();
         if (args == null) {
-            Log.v(LOG_TAG, "onCreateView without args - something went wrong..., hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+            Log.e(LOG_TAG, "onCreateView without args - something went wrong..., hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         } else {
             if (args.containsKey(ShowDrinkActivity.EXTRA_DRINK_URI)) {
                 mUri = args.getParcelable(ShowDrinkActivity.EXTRA_DRINK_URI);
@@ -87,29 +89,14 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         mDrinkSpecificsView = (TextView) mRootView.findViewById(R.id.drink_specifics);
         mDrinkIngredientsView = (TextView) mRootView.findViewById(R.id.drink_ingredients);
 
-        createToolbar();
+        createToolbar(mRootView, LOG_TAG);
 
         return mRootView;
     }
 
-    private void createToolbar() {
-        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
-            ActionBar supportActionBar = activity.getSupportActionBar();
-            if (supportActionBar == null) {
-                Log.e(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
-                return;
-            }
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-            supportActionBar.setHomeButtonEnabled(true);
-        } else {
-            Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
-        }
-    }
 
-    private void updateToolbar() {
+    @Override
+    void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
@@ -127,10 +114,9 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "onActivityCreated, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+    public void onResume() {
         getLoaderManager().initLoader(SHOW_DRINK_LOADER_ID, null, this);
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
     }
 
     @Override
@@ -140,7 +126,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    QueryColumns.DrinkFragment.DETAIL_COLUMNS,
+                    QueryColumns.DrinkFragment.ShowQuery.COLUMNS,
                     null,
                     null,
                     null);
@@ -152,7 +138,7 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            String drinkType = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_TYPE);
+            String drinkType = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_TYPE);
             mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
@@ -168,16 +154,18 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
                             getString(readableDrinkTypeIndex)));
             mDrinkNameLabelView.setText(readableDrinkTypeIndex);
 
-            String producerName = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_NAME);
+            mProducer_Id = data.getInt(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_ID);
+            String producerName = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_NAME);
             mProducerNameView.setText(producerName);
-            mProducerLocationView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_LOCATION));
+            mProducerNameView.setOnClickListener(this);
+            mProducerLocationView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_LOCATION));
 
-            String drinkName = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_NAME);
+            String drinkName = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_NAME);
             mDrinkNameView.setText(drinkName);
 
-            mDrinkStyleView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_STYLE));
-            mDrinkSpecificsView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_SPECIFICS));
-            mDrinkIngredientsView.setText(data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_INGREDIENTS));
+            mDrinkStyleView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_STYLE));
+            mDrinkSpecificsView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_SPECIFICS));
+            mDrinkIngredientsView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_INGREDIENTS));
 
             updateToolbar();
         }
@@ -188,10 +176,20 @@ public class ShowDrinkFragment extends Fragment implements LoaderManager.LoaderC
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
+    @Override
     public void updateFragment(Uri drinkUri) {
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
         mUri = drinkUri;
         calcCompleteUri();
         getLoaderManager().restartLoader(SHOW_DRINK_LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
+            startActivity(
+                    new Intent(getActivity(), ShowProducerActivity.class)
+                            .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)));
+        }
     }
 }

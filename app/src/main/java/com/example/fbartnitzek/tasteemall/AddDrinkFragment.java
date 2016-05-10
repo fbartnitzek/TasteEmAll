@@ -77,16 +77,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         // Required empty public constructor
     }
 
-//    public static AddDrinkFragment newInstance() {
-//        return new AddDrinkFragment();
-//    }
-//
-//    public static AddDrinkFragment newInstance(Uri contentUri) {
-//        AddDrinkFragment fragment = new AddDrinkFragment();
-//        fragment.setContentUri(contentUri);
-//        return fragment;
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -235,15 +225,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-
+    public void onResume() {
         if (mContentUri != null) {
-            Log.v(LOG_TAG, "onActivityCreated with contentUri - edit, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.v(LOG_TAG, "onResume with contentUri - edit, hashCode=" + this.hashCode() + ", " + "");
             getLoaderManager().initLoader(EDIT_DRINK_LOADER_ID, null, this);
         } else {
-            Log.v(LOG_TAG, "onActivityCreated without contentUri - add, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.v(LOG_TAG, "onResume without contentUri - add, hashCode=" + this.hashCode() + ", " + "");
         }
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
     }
 
     @Override
@@ -265,10 +254,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
         //validate
         if (mProducerId == null || mProducerName == null) {
-            Snackbar.make(mRootView, "choose an existing producer first...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_choose_existing_provider, Snackbar.LENGTH_SHORT).show();
             return;
         } else if ("".equals(drinkName)) {
-            Snackbar.make(mRootView, "choose a name first...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_choose_drink_name, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -349,8 +338,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             }
 
             ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
-        } else {
-//            Log.e(LOG_TAG, "onItemSelected other item selected..., hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
         }
 
     }
@@ -376,7 +363,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
+//        Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
     }
 
     private void updateProvider(Uri producerUri) {
@@ -386,7 +373,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     }
 
     public void setContentUri(Uri contentUri) {
-        this.mContentUri = contentUri;
+
+        this.mContentUri = Utils.calcDrinkIncludingProducerUri(contentUri);
     }
 
     @Override
@@ -398,7 +386,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     return new CursorLoader(
                             getActivity(),
                             mContentUri,
-                            QueryColumns.DrinkFragment.DETAIL_COLUMNS,
+                            QueryColumns.DrinkFragment.EditQuery.COLUMNS,
                             null,
                             null,
                             null
@@ -417,14 +405,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             case EDIT_DRINK_LOADER_ID:
                 if (data != null && data.moveToFirst()) {
                     // variables not really needed - optimize later...
-                    mProducerName= data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_NAME);
-                    String drinkName= data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_NAME);
-                    mDrinkId = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_ID);
-                    mProducerId = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_PRODUCER_ID);
-                    String drinkStyle = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_STYLE);
-                    String drinkIngredients = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_INGREDIENTS);
-                    String drinkSpecifics = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_SPECIFICS);
-                    String drinkType = data.getString(QueryColumns.DrinkFragment.COL_QUERY_DRINK_TYPE);
+                    mProducerName= data.getString(QueryColumns.DrinkFragment.EditQuery.COL_PRODUCER_NAME);
+                    String drinkName= data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_NAME);
+                    mDrinkId = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_ID);
+                    mProducerId = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_PRODUCER_ID);
+                    String drinkStyle = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_STYLE);
+                    String drinkIngredients = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_INGREDIENTS);
+                    String drinkSpecifics = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_SPECIFICS);
+                    String drinkType = data.getString(QueryColumns.DrinkFragment.EditQuery.COL_DRINK_TYPE);
 
                     mEditCompletionProducerName.setText(mProducerName);
                     mEditCompletionProducerName.dismissDropDown();
@@ -451,13 +439,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
-
-//    @Override
-//    public void onFoundProducer(int  producer_id, String producerName, String producer_Id) {
-//        mProducer_Id = producer_Id;
-//        mProducerId = producerId;
-//        mProducerName = producerName;
-//    }
 
     @Override
     public void onFoundProducer(int producer_Id, String producerName, String producerId) {

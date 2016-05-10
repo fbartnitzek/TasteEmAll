@@ -3,11 +3,15 @@ package com.example.fbartnitzek.tasteemall;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +30,7 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
 import com.example.fbartnitzek.tasteemall.tasks.QueryDrinkTask;
+import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 import com.example.fbartnitzek.tasteemall.ui.OnTouchHideKeyboardListener;
 
 import java.util.ArrayList;
@@ -34,7 +39,7 @@ import java.util.Arrays;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddReviewFragment extends Fragment implements CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler, View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler {
+public class AddReviewFragment extends Fragment implements CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler, View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = AddReviewFragment.class.getName();
     private static final String STATE_CONTENT_URI = "STATE_ADD_REVIEW_CONTENT_URI";
@@ -49,6 +54,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     private static final String STATE_REVIEW_READABLE_DATE = "STATE_ADD_REVIEW_READABLE_DATE";
     private static final String STATE_REVIEW_LOCATION = "STATE_ADD_REVIEW_LOCATION";
     private static final int DRINK_ACTIVITY_REQUEST_CODE = 999;
+    private static final int EDIT_REVIEW_LOADER_ID = 57892;
     private View mRootView;
 
     private static AutoCompleteTextView mEditCompletionDrinkName;
@@ -67,6 +73,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     private String mReviewId = null;
     private ArrayAdapter<String> mRatingAdapter;
     private int mRatingPosition;
+    private int mReview_Id;
 
     public AddReviewFragment() {
         // Required empty public constructor
@@ -110,7 +117,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(STATE_DRINK_NAME)){   //just typed some letters
-                //TODO: should it display drinkName (producerName)?
                 mDrinkName = savedInstanceState.getString(STATE_DRINK_NAME);
                 mEditCompletionDrinkName.setText(mDrinkName);
 //                mEditCompletionDrinkName.dismissDropDown();   //TODO: needed?
@@ -130,19 +136,14 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         mRootView.findViewById(R.id.help_review_rating_button).setOnClickListener(this);
 
         mSpinnerRating = (Spinner) mRootView.findViewById(R.id.review_rating);
+
         // TODO: spinner with invalid start-text...?
         // try later: http://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
         String[] reviewRatings = getActivity().getResources().getStringArray(R.array.pref_rating_values);
         mRatingAdapter = new CustomSpinnerAdapter(getActivity(),
                 new ArrayList<>(Arrays.asList(reviewRatings)), R.layout.spinner_small_row);
         mSpinnerRating.setAdapter(mRatingAdapter);
-//        mRatingAdapter = new ArrayAdapter<>(
-//                getActivity(),
-//                android.R.layout.simple_list_item_1,
-//                reviewRatings);
-//
-//        mRatingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mSpinnerRating.setAdapter(mRatingAdapter);
+
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_RATING_POSITION)) {
             mRatingPosition = savedInstanceState.getInt(STATE_REVIEW_RATING_POSITION);
             if (mRatingPosition> -1) {
@@ -203,11 +204,20 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         return mRootView;
     }
 
-
+    @Override
+    public void onResume() {
+        if (mContentUri != null) {
+            Log.v(LOG_TAG, "onResume with contentUri - edit, hashCode=" + this.hashCode() + ", " + "");
+            getLoaderManager().initLoader(EDIT_REVIEW_LOADER_ID, null, this);
+        } else {
+            Log.v(LOG_TAG, "onResume without contentUri - add, hashCode=" + this.hashCode() + ", " + "");
+        }
+        super.onResume();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
+//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
         outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
         outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString());
         outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString());
@@ -264,6 +274,8 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         }
     }
 
+
+
     private void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode());
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -310,20 +322,19 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     }
 
     public void saveData() {
-        // TODO insert or update
+
 
         if (mDrinkId == null || mDrinkName == null) {
-            //TODO: hardcoded strings!
-            Snackbar.make(mRootView, "choose an existing drink first...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (getString(R.string.pre_filled_rating).equals(mSpinnerRating.getSelectedItem().toString())) {
-            Snackbar.make(mRootView, "rate your drink first...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_rate_drink, Snackbar.LENGTH_SHORT).show();
             return;
         } else if ("".equals(mEditReviewUser.getText().toString())) {
-            Snackbar.make(mRootView, "no rating without username...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_no_username, Snackbar.LENGTH_SHORT).show();
             return;
         } else if ("".equals(mEditReviewReadableDate.getText().toString())) {
-            Snackbar.make(mRootView, "no rating without date...", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.toast_no_review_date, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -337,7 +348,17 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     }
 
     private void updateReview() {
-        // TODO
+        Uri singleEntryUri = Utils.calcSingleReviewUri(mContentUri);
+        new UpdateEntryTask(getActivity(), singleEntryUri, "Review for " + mDrinkName, mRootView)
+                .execute(DatabaseHelper.buildReviewValues(
+                        mReviewId,
+                        mSpinnerRating.getItemAtPosition(mRatingPosition).toString(),
+                        mEditReviewDescription.getText().toString(),
+                        mEditReviewReadableDate.getText().toString(),
+                        mEditReviewRecommendedSides.getText().toString(),
+                        mDrinkId,
+                        mEditReviewLocation.getText().toString(),
+                        mEditReviewUser.getText().toString()));
     }
 
     private void insertReview() {
@@ -358,8 +379,9 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
     }
 
-    public void setmContentUri(Uri mContentUri) {
-        this.mContentUri = mContentUri;
+    public void setmContentUri(Uri contentUri) {
+        this.mContentUri = Utils.calcJoinedReviewUri(contentUri);
+        Log.v(LOG_TAG, "setmContentUri, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "]");
     }
 
     @Override
@@ -414,5 +436,72 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         mDrinkName = drinkName;
         mProducerName = producerName;
         updateToolbar();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+        switch (id) {
+            case EDIT_REVIEW_LOADER_ID:
+                if (mContentUri != null) {
+                    return new CursorLoader(
+                            getActivity(),
+                            mContentUri,
+                            QueryColumns.ReviewFragment.EditQuery.COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case EDIT_REVIEW_LOADER_ID:
+                if (data != null && data.moveToFirst()) {
+                    // variables not really needed - optimize later...
+                    mProducerName= data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
+                    mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
+                    mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
+                    mDrink_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_DRINK__ID);
+                    mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
+                    mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
+                    // later for a matching icon...
+//                    String drinkType = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_TYPE);
+                    String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
+                    String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION);
+                    String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
+                    String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
+                    String userName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_USER_NAME);
+                    String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
+
+                    mEditCompletionDrinkName.setText(mDrinkName);
+                    mEditCompletionDrinkName.dismissDropDown();
+                    mRatingPosition = mRatingAdapter.getPosition(rating);
+                    if (mRatingPosition > -1) {
+                        mSpinnerRating.setSelection(mRatingPosition);
+                    }
+                    mEditReviewDescription.setText(reviewDesc);
+                    mEditReviewRecommendedSides.setText(recommendedSides);
+                    mEditReviewUser.setText(userName);
+                    mEditReviewReadableDate.setText(readableDate);
+                    mEditReviewLocation.setText(location);
+
+                    updateToolbar();
+
+                    Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+                }
+                break;
+            default:
+                Log.e(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // nothing
     }
 }

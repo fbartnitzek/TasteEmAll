@@ -42,6 +42,8 @@
     <string name="producer_show_whisky">Distillery</string>
     <string name="producer_show_wine">Winery</string>
     <string name="producer_show_generic">Producer</string>
+
+    <string name="title_show_review"><xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g>-Review</string>
     <string name="title_show_drink"><xliff:g id="producer">%2$s</xliff:g> - <xliff:g id="drink">%3$s</xliff:g></string>
     <!--<string name="title_show_producer"><xliff:g id="producerType">%1$s</xliff:g>: <xliff:g id="producer">%2$s</xliff:g></string>-->
     <string name="title_show_producer"><xliff:g id="producer">%1$s</xliff:g></string>
@@ -113,6 +115,13 @@
     <string name="label_review_details">review details</string>
     <string name="example_review_user_name">example_user</string>
     <string name="example_review_location">somewhere</string>
+    <string name="toast_choose_existing_drink">choose an existing drink first...</string>
+    <string name="toast_rate_drink">rate your drink first...</string>
+    <string name="toast_no_username">no rating without username...</string>
+    <string name="toast_no_review_date">no rating without date...</string>
+    <string name="toast_choose_existing_provider">choose an existing producer first...</string>
+    <string name="toast_choose_drink_name">choose a name first...</string>
+    <string name="example_review_recommended_sides">Kartoffelbrot</string>
 
 
 </resources>

@@ -73,7 +73,7 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
         Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
         return mActivity.getContentResolver().query(
                 DatabaseContract.DrinkEntry.buildUriWithName(String.valueOf(constraint)),
-                QueryColumns.ReviewFragment.DRINK_QUERY_COLUMNS,
+                QueryColumns.ReviewFragment.CompletionQuery.COLUMNS,
                 null,
                 null,
                 null);
@@ -82,10 +82,10 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
     @Override
     public CharSequence convertToString(Cursor cursor) {
         Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
-        String drinkName = cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_DRINK_NAME);
-        String drinkId = cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_DRINK_ID);
-        int drink_Id = cursor.getInt(QueryColumns.ReviewFragment.COL_QUERY_DRINK__ID);
-        String producerName = cursor.getString(QueryColumns.ReviewFragment.COL_QUERY_PRODUCER_NAME);
+        String drinkName = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_NAME);
+        String drinkId = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_ID);
+        int drink_Id = cursor.getInt(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK__ID);
+        String producerName = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_PRODUCER_NAME);
         mSelectHandler.onSelectedDrink(drink_Id, drinkName, drinkId, producerName);
         return drinkName;
     }

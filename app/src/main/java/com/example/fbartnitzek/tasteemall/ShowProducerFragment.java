@@ -3,14 +3,10 @@ package com.example.fbartnitzek.tasteemall;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +17,7 @@ import android.widget.TextView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ShowProducerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ShowProducerFragment extends ShowBaseFragment {
 
     private static final String LOG_TAG = ShowProducerFragment.class.getName();
 
@@ -39,10 +35,12 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
     }
 
-    private void calcCompleteUri() {    //if called with producer-only-id...
+    @Override
+    void calcCompleteUri() {    //if called with producer-only-id...
         // still the same for now...
     }
 
+    @Override
     public void updateFragment(Uri contentUri) {
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "]");
         mUri = contentUri;
@@ -72,33 +70,15 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         mProducerDescriptionView = (TextView) mRootView.findViewById(R.id.producer_description);
         mProducerWebsiteView = (TextView) mRootView.findViewById(R.id.producer_website);
 
-        createToolbar();
+        createToolbar(mRootView, LOG_TAG);
 
         return mRootView;
     }
 
-    private void createToolbar() {
-        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
-            ActionBar supportActionBar = activity.getSupportActionBar();
-            if (supportActionBar == null) {
-                Log.e(LOG_TAG, "createToolbar - no supportActionBar found, hashCode=" + this.hashCode() + ", " + "");
-                return;
-            }
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-            supportActionBar.setHomeButtonEnabled(true);
-        } else {
-            Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
-        }
-    }
-
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "onActivityCreated, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+    public void onResume() {
         getLoaderManager().initLoader(SHOW_PRODUCER_LOADER_ID, null, this);
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
     }
 
     @Override
@@ -118,7 +98,8 @@ public class ShowProducerFragment extends Fragment implements LoaderManager.Load
         return null;
     }
 
-    private void updateToolbar() {
+    @Override
+    void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
