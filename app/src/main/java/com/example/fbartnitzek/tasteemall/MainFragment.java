@@ -395,7 +395,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         if (requestCode == ADD_REVIEW_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             startActivity(
-                    new Intent(getActivity(), ShowDrinkActivity.class)
+                    new Intent(getActivity(), ShowReviewActivity.class)
                         .setData(data.getData()));
         } else if (requestCode == ADD_DRINK_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             startActivity(
