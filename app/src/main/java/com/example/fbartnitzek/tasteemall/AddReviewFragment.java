@@ -1,13 +1,20 @@
 package com.example.fbartnitzek.tasteemall;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -32,14 +39,20 @@ import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
 import com.example.fbartnitzek.tasteemall.tasks.QueryDrinkTask;
 import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 import com.example.fbartnitzek.tasteemall.ui.OnTouchHideKeyboardListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddReviewFragment extends Fragment implements CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler, View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler, LoaderManager.LoaderCallbacks<Cursor> {
+public class AddReviewFragment extends Fragment implements CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler, View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler, LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String LOG_TAG = AddReviewFragment.class.getName();
     private static final String STATE_CONTENT_URI = "STATE_ADD_REVIEW_CONTENT_URI";
@@ -74,6 +87,8 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     private ArrayAdapter<String> mRatingAdapter;
     private int mRatingPosition;
     private int mReview_Id;
+    private GoogleApiClient mGoogleApiClient;
+    private String mCurrentLocation;
 
     public AddReviewFragment() {
         // Required empty public constructor
@@ -86,7 +101,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_CONTENT_URI)) {
             mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
         }
-
+        buildGoogleApiClient();
         super.onCreate(savedInstanceState);
     }
 
@@ -115,8 +130,8 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
         createToolbar();
 
-        if (savedInstanceState != null){
-            if (savedInstanceState.containsKey(STATE_DRINK_NAME)){   //just typed some letters
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_DRINK_NAME)) {   //just typed some letters
                 mDrinkName = savedInstanceState.getString(STATE_DRINK_NAME);
                 mEditCompletionDrinkName.setText(mDrinkName);
 //                mEditCompletionDrinkName.dismissDropDown();   //TODO: needed?
@@ -146,7 +161,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_RATING_POSITION)) {
             mRatingPosition = savedInstanceState.getInt(STATE_REVIEW_RATING_POSITION);
-            if (mRatingPosition> -1) {
+            if (mRatingPosition > -1) {
                 mSpinnerRating.setSelection(mRatingPosition);
                 mSpinnerRating.clearFocus();    //TODO: needed?
             }
@@ -197,7 +212,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
             mEditReviewLocation.setText(savedInstanceState.getString(STATE_REVIEW_LOCATION));
         } else {
             // TODO init with lastLocation
-            mEditReviewLocation.setText("here");
+            updateLocation();
         }
 
         return mRootView;
@@ -274,12 +289,11 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     }
 
 
-
     private void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode());
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
-        if (activity.getSupportActionBar()!= null) {
+        if (activity.getSupportActionBar() != null) {
             if (mContentUri != null) {  // edit
                 activity.getSupportActionBar().setTitle(
                         getString(R.string.title_edit_review_activity,
@@ -402,7 +416,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     }
 
 
-
     private void showHelp() {
         // TODO: something better ;-)
         Toast.makeText(getActivity(),
@@ -460,7 +473,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
             case EDIT_REVIEW_LOADER_ID:
                 if (data != null && data.moveToFirst()) {
                     // variables not really needed - optimize later...
-                    mProducerName= data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
+                    mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
                     mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
                     mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
                     mDrink_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_DRINK__ID);
@@ -500,5 +513,118 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         // nothing
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        Log.v(LOG_TAG, "buildGoogleApiClient, hashCode=" + this.hashCode() + ", " + "");
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.v(LOG_TAG, "onConnected, hashCode=" + this.hashCode() + ", " + "bundle = [" + bundle + "]");
+        if (ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+
+            Log.v(LOG_TAG, "onConnected - no permission");
+            Toast.makeText(AddReviewFragment.this.getActivity(), "location access missing...", Toast.LENGTH_SHORT).show();
+
+            return;
+        } else {
+            Log.v(LOG_TAG, "onConnected - with permission");
+        }
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (lastLocation != null) {
+
+            // TODO async with IntentService / AsyncTask ...
+
+            // should also be callable later as special setting (geocode all)
+            geocodeAddress(lastLocation);
+
+            updateLocation();
+        } else {
+            Toast.makeText(AddReviewFragment.this.getActivity(), "last location not found - the global location settings might be disabled", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    private void geocodeAddress(Location currentLocation) {
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude(),
+                    1);
+            if (addresses == null || addresses.size() == 0) {
+                Toast.makeText(AddReviewFragment.this.getActivity(), "Geocoding did not work - check your network connection", Toast.LENGTH_SHORT).show();
+            } else {
+                Address address = addresses.get(0);
+
+                mCurrentLocation = Utils.formatAddress(address);
+
+                return;
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "geocodeAddress - exception while using geocoder..., hashCode=" + this.hashCode() + ", " + "currentLocation = [" + currentLocation + "]");
+        }
+
+        mCurrentLocation = Utils.formatLocation(currentLocation);
+    }
+
+    private void updateLocation() {
+        Log.v(LOG_TAG, "updateLocation - mCurrentLocation: " + mCurrentLocation + ", hashCode=" + this.hashCode() + ", " + "");
+        if (mCurrentLocation != null && mEditReviewLocation != null) {
+            mEditReviewLocation.setText(mCurrentLocation);
+        }
+    }
+
+    @Override
+
+    public void onConnectionSuspended(int i) {
+        Log.v(LOG_TAG, "onConnectionSuspended - try again, hashCode=" + this.hashCode() + ", " + "i = [" + i + "]");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.v(LOG_TAG, "onConnectionFailed, hashCode=" + this.hashCode() + ", " + "connectionResult = [" + connectionResult + "]");
+    }
+
+    @Override
+    public void onStart() {
+
+        super.onStart();
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
+            Log.v(LOG_TAG, "onStart - connecting googleApiClient, hashCode=" + this.hashCode() + ", " + "");
+            mGoogleApiClient.connect();
+        } else {
+            Log.v(LOG_TAG, "onStart - googleApiClient not found, hashCode=" + this.hashCode() + ", " + "");
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            Log.v(LOG_TAG, "onStop - disconnecting googleApiClient, hashCode=" + this.hashCode() + ", " + "");
+            mGoogleApiClient.disconnect();
+        } else {
+            Log.v(LOG_TAG, "onStop - googleApiClient not found or connected, hashCode=" + this.hashCode() + ", " + "");
+        }
     }
 }

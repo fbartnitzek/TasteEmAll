@@ -3,6 +3,8 @@ package com.example.fbartnitzek.tasteemall;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Location;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -51,6 +53,7 @@ public class Utils {
 //    }
 
     static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String GEOCODE_ME = "geocode_me";
 
     // TODO: might use some hash-function later...
     public static String calcProducerId(String producerName) {
@@ -152,6 +155,7 @@ public class Utils {
         return finalDateTime;
     }
 
+    // TODO: obsolete??
     public static String queryLocation(String locationString) {
         // use google maps api
         // https://maps.googleapis.com/maps/api/geocode/json?address=Toronto%20%28Canada%29,%20275%20Yonge%20Street
@@ -280,4 +284,20 @@ public class Utils {
         return R.string.producer_show_generic;
     }
 
+    public static String formatLocation(Location currentLocation) {
+        return GEOCODE_ME + "_lat_" + String.valueOf(currentLocation.getLatitude())
+                + "_long_" + String.valueOf(currentLocation.getLongitude());
+    }
+
+    public static String formatAddress(Address address) {
+        // Fetch the address lines using getAddressLine,
+        // join them, and send them to the thread.
+        String currentAddress = "";
+
+        for(int i = address.getMaxAddressLineIndex() -1 ; i >= 0; --i) {
+            currentAddress += address.getAddressLine(i) + ", ";  //seems to be quite good
+        }
+        currentAddress = currentAddress.substring(0, currentAddress.length() - 2); //65432 FFM, some street nr
+        return currentAddress;
+    }
 }
