@@ -76,7 +76,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
             }
         }
 
-        mProducerLabelView = (TextView) mRootView.findViewById(R.id.label_producer);
+        mProducerLabelView = (TextView) mRootView.findViewById(R.id.heading_choose_drink);
         mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
         mProducerNameLabelView = (TextView) mRootView.findViewById(R.id.label_producer_name);
         mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
@@ -102,7 +102,9 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
 
-            String readableDrink = getString(Utils.getDrinkName(mDrinkTypeIndex));
+
+//            String readableDrink = getString(Utils.getRgetDrinkName(mDrinkTypeIndex));
+            String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), mDrinkTypeIndex));
             String drinkName = mDrinkNameView.getText().toString();
             String producerName= mProducerNameView.getText().toString();
             actionBar.setTitle(
@@ -139,16 +141,17 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         if (data != null && data.moveToFirst()) {
 
             String drinkType = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_TYPE);
-            mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
+//            mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
+            mDrinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
-            int readableProducerTypeIndex = Utils.getProducerName(mDrinkTypeIndex);
+            int readableProducerTypeIndex = Utils.getReadableProducerNameId(getActivity(), mDrinkTypeIndex);
             mProducerLabelView.setText(
                     getString(R.string.producer_details_label,
                             getString(readableProducerTypeIndex)));
             mProducerNameLabelView.setText(readableProducerTypeIndex);
 
-            int readableDrinkTypeIndex = Utils.getDrinkName(mDrinkTypeIndex);
+            int readableDrinkTypeIndex = Utils.getReadableDrinkNameId(getActivity(), mDrinkTypeIndex);
             mDrinkLabelView.setText(
                     getString(R.string.drink_details_label,
                             getString(readableDrinkTypeIndex)));

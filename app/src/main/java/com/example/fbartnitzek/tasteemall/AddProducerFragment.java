@@ -108,7 +108,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
-            String readableProducer = getString(Utils.getProducerName(drinkType));
+            String readableProducer = getString(Utils.getReadableProducerNameId(getActivity(), drinkType));
             if (mContentUri != null) {
                 supportActionBar.setTitle(
                         getString(R.string.title_edit_producer_activity_preview,

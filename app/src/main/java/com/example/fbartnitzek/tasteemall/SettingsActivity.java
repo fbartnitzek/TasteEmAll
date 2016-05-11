@@ -32,8 +32,8 @@ public class SettingsActivity extends PreferenceActivity {
             // make sure default values are applied (shared function to retrieve)
 
             addPreferencesFromResource(R.xml.pref_general);
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_type_key)));
-            // TODO: username
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_type)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_user_name)));
         }
 
         /**
@@ -120,6 +120,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            // optionally init / reset stuff...
             Log.v(LOG_TAG, "onSharedPreferenceChanged, hashCode=" + this.hashCode() + ", " + "sharedPreferences = [" + sharedPreferences + "], key = [" + key + "]");
         }
     }

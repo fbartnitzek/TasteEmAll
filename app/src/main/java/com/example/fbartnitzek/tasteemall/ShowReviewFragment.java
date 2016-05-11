@@ -92,7 +92,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             }
         }
 
-        mProducerLabelView = (TextView) mRootView.findViewById(R.id.label_producer);
+        mProducerLabelView = (TextView) mRootView.findViewById(R.id.heading_choose_drink);
         mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
         mProducerNameLabelView = (TextView) mRootView.findViewById(R.id.label_producer_name);
         mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
@@ -168,16 +168,16 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
         if (data != null && data.moveToFirst()) {
 
             String drinkType = data.getString(ShowQuery.COL_DRINK_TYPE);
-            int drinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
+            int drinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
-            int readableProducerTypeIndex = Utils.getProducerName(drinkTypeIndex);
+            int readableProducerTypeIndex = Utils.getReadableProducerNameId(getActivity(), drinkTypeIndex);
             mProducerLabelView.setText(getActivity()
                     .getString(R.string.producer_details_label,
                             getString(readableProducerTypeIndex)));
             mProducerNameLabelView.setText(readableProducerTypeIndex);
 
-            int readableDrinkTypeIndex = Utils.getDrinkName(drinkTypeIndex);
+            int readableDrinkTypeIndex = Utils.getReadableDrinkNameId(getActivity(), drinkTypeIndex);
             mDrinkLabelView.setText(
                     getString(R.string.drink_details_label,
                             getString(readableDrinkTypeIndex)));

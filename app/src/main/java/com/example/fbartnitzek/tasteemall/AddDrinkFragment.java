@@ -190,7 +190,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
-            String readableDrink = getString(Utils.getDrinkName(drinkType));
+            String readableDrink = getString(Utils.getReadableDrinkNameId(activity, drinkType));
 
             if (mContentUri != null) {
                 Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
@@ -331,7 +331,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
             Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
             int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
-            String readableDrinkType = getString(Utils.getDrinkName(drinkTypeIndex));
+            String readableDrinkType = getString(Utils.getReadableDrinkNameId(getActivity(), drinkTypeIndex));
 
             if (mContentUri == null) {  //just update for new drinks, ignore for edits
                 updateToolbar(readableDrinkType, null);

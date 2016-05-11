@@ -17,12 +17,12 @@
 
         <!--Producer-->
         <TextView
-            android:id="@id/label_producer"
+            android:id="@id/heading_choose_drink"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
             android:gravity="center"
-            android:text="@string/title_producer_details"/>
+            android:text="@string/label_producer_details"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="@string/location"/>
+                android:text="@string/producer_location"/>
 
             <TextView
                 android:id="@+id/producer_location"

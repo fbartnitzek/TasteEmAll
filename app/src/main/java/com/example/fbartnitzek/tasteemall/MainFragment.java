@@ -269,6 +269,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onResume() {
         Log.v(LOG_TAG, "onResume, hashCode=" + this.hashCode() + ", " + "");
+        updateDrinkTypeFromPrefs();
+        updateSpinnerType();
         restartLoaders();
         super.onResume();
     }

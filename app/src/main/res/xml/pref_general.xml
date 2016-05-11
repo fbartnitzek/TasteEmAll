@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <EditTextPreference
+        android:key="@string/pref_key_user_name"
+        android:title="@string/pref_label_user_name"
+        android:contentDescription="enter the default user name for reviews"
+        android:hint="default user name for reviews"/>
+
     <ListPreference
-        android:defaultValue="@string/pref_type_generic"
+        android:defaultValue="@string/drink_key_generic"
         android:entries="@array/pref_type_filter_titles"
         android:entryValues="@array/pref_type_filter_values"
-        android:key="@string/pref_type_key"
-        android:title="@string/pref_type_label" />
-
-    <!-- TODO: default-userName -->
+        android:key="@string/pref_key_type"
+        android:title="@string/pref_label_type" />
 
 </PreferenceScreen>

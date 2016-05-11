@@ -69,7 +69,14 @@
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
 
-        <activity android:name=".SettingsActivity">
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_settings"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingsTheme">
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
     </application>
 

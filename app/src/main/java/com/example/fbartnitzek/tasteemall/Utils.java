@@ -110,53 +110,7 @@ public class Utils {
         }
     }
 
-    public static int getDrinkTypeIndexFromSharedPrefs(Context context, boolean isFilter) {
-        // TODO: currently kind of wrong way around :-p
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String drinkType = prefs.getString(
-                context.getString(R.string.pref_type_key),
-                context.getString(R.string.pref_type_generic));
-        int drinkIndex = getDrinkTypeIndex(context, drinkType);
-        if (isFilter) {
-            return drinkIndex;
-        } else {
-            return Drink.TYPE_ALL.equals(drinkType) ? R.string.drink_key_generic : drinkIndex;
-        }
-    }
 
-    public static int getDrinkTypeIndex(Context context, String drinkType) {
-        //TODO: generic solution - based only on string/array-values
-        if (context.getString(R.string.drink_key_beer).equals(drinkType)) {
-            return R.string.drink_key_beer;
-        } else if (context.getString(R.string.drink_key_coffee).equals(drinkType)) {
-            return R.string.drink_key_coffee;
-        } else if (context.getString(R.string.drink_key_whisky).equals(drinkType)) {
-            return R.string.drink_key_whisky;
-        } else if (context.getString(R.string.drink_key_wine).equals(drinkType)){
-            return R.string.drink_key_wine;
-        } else {
-            return R.string.drink_key_generic;
-        }
-    }
-
-    public static String getDrinkTypeFromSharedPrefs(Context context, boolean isFilter) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String drinkType = prefs.getString(
-                context.getString(R.string.pref_type_key),
-                context.getString(R.string.pref_type_generic));
-        if (isFilter) {
-            return drinkType;
-        } else {
-            return Drink.TYPE_ALL.equals(drinkType) ? Drink.TYPE_GENERIC : drinkType;
-        }
-    }
-
-    public static void setSharedPrefsDrinkType(Context context, String drinkType) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor spe = sp.edit();
-        spe.putString(context.getString(R.string.pref_type_key), drinkType);
-        spe.apply();
-    }
 
     public static ContentValues getContentValues(Producer producer) {
         return DatabaseHelper.buildProducerValues(
@@ -242,35 +196,88 @@ public class Utils {
 ////        return new Location(country, Double.toString(latitude), "location_" + locationString, Double.toString(longitude), postalCode, locality, route, formattedAddress);
     }
 
-    public static int getDrinkName(int drinkType) {
 
-        switch (drinkType) {
-            case R.string.drink_key_beer:
-                return R.string.drink_show_beer;
-            case R.string.drink_key_coffee:
-                return R.string.drink_show_coffee;
-            case R.string.drink_key_whisky:
-                return R.string.drink_show_whisky;
-            case R.string.drink_key_wine:
-                return R.string.drink_show_wine;
-            default:
-                return R.string.drink_show_generic;
+    public static String getUserNameFromSharedPrefs(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return prefs.getString(
+                    context.getString(R.string.pref_key_user_name),
+                    context.getString(R.string.pref_value_user_name_empty));
+
+    }
+
+
+    public static int getDrinkTypeIndexFromSharedPrefs(Context context, boolean isFilter) {
+        String drinkType = getDrinkTypeFromSharedPrefs(context, isFilter);
+        return getDrinkTypeId(context, drinkType);
+    }
+
+    public static String getDrinkTypeFromSharedPrefs(Context context, boolean isFilter) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (isFilter) {
+            return prefs.getString(
+                    context.getString(R.string.pref_key_type),
+                    context.getString(R.string.drink_key_all));
+        } else {    // no all
+            String drinkType = prefs.getString(
+                    context.getString(R.string.pref_key_type),
+                    context.getString(R.string.drink_key_generic));
+            if (Drink.TYPE_ALL.equals(drinkType)){
+                return context.getString(R.string.drink_key_generic);
+            } else {
+                return drinkType;
+            }
         }
     }
 
-    public static int getProducerName(int drinkType) {
-        switch (drinkType) {
-            case R.string.drink_key_beer:
-                return R.string.producer_show_beer;
-            case R.string.drink_key_coffee:
-                return R.string.producer_show_coffee;
-            case R.string.drink_key_whisky:
-                return R.string.producer_show_whisky;
-            case R.string.drink_key_wine:
-                return R.string.producer_show_wine;
-            default:
-                return R.string.producer_show_generic;
+    public static void setSharedPrefsDrinkType(Context context, String drinkType) {
+        // context.getResources().getStringArray(R.array.pref_rating_values);
+        // check if valid key?
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putString(context.getString(R.string.pref_key_type), drinkType);
+        spe.apply();
+    }
+
+    public static int getDrinkTypeId(Context context, String drinkTypeKey) {
+        int drinkTypeId = context.getResources().getIdentifier(
+                "drink_key_" + drinkTypeKey, "string", context.getPackageName());
+        if (drinkTypeId == 0) {
+            return R.string.drink_key_generic;
+        } else {
+            return drinkTypeId;
         }
+    }
+
+    public static int getReadableDrinkNameId(Context context, int drinkTypeId) {
+        return getReadableDrinkNameId(context, context.getResources().getString(drinkTypeId));
+    }
+
+    public static int getReadableDrinkNameId(Context context, String drinkType) {
+        if (drinkType != null) {
+            int showDrinkId = context.getResources().getIdentifier(
+                    "drink_show_" + drinkType, "string", context.getPackageName());
+            if (showDrinkId != 0) {
+                return showDrinkId;
+            }
+        }
+        return R.string.drink_show_generic;
+    }
+
+    public static int getReadableProducerNameId(Context context, int drinkTypeId) {
+        return getReadableProducerNameId(context, context.getResources().getString(drinkTypeId));
+    }
+
+    public static int getReadableProducerNameId(Context context, String drinkType) {
+        if (drinkType != null) {
+            int showProducerId = context.getResources().getIdentifier(
+                    "producer_show_" + drinkType, "string", context.getPackageName());
+            if (showProducerId != 0) {
+                return showProducerId;
+            }
+        }
+        return R.string.producer_show_generic;
     }
 
 }

@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="@string/location"/>
+                android:text="@string/producer_location"/>
 
             <EditText
                 android:id="@+id/producer_location"
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
-                android:text="@string/label_website"/>
+                android:text="@string/label_producer_website"/>
 
             <EditText
                 android:id="@+id/producer_website"

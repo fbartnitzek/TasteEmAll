@@ -180,8 +180,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_USER)) {
             mEditReviewUser.setText(savedInstanceState.getString(STATE_REVIEW_USER));
         } else {
-            // TODO init with preferences
-            mEditReviewUser.setText("user1");
+            mEditReviewUser.setText(Utils.getUserNameFromSharedPrefs(getActivity()));
         }
 
         // TODO: onClick some calendar-usage
@@ -255,7 +254,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
-            String readableDrink = getString(Utils.getDrinkName(drinkType));
+            String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), drinkType));
 
             if (mContentUri != null) {
                 Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
@@ -343,8 +342,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         } else {
             insertReview();
         }
-
-        Snackbar.make(mRootView, "TODO: save something", Snackbar.LENGTH_SHORT).show();
     }
 
     private void updateReview() {
