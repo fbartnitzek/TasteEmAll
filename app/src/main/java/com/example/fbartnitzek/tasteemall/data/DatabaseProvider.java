@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.fbartnitzek.tasteemall.Utils;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
@@ -62,6 +63,7 @@ public class DatabaseProvider extends ContentProvider {
     private static final int REVIEW_BY_ID = 503;
     private static final int REVIEW_WITH_ALL_BY_ID = 510;
     private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
+    private static final int REVIEWS_GEOCODE = 530;
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 //    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
@@ -155,7 +157,7 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL + "/#", REVIEW_WITH_ALL_BY_ID);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
-
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_GEOCODE_LOCATION, REVIEWS_GEOCODE);
 
         return matcher;
     }
@@ -277,7 +279,11 @@ public class DatabaseProvider extends ContentProvider {
                             projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
                 }
                 break;
-
+            case REVIEWS_GEOCODE:
+                cursor = db.query(ReviewEntry.TABLE_NAME, projection,
+                        Review.LOCATION + " LIKE '" + Utils.GEOCODE_ME + "%'",
+                        selectionArgs, null, null, sortOrder);
+                break;
             // TODO: special review-searches    - advanced search Fragment...
             //  ALL_COLUMNS, Selection- and SortOrder- Builder
             //  - CONTAINS_STRING_IN_DESCRIPTION
@@ -517,6 +523,8 @@ public class DatabaseProvider extends ContentProvider {
             case REVIEW_WITH_ALL_BY_ID:
                 return ReviewEntry.CONTENT_ITEM_TYPE;
             case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
+                return ReviewEntry.CONTENT_TYPE;
+            case REVIEWS_GEOCODE:
                 return ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

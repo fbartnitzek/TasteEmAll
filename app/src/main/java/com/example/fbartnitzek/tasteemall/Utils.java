@@ -53,7 +53,10 @@ public class Utils {
 //    }
 
     static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final String GEOCODE_ME = "geocode_me";
+    public static final String GEOCODE_ME = "geocode_me";
+    private static final String LAT_PREFIX = "_lat_";
+    private static final String LONG_PREFIX = "_long_";
+    private static final String D_DOT_D = "\\d+\\.\\d+";
 
     // TODO: might use some hash-function later...
     public static String calcProducerId(String producerName) {
@@ -285,8 +288,8 @@ public class Utils {
     }
 
     public static String formatLocation(Location currentLocation) {
-        return GEOCODE_ME + "_lat_" + String.valueOf(currentLocation.getLatitude())
-                + "_long_" + String.valueOf(currentLocation.getLongitude());
+        return GEOCODE_ME + LAT_PREFIX + String.valueOf(currentLocation.getLatitude())
+                + LONG_PREFIX + String.valueOf(currentLocation.getLongitude());
     }
 
     public static String formatAddress(Address address) {
@@ -299,5 +302,29 @@ public class Utils {
         }
         currentAddress = currentAddress.substring(0, currentAddress.length() - 2); //65432 FFM, some street nr
         return currentAddress;
+    }
+
+    public static boolean checkGeocodeAddressFormat(String formattedAddress) {
+        if (formattedAddress == null) {
+            return false;
+        }
+        return formattedAddress.matches(GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
+    }
+
+    public static double getLatitude(String location) throws NumberFormatException {
+        if (location != null && location.contains(LAT_PREFIX) && location.contains(LONG_PREFIX)) {
+            String lat = location.substring(
+                    GEOCODE_ME.length() + LAT_PREFIX.length(), location.indexOf(LONG_PREFIX));
+            return Double.parseDouble(lat);
+        }
+        throw new NumberFormatException();
+    }
+
+    public static double getLongitude(String location) throws NumberFormatException {
+        if (location != null && location.contains(LAT_PREFIX) && location.contains(LONG_PREFIX)) {
+            String longitude = location.substring(location.indexOf(LONG_PREFIX) + LONG_PREFIX.length());
+            return Double.parseDouble(longitude);
+        }
+        throw new NumberFormatException();
     }
 }

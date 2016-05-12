@@ -37,6 +37,7 @@ public class DatabaseContract {
     public static final String PATH_REVIEW = "review";
     public static final String PATH_REVIEW_WITH_ALL = "review_with_all";
     public static final String PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE = "review_with_all_by_name_and_type";
+    public static final String PATH_REVIEW_GEOCODE_LOCATION = "review_geocode_locations";
 
 //    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
@@ -156,7 +157,6 @@ public class DatabaseContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
                 + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
-
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
         }
@@ -171,6 +171,10 @@ public class DatabaseContract {
                     .appendPath(type)
                     .appendPath(pattern)
                     .build();
+        }
+
+        public static Uri buildGeocodingUri() {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW_GEOCODE_LOCATION).build();
         }
 
         public static String getSearchString(Uri uri, boolean withDrink) {

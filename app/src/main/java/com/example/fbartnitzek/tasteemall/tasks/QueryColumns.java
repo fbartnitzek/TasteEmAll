@@ -79,6 +79,16 @@ public class QueryColumns {
             public static final int COL_PRODUCER_NAME = 5;
 
         }
+
+        public static class GeocodingQuery {
+            public static final String[] COLUMNS = {
+                    ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID,
+                    Review.LOCATION
+            };
+
+            public static final int COL_REVIEW__ID = 0;
+            public static final int COL_LOCATION = 1;
+        }
     }
 
     public static class ReviewFragment {

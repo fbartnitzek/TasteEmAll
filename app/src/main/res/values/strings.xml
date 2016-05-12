@@ -122,7 +122,7 @@
     <string name="hint_review_location">location of the review</string>
 
 
-    <!-- Toast warnings-->
+    <!-- Toast warnings / messages -->
     <string name="toast_choose_existing_drink">choose an existing drink first...</string>
     <string name="toast_rate_drink">rate your drink first...</string>
     <string name="toast_no_username">no rating without username...</string>
@@ -135,6 +135,10 @@
     <string name="toast_no_location_access">no location access provided (you might activate it in your device location settings), please enter the location manually</string>
     <string name="toast_service_not_available">Geocoder not available or unreachable - the location-values will be translated on next start with network services</string>
     <string name="toast_no_location_generic">no location found, please enter the location manually</string>
+    <string name="toast_invalid_geocode_location">the geocode placeholder in review location was modified, please enter the location manually</string>
+    <string name="toast_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$s</xliff:g> Reviews failed)</string>
+    <string name="toast_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$s</xliff:g> Reviews failed)</string>
+
 
     <!-- examples-->
     <string name="example_review_date">20160509</string>
@@ -162,6 +166,8 @@
     <string name="no_address_found">no address found</string>
     <string name="address_found">address found</string>
     <string name="action_geocode">geocode</string>
+    <string name="no_geocode_reviews">no reviews found to geocode</string>
+    <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
 
 
 </resources>

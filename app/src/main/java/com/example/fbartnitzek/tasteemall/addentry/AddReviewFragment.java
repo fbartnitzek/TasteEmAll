@@ -341,7 +341,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
     public void saveData() {
 
-
         if (mDrinkId == null || mDrinkName == null) {
             Snackbar.make(mRootView, R.string.toast_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
             return;
@@ -354,12 +353,23 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         } else if ("".equals(mEditReviewReadableDate.getText().toString().trim())) {
             Snackbar.make(mRootView, R.string.toast_no_review_date, Snackbar.LENGTH_SHORT).show();
             return;
+        } else if (!validateLocation()) {
+            Snackbar.make(mRootView, R.string.toast_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
+            return;
         }
 
         if (mContentUri != null) {
             updateReview();
         } else {
             insertReview();
+        }
+    }
+
+    private boolean validateLocation() {
+        if (mEditReviewLocation.getText().toString().startsWith(Utils.GEOCODE_ME)) {
+            return Utils.checkGeocodeAddressFormat(mEditReviewLocation.getText().toString());
+        } else {
+            return true;
         }
     }
 

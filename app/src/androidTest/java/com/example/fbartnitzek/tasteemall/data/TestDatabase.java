@@ -64,8 +64,7 @@ public class TestDatabase extends AndroidTestCase {
 //        db.close();
 //    }
 
-    public void testAllTables
-            () {
+    public void testAllTables() {
         DatabaseHelper dbHelper = new DatabaseHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.example.fbartnitzek.tasteemall.tasks.GeocodeReviewsTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,15 +73,28 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_geocode:
+                startGeocoding();
+                return true;
+            default:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
+    }
+
+    private void startGeocoding() {
+        Log.v(LOG_TAG, "startGeocoding, hashCode=" + this.hashCode() + ", " + "");
+        new GeocodeReviewsTask(this, new GeocodeReviewsTask.GeocodeReviewsUpdatedHandler() {
+            @Override
+            public void onUpdatedReviews(String msg) {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+        }).execute();
     }
 
 
