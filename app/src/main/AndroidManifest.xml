@@ -39,26 +39,26 @@
         <!-- bugfix for editText hides nestedScrollView: -->
         <!-- android:windowSoftInputMode="adjustResize" -->
         <activity
-            android:name=".AddProducerActivity"
+            android:name=".addentry.AddProducerActivity"
             android:label="@string/title_add_producer_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".AddDrinkActivity"
+            android:name=".addentry.AddDrinkActivity"
             android:label="@string/title_add_drink_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".AddReviewActivity"
+            android:name=".addentry.AddReviewActivity"
             android:label="@string/title_add_review_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <!--TODO: parent = back-button OR Home-Symbol...-->
         <activity
-            android:name=".ShowProducerActivity"
+            android:name=".showentry.ShowProducerActivity"
             android:label="@string/title_activity_producer"
             android:theme="@style/AppTheme">
             <meta-data
@@ -66,14 +66,14 @@
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
-            android:name=".ShowDrinkActivity"
+            android:name=".showentry.ShowDrinkActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
-            android:name=".ShowReviewActivity"
+            android:name=".showentry.ShowReviewActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -89,6 +89,10 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
+
+        <service
+            android:name=".location.GeocodeAddressIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.showentry;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.example.fbartnitzek.tasteemall.R;
 
 import java.util.ArrayList;
 
@@ -26,7 +28,7 @@ import java.util.ArrayList;
  * limitations under the License.
  */
 
-class CustomSpinnerAdapter extends ArrayAdapter<String> {
+public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     private final Context context;
     private final ArrayList<String> data;

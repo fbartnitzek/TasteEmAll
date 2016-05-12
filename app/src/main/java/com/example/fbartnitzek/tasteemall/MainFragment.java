@@ -28,11 +28,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import com.example.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.showentry.ShowDrinkActivity;
+import com.example.fbartnitzek.tasteemall.showentry.ShowProducerActivity;
+import com.example.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.example.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -302,7 +308,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         sortOrder);
             case REVIEW_LOADER_ID:
                 sortOrder = ProducerEntry.ALIAS+ "." + Producer.NAME + ", " +
-                        DrinkEntry.ALIAS + "." + Drink.NAME;;
+                        DrinkEntry.ALIAS + "." + Drink.NAME;
                 return new CursorLoader(getActivity(),
                         DatabaseContract.ReviewEntry.buildUriForShowReviewWithPatternAndType(
                                 mSearchPattern == null ? "" : mSearchPattern,

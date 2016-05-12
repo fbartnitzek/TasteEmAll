@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.addentry;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -6,9 +6,11 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.fbartnitzek.tasteemall.R;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 /**
  * Copyright 2016.  Frank Bartnitzek

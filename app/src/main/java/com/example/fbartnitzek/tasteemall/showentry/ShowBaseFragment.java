@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.showentry;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+
+import com.example.fbartnitzek.tasteemall.R;
 
 /**
  * Copyright 2016.  Frank Bartnitzek

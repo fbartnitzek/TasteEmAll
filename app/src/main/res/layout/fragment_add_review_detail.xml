@@ -136,7 +136,7 @@
                 android:id="@+id/review_recommended_sides"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="text|textMultiLine"
                 android:hint="@string/hint_review_recommended_sides"/>
         </LinearLayout>
 

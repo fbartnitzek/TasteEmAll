@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.tasks;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.*;
@@ -116,9 +116,9 @@ public class QueryColumns {
                     Drink.STYLE,
                     Drink.SPECIFICS,
                     Drink.INGREDIENTS,
+                    ProducerEntry.ALIAS + "." + ProducerEntry._ID,
                     Producer.NAME,
                     Producer.LOCATION,
-                    ProducerEntry.ALIAS + "." + ProducerEntry._ID
             };
 
             public static final int COL_REVIEW__ID = 0;
@@ -179,7 +179,7 @@ public class QueryColumns {
 
         public static class ShowQuery {
 
-            static final String[] COLUMNS = {
+            public static final String[] COLUMNS = {
                     DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursorAdapter doesn't work
                     Drink.NAME,
                     Drink.DRINK_ID,
@@ -191,22 +191,22 @@ public class QueryColumns {
                     Producer.NAME,
                     Producer.LOCATION};
 
-            static final int COL_DRINK__ID = 0;
-            static final int COL_DRINK_NAME = 1;
-            static final int COL_DRINK_ID = 2;
-            static final int COL_DRINK_TYPE = 3;
-            static final int COL_DRINK_SPECIFICS = 4;
-            static final int COL_DRINK_STYLE = 5;
-            static final int COL_DRINK_INGREDIENTS = 6;
-            static final int COL_PRODUCER_ID = 7;
-            static final int COL_PRODUCER_NAME = 8;
-            static final int COL_PRODUCER_LOCATION = 9;
+            public static final int COL_DRINK__ID = 0;
+            public static final int COL_DRINK_NAME = 1;
+            public static final int COL_DRINK_ID = 2;
+            public static final int COL_DRINK_TYPE = 3;
+            public static final int COL_DRINK_SPECIFICS = 4;
+            public static final int COL_DRINK_STYLE = 5;
+            public static final int COL_DRINK_INGREDIENTS = 6;
+            public static final int COL_PRODUCER_ID = 7;
+            public static final int COL_PRODUCER_NAME = 8;
+            public static final int COL_PRODUCER_LOCATION = 9;
         }
 
 
         public static class EditQuery {
 
-            static final String[] COLUMNS = {
+            public static final String[] COLUMNS = {
                     DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursorAdapter doesn't work
                     Drink.NAME,
                     Drink.DRINK_ID,
@@ -218,16 +218,16 @@ public class QueryColumns {
                     Producer.NAME,
                     Producer.LOCATION};
 
-            static final int COL_DRINK__ID = 0;
-            static final int COL_DRINK_NAME = 1;
-            static final int COL_DRINK_ID = 2;
-            static final int COL_DRINK_TYPE = 3;
-            static final int COL_DRINK_SPECIFICS = 4;
-            static final int COL_DRINK_STYLE = 5;
-            static final int COL_DRINK_INGREDIENTS = 6;
-            static final int COL_PRODUCER_ID = 7;
-            static final int COL_PRODUCER_NAME = 8;
-            static final int COL_PRODUCER_LOCATION = 9;
+            public static final int COL_DRINK__ID = 0;
+            public static final int COL_DRINK_NAME = 1;
+            public static final int COL_DRINK_ID = 2;
+            public static final int COL_DRINK_TYPE = 3;
+            public static final int COL_DRINK_SPECIFICS = 4;
+            public static final int COL_DRINK_STYLE = 5;
+            public static final int COL_DRINK_INGREDIENTS = 6;
+            public static final int COL_PRODUCER_ID = 7;
+            public static final int COL_PRODUCER_NAME = 8;
+            public static final int COL_PRODUCER_LOCATION = 9;
         }
 
         public static final String[] PRODUCER_QUERY_COLUMNS = {
@@ -238,7 +238,7 @@ public class QueryColumns {
 
         public static final int COL_QUERY_PRODUCER__ID = 0;
         public static final int COL_QUERY_PRODUCER_NAME = 1;
-        static final int COL_QUERY_PRODUCER_LOCATION = 2;
+        public static final int COL_QUERY_PRODUCER_LOCATION = 2;
         public static final int COL_QUERY_PRODUCER_ID = 3;
     }
 
@@ -253,12 +253,12 @@ public class QueryColumns {
                 Producer.LOCATION
         };
 
-        static final int COL_PRODUCER__ID = 0;
-        static final int COL_PRODUCER_ID = 1;
-        static final int COL_PRODUCER_NAME = 2;
+        public static final int COL_PRODUCER__ID = 0;
+        public static final int COL_PRODUCER_ID = 1;
+        public static final int COL_PRODUCER_NAME = 2;
         public static final int COL_PRODUCER_DESCRIPTION = 3;
-        static final int COL_PRODUCER_WEBSITE = 4;
-        static final int COL_PRODUCER_LOCATION = 5;
+        public static final int COL_PRODUCER_WEBSITE = 4;
+        public static final int COL_PRODUCER_LOCATION = 5;
     }
 
 

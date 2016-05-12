@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.showentry;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 
 /**
  * Copyright 2016.  Frank Bartnitzek

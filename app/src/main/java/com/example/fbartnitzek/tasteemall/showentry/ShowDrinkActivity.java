@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.showentry;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,43 +9,49 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ShowProducerActivity extends AppCompatActivity {
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.addentry.AddDrinkActivity;
 
-    private static final String FRAGMENT_TAG = "SHOW_PRODUCER_TAG";
-    private static final String LOG_TAG = ShowProducerActivity.class.getName();
-    public static final String EXTRA_PRODUCER_URI = "EXTRA_PRODUCER_URI";
-    private static final int EDIT_PRODUCER_REQUEST = 444;
+public class ShowDrinkActivity extends AppCompatActivity {
+
+    private static final String FRAGMENT_TAG = "SHOw_DRINK_TAG";
+    private static final String LOG_TAG = ShowDrinkActivity.class.getName();
+    public static final String EXTRA_DRINK_URI = "EXTRA_DRINK_URI";
+    private static final int EDIT_DRINK_REQUEST = 432;
     private Uri mContentUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
-        setContentView(R.layout.activity_show_producer);
+        Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+        setContentView(R.layout.activity_show_drink);
 
+        // explicitly add fragment with pattern
         if (findViewById(R.id.fragment_container) != null) {
-            if (savedInstanceState != null) {
+            if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
-            ShowProducerFragment fragment = new ShowProducerFragment();
+            ShowDrinkFragment fragment = new ShowDrinkFragment();
 
             mContentUri = getIntent().getData();
             if (mContentUri != null) {
                 Bundle args = new Bundle();
-                args.putParcelable(EXTRA_PRODUCER_URI, mContentUri);
+                args.putParcelable(EXTRA_DRINK_URI, mContentUri);
                 fragment.setArguments(args);
+            } else {
+                Log.e(LOG_TAG, "onCreate - without intentData???, hashCode=" + this.hashCode() + "]");
             }
 
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, fragment, FRAGMENT_TAG)
                     .commit();
-
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + "]");
         }
 
+        //init toolbar in fragment
     }
 
     @Override
@@ -55,8 +61,8 @@ public class ShowProducerActivity extends AppCompatActivity {
         return true;
     }
 
-    private ShowProducerFragment getFragment() {
-        return (ShowProducerFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+    private ShowDrinkFragment getFragment(){
+        return (ShowDrinkFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
     }
 
     @Override
@@ -65,28 +71,30 @@ public class ShowProducerActivity extends AppCompatActivity {
             case R.id.action_edit:
                 Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
 
-                Intent intent = new Intent(this, AddProducerActivity.class);
+                Intent intent = new Intent(this, AddDrinkActivity.class);
                 intent.setData(mContentUri);
-                startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
+                startActivityForResult(intent, EDIT_DRINK_REQUEST);
+
                 break;
             default:
-                Log.v(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+//                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-        if (requestCode == EDIT_PRODUCER_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Uri producerUri = data.getData();
-
-            ShowProducerFragment fragment = getFragment();
-            if (fragment != null && producerUri != null) {
-                fragment.updateFragment(producerUri);
+        if (requestCode == EDIT_DRINK_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri drinkUri = data.getData();
+            ShowDrinkFragment fragment = getFragment();
+            if (fragment != null && drinkUri != null) {
+                fragment.updateFragment(drinkUri);
             } else {
                 Log.v(LOG_TAG, "onActivityResult - data or fragment missing..., hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
             }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

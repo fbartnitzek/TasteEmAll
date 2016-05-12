@@ -129,6 +129,12 @@
     <string name="toast_no_review_date">no rating without date...</string>
     <string name="toast_choose_existing_provider">choose an existing producer first...</string>
     <string name="toast_choose_drink_name">choose a name first...</string>
+    <string name="toast_no_address_found">no address was found by your coordinates - please enter the location manually</string>
+    <string name="toast_invalid_lat_long">invalid latitude and longitude values detected, please enter the location manually</string>
+    <string name="toast_no_location_provided">no location data provided (you might have deactivated location settings), please enter the location manually</string>
+    <string name="toast_no_location_access">no location access provided (you might activate it in your device location settings), please enter the location manually</string>
+    <string name="toast_service_not_available">Geocoder not available or unreachable - the location-values will be translated on next start with network services</string>
+    <string name="toast_no_location_generic">no location found, please enter the location manually</string>
 
     <!-- examples-->
     <string name="example_review_date">20160509</string>
@@ -149,6 +155,13 @@
     <string name="example_drink_name">some drink</string>
     <string name="example_location">TestLocation</string>
     <string name="title_settings">Settings</string>
+
+    <!-- logging -->
+    <string name="service_not_available">service not avaiable</string>
+    <string name="invalid_lat_long_used">invalid location input data</string>
+    <string name="no_address_found">no address found</string>
+    <string name="address_found">address found</string>
+    <string name="action_geocode">geocode</string>
 
 
 </resources>

@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.fbartnitzek.tasteemall.QueryColumns;
 import com.example.fbartnitzek.tasteemall.Utils;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.addentry;
 
 
 import android.app.Activity;
@@ -26,9 +26,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.Utils;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 import com.example.fbartnitzek.tasteemall.tasks.QueryProducerTask;
 import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
@@ -156,13 +159,13 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(STATE_PRODUCER_NAME, mEditCompletionProducerName.getText().toString());
+        outState.putString(STATE_PRODUCER_NAME, mEditCompletionProducerName.getText().toString().trim());
 
-        outState.putString(STATE_DRINK_NAME, mEditDrinkName.getText().toString());
+        outState.putString(STATE_DRINK_NAME, mEditDrinkName.getText().toString().trim());
         outState.putInt(STATE_DRINK_TYPE_POSITION, mSpinnerDrinkType.getSelectedItemPosition());
-        outState.putString(STATE_DRINK_STYLE, mEditDrinkStyle.getText().toString());
-        outState.putString(STATE_DRINK_INGREDIENTS, mEditDrinkIngredients.getText().toString());
-        outState.putString(STATE_DRINK_SPECIFICS, mEditDrinkSpecifics.getText().toString());
+        outState.putString(STATE_DRINK_STYLE, mEditDrinkStyle.getText().toString().trim());
+        outState.putString(STATE_DRINK_INGREDIENTS, mEditDrinkIngredients.getText().toString().trim());
+        outState.putString(STATE_DRINK_SPECIFICS, mEditDrinkSpecifics.getText().toString().trim());
 
         if (mProducerId != null) {
             outState.putString(STATE_PRODUCER_ID, mProducerId);
@@ -250,7 +253,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     void saveData() {
         Log.v(LOG_TAG, "saveData, hashCode=" + this.hashCode() + ", " + "");
 
-        String drinkName = mEditDrinkName.getText().toString();
+        String drinkName = mEditDrinkName.getText().toString().trim();
 
         //validate
         if (mProducerId == null || mProducerName == null) {
@@ -276,11 +279,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                 .execute(DatabaseHelper.buildDrinkValues(
                         mDrinkId,
                         drinkName,
-                        mEditDrinkSpecifics.getText().toString(),
-                        mEditDrinkStyle.getText().toString(),
+                        mEditDrinkSpecifics.getText().toString().trim(),
+                        mEditDrinkStyle.getText().toString().trim(),
                         mSpinnerDrinkType.getItemAtPosition(
                                 mSpinnerDrinkType.getSelectedItemPosition()).toString(),
-                        mEditDrinkIngredients.getText().toString(),
+                        mEditDrinkIngredients.getText().toString().trim(),
                         mProducerId)
                 );
 
@@ -292,11 +295,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     .execute(DatabaseHelper.buildDrinkValues(
                         Utils.calcDrinkId(drinkName, mProducerId),
                         drinkName,
-                        mEditDrinkSpecifics.getText().toString(),
-                        mEditDrinkStyle.getText().toString(),
+                        mEditDrinkSpecifics.getText().toString().trim(),
+                        mEditDrinkStyle.getText().toString().trim(),
                         mSpinnerDrinkType.getItemAtPosition(
                                 mSpinnerDrinkType.getSelectedItemPosition()).toString(),
-                        mEditDrinkIngredients.getText().toString(),
+                        mEditDrinkIngredients.getText().toString().trim(),
                         mProducerId));
     }
 
@@ -317,7 +320,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         Intent intent = new Intent(getActivity(), AddProducerActivity.class);
         // use pre filled name
         intent.putExtra(AddProducerActivity.PRODUCER_NAME_EXTRA,
-                mEditCompletionProducerName.getText().toString());
+                mEditCompletionProducerName.getText().toString().trim());
         startActivityForResult(intent, PRODUCER_ACTIVITY_REQUEST_CODE);
     }
 
@@ -447,7 +450,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         mProducerId = producerId;
         mProducerName = producerName;
 
-        if (!mEditCompletionProducerName.getText().toString().equals(mProducerName)){
+        if (!mEditCompletionProducerName.getText().toString().trim().equals(mProducerName)){
             mEditCompletionProducerName.setText(mProducerName);
             mEditCompletionProducerName.dismissDropDown();
         }

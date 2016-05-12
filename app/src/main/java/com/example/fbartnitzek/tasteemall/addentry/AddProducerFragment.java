@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.addentry;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,9 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.Utils;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.tasks.InsertEntryTask;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 import com.example.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
 
@@ -126,10 +129,10 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(STATE_PRODUCER_NAME, mEditProducerName.getText().toString());
-        outState.putString(STATE_PRODUCER_LOCATION, mEditProducerLocation.getText().toString());
-        outState.putString(STATE_PRODUCER_WEBSITE, mEditProducerWebsite.getText().toString());
-        outState.putString(STATE_PRODUCER_DESCRIPTION, mEditProducerDescription.getText().toString());
+        outState.putString(STATE_PRODUCER_NAME, mEditProducerName.getText().toString().trim().trim());
+        outState.putString(STATE_PRODUCER_LOCATION, mEditProducerLocation.getText().toString().trim());
+        outState.putString(STATE_PRODUCER_WEBSITE, mEditProducerWebsite.getText().toString().trim());
+        outState.putString(STATE_PRODUCER_DESCRIPTION, mEditProducerDescription.getText().toString().trim());
 
         if (mContentUri != null) {
             outState.putParcelable(STATE_CONTENT_URI, mContentUri);
@@ -178,9 +181,9 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                     .execute(DatabaseHelper.buildProducerValues(
                             Utils.calcProducerId(producerName),
                             producerName,
-                            mEditProducerDescription.getText().toString(),
-                            mEditProducerWebsite.getText().toString(),
-                            mEditProducerLocation.getText().toString()));
+                            mEditProducerDescription.getText().toString().trim(),
+                            mEditProducerWebsite.getText().toString().trim(),
+                            mEditProducerLocation.getText().toString().trim()));
     }
 
     private void updateData(String producerName) {
@@ -189,14 +192,14 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                 .execute(DatabaseHelper.buildProducerValues(
                         mProducerId,
                         producerName,
-                        mEditProducerDescription.getText().toString(),
-                        mEditProducerWebsite.getText().toString(),
-                        mEditProducerLocation.getText().toString()));
+                        mEditProducerDescription.getText().toString().trim(),
+                        mEditProducerWebsite.getText().toString().trim(),
+                        mEditProducerLocation.getText().toString().trim()));
     }
 
     void saveData() {
 
-        String producerName = mEditProducerName.getText().toString();
+        String producerName = mEditProducerName.getText().toString().trim();
 
         if (mContentUri != null) { //update
 

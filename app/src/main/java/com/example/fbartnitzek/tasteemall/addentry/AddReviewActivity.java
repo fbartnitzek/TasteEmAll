@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.addentry;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,18 +6,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class AddDrinkActivity extends AppCompatActivity {
+import com.example.fbartnitzek.tasteemall.R;
 
-    private static final String LOG_TAG = AddDrinkActivity.class.getName();
-    private static final String ADD_DRINK_FRAGMENT_TAG = "ADD_DRINK_FRAGMENT_TAG";
-    public static final String PATTERN_EXTRA = "EXTRA_PRE_FILLED_PATTERN";
+public class AddReviewActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = AddReviewActivity.class.getName();
+    private static final String ADD_REVIEW_FRAGMENT_TAG = "ADD_REVIEW_FRAGMENT_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_drink);
+        setContentView(R.layout.activity_add_review);
 
         // explicitly add fragment, toolbar from fragment...
         if (findViewById(R.id.fragment_container) != null) {
@@ -28,19 +28,16 @@ public class AddDrinkActivity extends AppCompatActivity {
             }
 
             // edit or add
-            AddDrinkFragment fragment = getFragment();
+            AddReviewFragment fragment = getFragment();
             if (fragment == null) {
-                fragment = new AddDrinkFragment();
+
+                fragment = new AddReviewFragment();
                 if (getIntent().getData() != null) {
-//                    fragment = AddDrinkFragment.newInstance(getIntent().getData());
-                    fragment.setContentUri(getIntent().getData());
-                } else if (getIntent().hasExtra(PATTERN_EXTRA)) {
-                    fragment.setmPreFilledPattern(getIntent().getStringExtra(PATTERN_EXTRA));
-//                    fragment = AddDrinkFragment.newInstance();
+                    fragment.setmContentUri(getIntent().getData());
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
+                        .add(R.id.fragment_container, fragment, ADD_REVIEW_FRAGMENT_TAG)
                         .commit();
             } else {
                 Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
@@ -53,6 +50,10 @@ public class AddDrinkActivity extends AppCompatActivity {
         // add toolbar from fragment (when view is initialized)
     }
 
+    private AddReviewFragment getFragment() {
+        return (AddReviewFragment) getSupportFragmentManager().findFragmentByTag(ADD_REVIEW_FRAGMENT_TAG);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
@@ -60,16 +61,12 @@ public class AddDrinkActivity extends AppCompatActivity {
         return true;
     }
 
-    private AddDrinkFragment getFragment() {
-        return (AddDrinkFragment) getSupportFragmentManager().findFragmentByTag(ADD_DRINK_FRAGMENT_TAG);
-    }
-
     // TODO: might be better directly in fragment...
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                AddDrinkFragment fragment = getFragment();
+                AddReviewFragment fragment = getFragment();
                 if (fragment != null) {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
@@ -80,4 +77,6 @@ public class AddDrinkActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

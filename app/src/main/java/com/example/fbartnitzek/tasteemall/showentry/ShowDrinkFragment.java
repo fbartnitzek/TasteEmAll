@@ -1,4 +1,4 @@
-package com.example.fbartnitzek.tasteemall;
+package com.example.fbartnitzek.tasteemall.showentry;
 
 
 import android.content.Intent;
@@ -16,7 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.fbartnitzek.tasteemall.R;
+import com.example.fbartnitzek.tasteemall.Utils;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 
 /**

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
-import com.example.fbartnitzek.tasteemall.QueryColumns;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;

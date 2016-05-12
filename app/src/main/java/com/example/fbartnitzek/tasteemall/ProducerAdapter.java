@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.example.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 
 /**
