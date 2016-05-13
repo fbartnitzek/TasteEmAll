@@ -47,6 +47,9 @@ abstract class ShowBaseFragment extends Fragment implements LoaderManager.Loader
             }
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setCustomView(R.layout.action_bar_title_layout);
+            supportActionBar.setDisplayShowCustomEnabled(true);
         } else {
             Log.v(LOG_TAG, "createToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }

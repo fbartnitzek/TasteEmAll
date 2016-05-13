@@ -128,7 +128,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
             String drinkName = mDrinkNameView.getText().toString();
             String producerName= mProducerNameView.getText().toString();
-            actionBar.setTitle(
+            ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                     getString(R.string.title_show_review, producerName, drinkName));
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");

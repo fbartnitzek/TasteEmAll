@@ -110,7 +110,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
             String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), mDrinkTypeIndex));
             String drinkName = mDrinkNameView.getText().toString();
             String producerName= mProducerNameView.getText().toString();
-            actionBar.setTitle(
+            ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                     getString(R.string.title_show_drink,
                             readableDrink, producerName, drinkName));
         } else {

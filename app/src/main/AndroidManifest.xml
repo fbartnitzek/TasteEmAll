@@ -23,7 +23,6 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -40,26 +39,22 @@
         <!-- android:windowSoftInputMode="adjustResize" -->
         <activity
             android:name=".addentry.AddProducerActivity"
-            android:label="@string/title_add_producer_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
             android:name=".addentry.AddDrinkActivity"
-            android:label="@string/title_add_drink_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
             android:name=".addentry.AddReviewActivity"
-            android:label="@string/title_add_review_activity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <!--TODO: parent = back-button OR Home-Symbol...-->
         <activity
             android:name=".showentry.ShowProducerActivity"
-            android:label="@string/title_activity_producer"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

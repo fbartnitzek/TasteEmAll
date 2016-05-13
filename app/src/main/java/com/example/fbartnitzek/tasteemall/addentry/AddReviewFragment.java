@@ -33,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fbartnitzek.tasteemall.R;
@@ -218,7 +219,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_LOCATION)) {
             mEditReviewLocation.setText(savedInstanceState.getString(STATE_REVIEW_LOCATION));
         } else {
-            // TODO init with lastLocation
             updateLocation();
         }
 
@@ -275,17 +275,19 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
             }
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setCustomView(R.layout.action_bar_title_layout);
+            supportActionBar.setDisplayShowCustomEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
             String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), drinkType));
 
             if (mContentUri != null) {
                 Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
-                supportActionBar.setTitle(
-                        getString(R.string.title_edit_review_activity_preview,
-                                readableDrink));
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+                        getString(R.string.title_edit_review_activity_preview, readableDrink));
             } else {
                 Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
-                supportActionBar.setTitle(
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_add_review_activity_preview,
                                 readableDrink));
             }
@@ -302,12 +304,12 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
 
         if (activity.getSupportActionBar() != null) {
             if (mContentUri != null) {  // edit
-                activity.getSupportActionBar().setTitle(
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_review_activity,
                                 mDrinkName, mProducerName));
             } else {    // add
                 if (mDrinkId != null) { //known names
-                    activity.getSupportActionBar().setTitle(
+                    ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                             getString(R.string.title_add_review_activity,
                                     mDrinkName, mProducerName));
                 }

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.fbartnitzek.tasteemall.R;
 import com.example.fbartnitzek.tasteemall.Utils;
@@ -110,20 +111,36 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             }
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setCustomView(R.layout.action_bar_title_layout);
+            supportActionBar.setDisplayShowCustomEnabled(true);
+
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
             String readableProducer = getString(Utils.getReadableProducerNameId(getActivity(), drinkType));
             if (mContentUri != null) {
-                supportActionBar.setTitle(
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_producer_activity_preview,
                                 readableProducer));
             } else {
-                supportActionBar.setTitle(
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_add_drink_activity,
                                 readableProducer));
             }
 
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
+    }
+
+    private void updateToolbar(String producerName) {
+        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity.getSupportActionBar()!= null) {
+            ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+                    getString(R.string.title_edit_producer_activity,
+                            producerName));
+        } else {
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
         }
     }
 
@@ -142,18 +159,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         }
 
         super.onSaveInstanceState(outState);
-    }
-
-    private void updateToolbar(String producerName) {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity.getSupportActionBar()!= null) {
-            activity.getSupportActionBar().setTitle(
-                    getString(R.string.title_edit_producer_activity,
-                            producerName));
-        } else {
-            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
-        }
     }
 
 

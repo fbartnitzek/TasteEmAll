@@ -111,7 +111,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
             // later: when called from drink you may use the drinkType - now it's ... wrong
 //            String readableProducerType = getString(Utils.getProducerName(mDrinkTypeIndex));
             String producerName= mProducerNameView.getText().toString();
-            actionBar.setTitle(
+            ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                     getString(R.string.title_show_producer, producerName));
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");

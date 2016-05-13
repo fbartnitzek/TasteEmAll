@@ -192,23 +192,45 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             }
             supportActionBar.setDisplayHomeAsUpEnabled(true);
             supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setCustomView(R.layout.action_bar_title_layout);
+            supportActionBar.setDisplayShowCustomEnabled(true);
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
             String readableDrink = getString(Utils.getReadableDrinkNameId(activity, drinkType));
 
             if (mContentUri != null) {
                 Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
-                supportActionBar.setTitle(
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_drink_activity_preview,
                                 readableDrink));
             } else {
                 Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
-                supportActionBar.setTitle(
-                        getString(R.string.title_add_drink_activity,
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+                                getString(R.string.title_add_drink_activity,
                                 readableDrink));
             }
 
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+        }
+    }
+
+    private void updateToolbar(String drinkNameOrDrinkType, String producerName) {
+        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+
+        if (activity.getSupportActionBar()!= null) {
+            if (mContentUri != null) {  // edit
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+                        getString(R.string.title_edit_drink_activity,
+                                drinkNameOrDrinkType, producerName));
+            } else {    // add
+                ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+                        getString(R.string.title_add_drink_activity,
+                                drinkNameOrDrinkType));
+            }
+        } else {
+            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
         }
     }
 
@@ -343,25 +365,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             ((TextView) mRootView.findViewById(R.id.label_drink)).setText(readableDrinkType);
         }
 
-    }
-
-    private void updateToolbar(String drinkNameOrDrinkType, String producerName) {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-
-        if (activity.getSupportActionBar()!= null) {
-            if (mContentUri != null) {  // edit
-                activity.getSupportActionBar().setTitle(
-                        getString(R.string.title_edit_drink_activity,
-                                drinkNameOrDrinkType, producerName));
-            } else {    // add
-                activity.getSupportActionBar().setTitle(
-                        getString(R.string.title_add_drink_activity,
-                                drinkNameOrDrinkType));
-            }
-        } else {
-            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
-        }
     }
 
     @Override
