@@ -377,6 +377,11 @@ public class DatabaseProvider extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
+                        // insert or replace handling not needed (on conflict replace...)
+//                        boolean replace = usesReplace(value);
+                        // for more validation (later) use special tag-value
+                        // src: https://www.buzzingandroid.com/2013/01/sqlite-insert-or-replace-through-contentprovider/
+
                         long id = db.insertWithOnConflict(ProducerEntry.TABLE_NAME, null, value,
                                 SQLiteDatabase.CONFLICT_REPLACE);
                         if (id != -1) {

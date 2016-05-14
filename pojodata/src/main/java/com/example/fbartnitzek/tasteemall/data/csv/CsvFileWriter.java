@@ -32,7 +32,7 @@ public class CsvFileWriter {
     public static final char QUOTE_CHAR = '"';
 
     // Umlaute working - just not in excel android app :-p
-    public static CSVFormat mFormat = CSVFormat.RFC4180.withDelimiter(DELIMITER).withQuote(QUOTE_CHAR);
+    public static CSVFormat CSV_FORMAT_RFC4180 = CSVFormat.RFC4180.withDelimiter(DELIMITER).withQuote(QUOTE_CHAR);
 
     public static String writeFile(String[] headers, List<List<String>> entries, File file) {
 
@@ -41,7 +41,7 @@ public class CsvFileWriter {
         String msg = null;
         try {
             fileWriter = new FileWriter(file);  //initialize FileWriter object
-            csvFilePrinter = new CSVPrinter(fileWriter, mFormat);   //initialize CSVPrinter object
+            csvFilePrinter = new CSVPrinter(fileWriter, CSV_FORMAT_RFC4180);   //initialize CSVPrinter object
             csvFilePrinter.printRecord(headers);    //Create CSV file header
 
             //Write a new student object list to the CSV file

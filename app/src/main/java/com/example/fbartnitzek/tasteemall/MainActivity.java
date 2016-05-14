@@ -14,16 +14,19 @@ import android.widget.Toast;
 
 import com.example.fbartnitzek.tasteemall.tasks.ExportToDirTask;
 import com.example.fbartnitzek.tasteemall.tasks.GeocodeReviewsTask;
+import com.example.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ExportToDirTask.ExportHandler {
+public class MainActivity extends AppCompatActivity implements ExportToDirTask.ExportHandler, ImportFilesTask.ImportHandler {
 
     private static final String LOG_TAG = MainActivity.class.getName();
     private static final String MAIN_FRAGMENT_TAG = "MAIN_FRAGMENT_TAG";
-    private static final int REQUEST_FILE_CODE = 1233;
+    private static final int REQUEST_EXPORT_DIR_CODE = 1233;
+    private static final int REQUEST_IMPORT_FILES_CODE = 1234;
 
 
     @Override
@@ -92,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                 return true;
             case R.id.action_export:
                 startExport();
+                return true;
+            case R.id.action_import:
+                startImport();
+                return true;
             default:
 
         }
@@ -109,7 +116,19 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
         intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
                 Environment.getExternalStorageDirectory().getPath());
-        startActivityForResult(intent, REQUEST_FILE_CODE);
+        startActivityForResult(intent, REQUEST_EXPORT_DIR_CODE);
+    }
+
+    private void startImport() {
+        Log.v(LOG_TAG, "startImport, hashCode=" + this.hashCode() + ", " + "");
+        Intent intent = new Intent(this, FilePickerActivity.class);
+
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
+                Environment.getExternalStorageDirectory().getPath());
+        startActivityForResult(intent, REQUEST_IMPORT_FILES_CODE);
     }
 
     private void startGeocoding() {
@@ -127,9 +146,12 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
 
-        if (requestCode == REQUEST_FILE_CODE && resultCode == AppCompatActivity.RESULT_OK) {
+        if (requestCode == REQUEST_EXPORT_DIR_CODE || requestCode == REQUEST_IMPORT_FILES_CODE
+                && resultCode == AppCompatActivity.RESULT_OK) {
             Uri uri = null;
             if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
+
+                List<File> files = new ArrayList<>();
                 // For JellyBean and above
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     ClipData clip = data.getClipData();
@@ -138,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                         for (int i = 0; i < clip.getItemCount(); i++) {
                             uri = clip.getItemAt(i).getUri();
                             Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+                            files.add(new File(uri.getPath()));
                             // Do something with the URI
                         }
                     }
@@ -147,22 +170,27 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                             (FilePickerActivity.EXTRA_PATHS);
 
                     if (paths != null) {
-                        for (String path: paths) {
-                            uri = Uri.parse(path);
+                        for (String path : paths) {
+                            uri = Uri.parse(path);  // TODO: might be useless conversion...
                             Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                            // Do something with the URI
+                            files.add(new File(uri.getPath()));
                         }
                     }
                 }
 
+                if (!files.isEmpty() && requestCode == REQUEST_IMPORT_FILES_CODE) {
+                    new ImportFilesTask(this, this).execute(files);
+
+                }
+
             } else {
+                Log.v(LOG_TAG, "onActivityResult - single file, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                 uri = data.getData();
                 // Do something with the URI
-                Log.v(LOG_TAG, "onActivityResult - allow multipe - should not happen, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-            }
-
-            if (uri != null) {  //somehow it returned a filepath (confusing use of multiple flag...
-                new ExportToDirTask(this, this).execute(new File(uri.getPath()));
+                if (uri != null && requestCode == REQUEST_EXPORT_DIR_CODE) {
+                    //somehow it returned a filepath (confusing use of multiple flag...
+                    new ExportToDirTask(this, this).execute(new File(uri.getPath()));
+                }
 
             }
 
@@ -171,9 +199,15 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // TODO: show Msg Activity/Dialog/Fragment (LONG is to short ...) with ok button
+
     @Override
     public void onExportFinished(String message) {
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+    }
 
+    @Override
+    public void onImportFinished(String message) {
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 }

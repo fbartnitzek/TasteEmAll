@@ -124,24 +124,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createReviewTable);
 
         //different DatabaseFillHelper in release and debug with problems (cannot resolve symbol SQLiteDatabase)...
-        //TODO: workaround: fill it every time, remove later
-        insertTestData(db);
+//        //TODO: workaround: fill it every time, remove later
+//        insertTestData(db);
 
     }
 
-    private void insertTestData(SQLiteDatabase db) {
-        db.insert(DatabaseContract.ProducerEntry.TABLE_NAME, null,
-                DatabaseHelper.buildProducerValues("producer_Brewdog",
-                        "Brewdog", "#independenceordeath", "brewdog.com", "Aberdeen"));
-        db.insert(DatabaseContract.DrinkEntry.TABLE_NAME, null,
-                DatabaseHelper.buildDrinkValues("drink_Brewdog_JetBlackHeart", "Jet Black Heart",
-                        "4.7%", "Milk Stout", "beer",
-                        "water, barley, hops, yeast, milk sugars", "producer_Brewdog"));
-        db.insert(DatabaseContract.DrinkEntry.TABLE_NAME, null,
-                DatabaseHelper.buildDrinkValues("drink_Brewdog_HopFiction", "Hop Fiction",
-                        "5.2%", "Pale Ale", "beer",
-                        "water, barley, hops, yeast", "producer_Brewdog"));
-    }
+//    private void insertTestData(SQLiteDatabase db) {
+//        db.insert(DatabaseContract.ProducerEntry.TABLE_NAME, null,
+//                DatabaseHelper.buildProducerValues("producer_Brewdog",
+//                        "Brewdog", "#independenceordeath", "brewdog.com", "Aberdeen"));
+//        db.insert(DatabaseContract.DrinkEntry.TABLE_NAME, null,
+//                DatabaseHelper.buildDrinkValues("drink_Brewdog_JetBlackHeart", "Jet Black Heart",
+//                        "4.7%", "Milk Stout", "beer",
+//                        "water, barley, hops, yeast, milk sugars", "producer_Brewdog"));
+//        db.insert(DatabaseContract.DrinkEntry.TABLE_NAME, null,
+//                DatabaseHelper.buildDrinkValues("drink_Brewdog_HopFiction", "Hop Fiction",
+//                        "5.2%", "Pale Ale", "beer",
+//                        "water, barley, hops, yeast", "producer_Brewdog"));
+//    }
 
 
     @Override

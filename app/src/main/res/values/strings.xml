@@ -151,7 +151,11 @@
     <string name="toast_writing_entries_failed">IOException while writing <xliff:g id="entries">%1$s</xliff:g></string>
     <string name="toast_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g>"</string>
     <string name="toast_export_entries_failed_no_cursor">no cursor found while exporting <xliff:g id="entries">%1$s</xliff:g></string>
-
+    <string name="toast_on_import_files_chosen">no import files chosen</string>
+    <string name="toast_no_entry_file_import">no <xliff:g id="entries">%1$s</xliff:g> file selected to import</string>
+    <string name="toast_invalid_import_file"><xliff:g id="entries">%1$s</xliff:g>-file <xliff:g id="filename">%2$s</xliff:g> could not be read or is empty...</string>
+    <string name="toast_entries_imported"><xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> imported into database<xliff:g id="optUnusedColText">%3$s</xliff:g></string>
+    <string name="toast_unused_column_names"> (detected some unknown columns: <xliff:g id="colNames">%1$s</xliff:g>)</string>
 
 
     <!-- examples-->
@@ -182,7 +186,7 @@
     <string name="action_geocode">geocode</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
-
+    <string name="action_import">database import</string>
 
 
 </resources>

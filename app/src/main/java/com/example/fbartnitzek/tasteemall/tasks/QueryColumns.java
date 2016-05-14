@@ -272,7 +272,7 @@ public class QueryColumns {
     }
 
 
-    public static class Export {
+    public static class ExportAndImport {
         public static class ReviewColumns {
             public static final String[] COLUMNS = {
                     Review.REVIEW_ID,

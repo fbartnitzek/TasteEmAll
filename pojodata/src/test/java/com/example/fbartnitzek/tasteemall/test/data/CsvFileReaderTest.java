@@ -4,7 +4,11 @@ import com.example.fbartnitzek.tasteemall.data.csv.CsvFileReader;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -25,13 +29,34 @@ import org.junit.Test;
 public class CsvFileReaderTest {
 
     @Test
-    public void testCsvReader() {
-        String fileName = System.getProperty("user.home") + "/beer.csv";
+    public void testReadCsvFileHeadingAndData() throws Exception {
 
-        System.out.println("reading csv file:");
-        System.out.println(CsvFileReader.readCsvFile(fileName, "frank", '§', System.getProperty("user.home") + "/beer.json"));
-        System.out.println();
-        System.out.println("finished csv file reading");
+        //        String fileName = System.getProperty("user.home") + "/beer.csv";
+        String fileName = System.getProperty("user.home")
+                + "/prog/Udacity_Android/TasteEmAll/csvData/export_Reviews_20160514_021338.csv";
 
+        File file = new File(fileName);
+        assertTrue("File " + file.getAbsolutePath() + " can not be found", file.exists() && file.canRead());
+
+        List<String> headers = new ArrayList<>();
+        List<List<String>> data = CsvFileReader.readCsvFileHeadingAndData (file, headers);
+
+        assertTrue("invalid csv file", !data.isEmpty());
+        assertTrue("number of headerColumns != number of dataColumns", headers.size() == data.get(0).size());
+
+        // print file
+        String line = "";
+        for (String header : headers) {
+            line += header + " §§ ";
+        }
+        System.out.println(line);
+
+        for (List<String> dataEntry : data) {
+            line = "";
+            for (String attribute : dataEntry) {
+                line += attribute + " §§ ";
+            }
+            System.out.println(line);
+        }
     }
 }

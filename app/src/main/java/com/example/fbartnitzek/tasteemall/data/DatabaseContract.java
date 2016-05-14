@@ -25,6 +25,7 @@ public class DatabaseContract {
 
     private static final String LOG_TAG = DatabaseContract.class.getName();
 
+//    public static final String SQL_INSERT_OR_REPLACE = " sql insert or replace";
     public static final String PATH_PRODUCER = "producer";
     public static final String PATH_PRODUCER_BY_NAME = "producer_by_name";
     public static final String PATH_PRODUCER_BY_PATTERN = "producer_by_pattern";

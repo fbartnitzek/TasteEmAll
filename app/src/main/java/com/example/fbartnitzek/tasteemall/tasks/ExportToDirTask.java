@@ -33,7 +33,7 @@ import java.util.List;
 
 public class ExportToDirTask extends AsyncTask<File, Void, String>{
 
-    private static final String EXPORT_PREFIX = "export_";
+    public static final String EXPORT_PREFIX = "export_";
     private final Activity mActivity;
     private final ExportHandler mExportHandler;
 
@@ -62,16 +62,16 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
 
         String message;
         // TODO: different strings for message and filename (i18n between phones...)
-        message = exportEntry(DatabaseContract.ProducerEntry.CONTENT_URI,
-                QueryColumns.Export.ProducerColumns.COLUMNS,
+        message = exportEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
+                QueryColumns.ExportAndImport.ProducerColumns.COLUMNS,
                 dir, mActivity.getString(R.string.label_producers));
 
-        message += "\n" + exportEntry(DatabaseContract.DrinkEntry.CONTENT_URI,
-                QueryColumns.Export.DrinkColumns.COLUMNS,
+        message += "\n" + exportEntries(DatabaseContract.DrinkEntry.CONTENT_URI,
+                QueryColumns.ExportAndImport.DrinkColumns.COLUMNS,
                 dir, mActivity.getString(R.string.label_drinks));
 
-        message += "\n" + exportEntry(DatabaseContract.ReviewEntry.CONTENT_URI,
-                QueryColumns.Export.ReviewColumns.COLUMNS,
+        message += "\n" + exportEntries(DatabaseContract.ReviewEntry.CONTENT_URI,
+                QueryColumns.ExportAndImport.ReviewColumns.COLUMNS,
                 dir, mActivity.getString(R.string.label_reviews));
 
         return message;
@@ -82,12 +82,12 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         mExportHandler.onExportFinished(s);
     }
 
-    private String exportEntry(Uri contentUri, String[] columns, File dir, String entries) {
+    private String exportEntries(Uri contentUri, String[] columns, File dir, String entries) {
 
         String fileName = EXPORT_PREFIX + entries + Utils.getCurrentLocalTimePrefix() + ".csv";
         File file = new File(dir, fileName);
 
-        Log.v(LOG_TAG, "exportEntry, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
+        Log.v(LOG_TAG, "exportEntries, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
         
         Cursor cursor = mActivity.getContentResolver().query(
                 contentUri, columns, null, null, null);
@@ -111,7 +111,7 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                 message = mActivity.getString(R.string.toast_entries_exported_success,
                         entries, cursor.getCount(), file.getName());
             } else {
-                Log.e(LOG_TAG, "exportEntry - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
+                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
                 message = mActivity.getString(R.string.toast_writing_entries_failed, entries);
             }
 
