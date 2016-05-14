@@ -272,4 +272,69 @@ public class QueryColumns {
     }
 
 
+    public static class Export {
+        public static class ReviewColumns {
+            public static final String[] COLUMNS = {
+                    Review.REVIEW_ID,
+                    Review.USER_NAME,
+                    Review.READABLE_DATE,
+                    Review.LOCATION,
+                    Review.RATING,
+                    Review.DESCRIPTION,
+                    Review.RECOMMENDED_SIDES,
+                    Review.DRINK_ID
+            };
+
+            public static final int COL_REVIEW_ID = 0;
+            public static final int COL_USER_NAME = 1;
+            public static final int COL_READABLE_DATE = 2;
+            public static final int COL_LOCATION = 3;
+            public static final int COL_RATING = 4;
+            public static final int COL_DESCRIPTION = 5;
+            public static final int COL_RECOMMNEDED_SIDES = 6;
+            public static final int COL_DRINK_ID = 7;
+
+
+        }
+
+        public static class DrinkColumns {
+            public static final String[] COLUMNS = {
+                    Drink.DRINK_ID,
+                    Drink.NAME,
+                    Drink.SPECIFICS,
+                    Drink.STYLE,
+                    Drink.TYPE,
+                    Drink.INGREDIENTS,
+                    Drink.PRODUCER_ID
+            };
+
+            public static final int COL_DRINK_ID = 0;
+            public static final int COL_NAME = 1;
+            public static final int COL_SPECIFICS = 2;
+            public static final int COL_STYLE = 3;
+            public static final int COL_TYPE = 4;
+            public static final int COL_INGREDIENTS = 5;
+            public static final int COL_PRODUCER_ID= 6;
+        }
+
+        public static class ProducerColumns {
+            public static final String[] COLUMNS = {
+                    Producer.PRODUCER_ID,
+                    Producer.NAME,
+                    Producer.LOCATION,
+                    Producer.DESCRIPTION,
+                    Producer.WEBSITE
+            };
+
+            public static final int COL_PRODUCER_ID = 0;
+            public static final int COL_NAME= 1;
+            public static final int COL_LOCATION = 2;
+            public static final int COL_DESCRIPTION = 3;
+            public static final int COL_WEBSITE = 4;
+
+
+        }
+
+
+    }
 }

@@ -63,6 +63,9 @@
     <string name="label_producer">Producer</string>
     <string name="label_drink">Drink</string>
     <string name="label_review">Review</string>
+    <string name="label_producers">Producers</string>
+    <string name="label_drinks">Drinks</string>
+    <string name="label_reviews">Reviews</string>
     <string name="label_producer_details">producer details</string>
     <string name="label_drink_details">drink details</string>
     <string name="label_review_details">review details</string>
@@ -94,18 +97,6 @@
     <string name="label_drink_specifics">Specifics</string>
     <string name="hint_drink_specifics">other specifics of the drink (like mixture of coffee-beans or ABV of an alcoholic drink</string>
 
-
-    <!-- menu and buttons -->
-    <string name="menu_action_save">save</string>
-    <string name="menu_action_edit">edit</string>
-    <string name="text_choose_a_producer">choose a producer</string>
-    <string name="text_choose_a_drink">choose a drink</string>
-    <string name="description_add_a_new_producer">create a new producer</string>
-    <string name="description_add_a_new_drink">create a new drink</string>
-    <string name="text_plus">+</string>
-    <string name="text_questionmark">\?</string>
-
-
     <!-- review attributes -->
     <string name="label_review_user_name">User</string>
     <string name="hint_review_user_name">name of the reviewer</string>
@@ -122,6 +113,22 @@
     <string name="hint_review_location">location of the review</string>
 
 
+
+    <!-- menu and buttons -->
+    <string name="menu_action_save">save</string>
+    <string name="menu_action_edit">edit</string>
+    <string name="text_choose_a_producer">choose a producer</string>
+    <string name="text_choose_a_drink">choose a drink</string>
+    <string name="description_add_a_new_producer">create a new producer</string>
+    <string name="description_add_a_new_drink">create a new drink</string>
+    <string name="text_plus">+</string>
+    <string name="text_questionmark">\?</string>
+    <string name="pref_label_export_dir">Export directory</string>
+    <string name="content_desc_choose_export_dir">choose the directory on your phone for exports</string>
+    <string name="hint_choose_export_dir">choose export directory</string>
+    <string name="action_export">Export database</string>
+
+
     <!-- Toast warnings / messages -->
     <string name="toast_choose_existing_drink">choose an existing drink first...</string>
     <string name="toast_rate_drink">rate your drink first...</string>
@@ -136,8 +143,15 @@
     <string name="toast_service_not_available">Geocoder not available or unreachable - the location-values will be translated on next start with network services</string>
     <string name="toast_no_location_generic">no location found, please enter the location manually</string>
     <string name="toast_invalid_geocode_location">the geocode placeholder in review location was modified, please enter the location manually</string>
-    <string name="toast_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$s</xliff:g> Reviews failed)</string>
-    <string name="toast_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$s</xliff:g> Reviews failed)</string>
+    <string name="toast_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$d</xliff:g> Reviews failed)</string>
+    <string name="toast_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$d</xliff:g> Reviews failed)</string>
+    <string name="toast_no_export_directory">no export directory chosen</string>
+    <string name="toast_wrong_export_directory">the export directory does not exist or it cannot be written to (<xliff:g id="path">%1$s</xliff:g>)</string>
+    <string name="toast_export_files_no_write">files can not be created below this path (<xliff:g id="path">%1$s</xliff:g>)</string>
+    <string name="toast_writing_entries_failed">IOException while writing <xliff:g id="entries">%1$s</xliff:g></string>
+    <string name="toast_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g>"</string>
+    <string name="toast_export_entries_failed_no_cursor">no cursor found while exporting <xliff:g id="entries">%1$s</xliff:g></string>
+
 
 
     <!-- examples-->
@@ -168,6 +182,7 @@
     <string name="action_geocode">geocode</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
+
 
 
 </resources>

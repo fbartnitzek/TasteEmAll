@@ -206,8 +206,9 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
             mEditReviewUser.setText(Utils.getUserNameFromSharedPrefs(getActivity()));
         }
 
-        // TODO: onClick some calendar-usage
-        // later, maybe this one: https://github.com/roomorama/Caldroid
+        // TODO: onClick some dateAndTime-picker
+        // that seems to be the best option, but no ext lib - so: later :-p
+        // https://github.com/jjobes/SlideDateTimePicker
         mEditReviewReadableDate = (EditText) mRootView.findViewById(R.id.review_readable_date);
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_READABLE_DATE)) {
             mEditReviewReadableDate.setText(savedInstanceState.getString(STATE_REVIEW_READABLE_DATE));

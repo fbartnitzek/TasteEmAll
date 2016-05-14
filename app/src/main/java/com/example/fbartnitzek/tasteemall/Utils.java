@@ -12,9 +12,6 @@ import com.example.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.example.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.example.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.example.fbartnitzek.tasteemall.data.pojo.Producer;
-import com.google.maps.GeoApiContext;
-import com.google.maps.GeocodingApi;
-import com.google.maps.model.GeocodingResult;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,6 +50,7 @@ public class Utils {
 //    }
 
     static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    static final SimpleDateFormat filePrefixFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     public static final String GEOCODE_ME = "geocode_me";
     private static final String LAT_PREFIX = "_lat_";
     private static final String LONG_PREFIX = "_long_";
@@ -129,6 +127,10 @@ public class Utils {
         return iso8601Format.format(new java.util.Date());
     }
 
+    public static String getCurrentLocalTimePrefix() {
+        return "_" + filePrefixFormat.format(new java.util.Date());
+    }
+
     public static String formatDateTime(Context context, String timeToFormat) {
 
         String finalDateTime = "";
@@ -158,50 +160,18 @@ public class Utils {
         return finalDateTime;
     }
 
-    // TODO: obsolete??
-    public static String queryLocation(String locationString) {
-        // use google maps api
-        // https://maps.googleapis.com/maps/api/geocode/json?address=Toronto%20%28Canada%29,%20275%20Yonge%20Street
-
-        GeoApiContext context = new GeoApiContext().setApiKey(BuildConfig.GOOGLE_MAPS_GEOCODE_KEY);
-        GeocodingResult[] results = new GeocodingResult[0];
-        try {
-            results = GeocodingApi.geocode(context, locationString).await();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return results[0].formattedAddress;
-//        String formattedAddress = results[0].formattedAddress;
-//        System.out.println(formattedAddress);
-//        double latitude = results[0].geometry.location.lat;
-//        double longitude = results[0].geometry.location.lng;
-//        String route = null;
-//        String country= null;
-//        String postalCode = null;
-//        String locality = null;
-//        // country, street_number, route, postal_code, long, lat, locality
-//        // "location": {
-//        // "lat": ​43.6555326,
-//        // "lng": ​-79.3802037 },
-//        AddressComponent[] addressComponents = results[0].addressComponents;
-//        for (AddressComponent a: addressComponents){
-//            for (AddressComponentType type : a.types) {
-//                if ("postal_code".equals(type.name().toLowerCase())) {
-//                    postalCode = a.longName;
-//                } else if ("route".equals(type.name().toLowerCase())) {
-//                    route = a.longName;
-//                } else if ("country".equals(type.name().toLowerCase())) {
-//                    country = a.longName;
-//                } else if ("locality".equals(type.name().toLowerCase())) {
-//                    locality = a.longName;
-//                }
+//    public static Date getDate(String timeToFormat) {
+//
+//        Date date = null;
+//        if (timeToFormat != null) {
+//            try {
+//                date = iso8601Format.parse(timeToFormat);
+//            } catch (ParseException e) {
+//                date = null;
 //            }
 //        }
-//
-//        return DatabaseHelper.buildLocationValues("location_" + locationString, locality, country, postalCode,
-//                route, Double.toString(longitude), Double.toString(latitude), formattedAddress);
-////        return new Location(country, Double.toString(latitude), "location_" + locationString, Double.toString(longitude), postalCode, locality, route, formattedAddress);
-    }
+//        return date;
+//    }
 
 
     public static String getUserNameFromSharedPrefs(Context context) {

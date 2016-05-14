@@ -11,7 +11,12 @@
 
     <item
         android:id="@+id/action_geocode"
-        android:orderInCategory="90"
+        android:orderInCategory="80"
         android:title="@string/action_geocode"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_export"
+        android:orderInCategory="90"
+        android:title="@string/action_export"
         app:showAsAction="never"/>
 </menu>

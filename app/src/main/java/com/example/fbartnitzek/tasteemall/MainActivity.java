@@ -1,19 +1,29 @@
 package com.example.fbartnitzek.tasteemall;
 
+import android.content.ClipData;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.fbartnitzek.tasteemall.tasks.ExportToDirTask;
 import com.example.fbartnitzek.tasteemall.tasks.GeocodeReviewsTask;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.File;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements ExportToDirTask.ExportHandler {
 
     private static final String LOG_TAG = MainActivity.class.getName();
     private static final String MAIN_FRAGMENT_TAG = "MAIN_FRAGMENT_TAG";
+    private static final int REQUEST_FILE_CODE = 1233;
 
 
     @Override
@@ -64,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);  //TODO: add geocode reaction
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -80,11 +90,26 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_geocode:
                 startGeocoding();
                 return true;
+            case R.id.action_export:
+                startExport();
             default:
 
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
+    }
+
+    private void startExport() {
+        Log.v(LOG_TAG, "startExport, hashCode=" + this.hashCode() + ", " + "");
+        Intent intent = new Intent(this, FilePickerActivity.class);
+
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+
+        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
+                Environment.getExternalStorageDirectory().getPath());
+        startActivityForResult(intent, REQUEST_FILE_CODE);
     }
 
     private void startGeocoding() {
@@ -102,7 +127,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
 
+        if (requestCode == REQUEST_FILE_CODE && resultCode == AppCompatActivity.RESULT_OK) {
+            Uri uri = null;
+            if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
+                // For JellyBean and above
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    ClipData clip = data.getClipData();
+
+                    if (clip != null) {
+                        for (int i = 0; i < clip.getItemCount(); i++) {
+                            uri = clip.getItemAt(i).getUri();
+                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+                            // Do something with the URI
+                        }
+                    }
+                    // For Ice Cream Sandwich
+                } else {
+                    ArrayList<String> paths = data.getStringArrayListExtra
+                            (FilePickerActivity.EXTRA_PATHS);
+
+                    if (paths != null) {
+                        for (String path: paths) {
+                            uri = Uri.parse(path);
+                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+                            // Do something with the URI
+                        }
+                    }
+                }
+
+            } else {
+                uri = data.getData();
+                // Do something with the URI
+                Log.v(LOG_TAG, "onActivityResult - allow multipe - should not happen, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+            }
+
+            if (uri != null) {  //somehow it returned a filepath (confusing use of multiple flag...
+                new ExportToDirTask(this, this).execute(new File(uri.getPath()));
+
+            }
+
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onExportFinished(String message) {
+
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+    }
 }
