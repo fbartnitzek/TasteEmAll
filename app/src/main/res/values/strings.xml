@@ -187,6 +187,8 @@
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
     <string name="action_import">database import</string>
+    <string name="title_show_map">Show Map</string>
+    <string name="action_show_map">Show Map</string>
 
 
 </resources>

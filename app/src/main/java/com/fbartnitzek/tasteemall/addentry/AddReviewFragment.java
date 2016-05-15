@@ -57,7 +57,11 @@ import java.util.Arrays;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddReviewFragment extends Fragment implements CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler, View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler, LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class AddReviewFragment extends Fragment implements
+        CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler,
+        View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler,
+        LoaderManager.LoaderCallbacks<Cursor>,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String LOG_TAG = AddReviewFragment.class.getName();
     private static final String STATE_CONTENT_URI = "STATE_ADD_REVIEW_CONTENT_URI";
@@ -117,7 +121,6 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         if (mContentUri != null) {
             Log.v(LOG_TAG, "onActivityCreated with contentUri, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-            // TODO - initLoader & co
         } else {
             Log.v(LOG_TAG, "onActivityCreated without contentUri, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
@@ -541,6 +544,7 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
                 .build();
     }
 
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.v(LOG_TAG, "onConnected, hashCode=" + this.hashCode() + ", " + "bundle = [" + bundle + "]");
@@ -549,7 +553,12 @@ public class AddReviewFragment extends Fragment implements CompletionDrinkAdapte
                 ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            // TODO: Consider calling
+            // TODO: request permissions
+            // https://developers.google.com/maps/documentation/android-api/location#request_runtime_permissions
+            // https://developer.android.com/training/permissions/requesting.html
+
+//            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
+
         //    ActivityCompat#requestPermissions
         // here to request the missing permissions, and then overriding
         //   public void onRequestPermissionsResult(int requestCode, String[] permissions,

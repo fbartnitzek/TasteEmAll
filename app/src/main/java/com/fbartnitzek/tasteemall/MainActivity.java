@@ -99,11 +99,19 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
             case R.id.action_import:
                 startImport();
                 return true;
+            case R.id.action_show_map:
+                startShowMap();
+                return true;
             default:
 
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
+    }
+
+    private void startShowMap() {
+        Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
+        startActivity(new Intent(this, ShowMapActivity.class));
     }
 
     private void startExport() {
