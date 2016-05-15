@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.example.fbartnitzek.tasteemall"
+<manifest package="com.fbartnitzek.tasteemall"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -60,21 +60,21 @@
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+                android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
             android:name=".showentry.ShowDrinkActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+                android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
             android:name=".showentry.ShowReviewActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+                android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
 
         <activity
@@ -84,7 +84,7 @@
             android:theme="@style/SettingsTheme">
             <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.fbartnitzek.tasteemall.MainActivity"/>
+            android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
 
         <activity
