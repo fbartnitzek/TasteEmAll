@@ -51,6 +51,9 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
     private static final String LOG_TAG = ShowMapFragment.class.getName();
     private static final int MAP_REVIEWS_LOADER = 54356;
     private static final int MAP_PRODUCERS_LOADER = 54357;
+    private static final String STATE_MAP_INFO = "STATE_MAP_INFO";
+    private static final String STATE_NAVIGATION_DONE = "STATE_NAVIGATION_DONE";
+
     GoogleMap mMap;
     boolean mMapReady = false;
     private Uri mReviewsUri;
@@ -61,11 +64,20 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
     private int mMapType = -1;
     private Map<LatLng, PopulateMapTask.MarkerInfo> mMarkers;
     private TextView mInfoView;
+    private boolean mAlreadyLoaded = false;
 
     // clustering and querying really bad ...
     // TODO: new entry "Location" (with LatLng, name, ...)
     // TODO: foreignKey in Review and Producer, queries and Adapter here
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_NAVIGATION_DONE)) {
+            mAlreadyLoaded =  savedInstanceState.getBoolean(STATE_NAVIGATION_DONE);
+        }
+    }
 
     @Nullable
     @Override
@@ -94,6 +106,10 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
         mInfoView = (TextView) mRootView.findViewById(R.id.map_info);
         // src: http://stackoverflow.com/questions/1748977/making-textview-scrollable-in-android
         mInfoView.setMovementMethod(new ScrollingMovementMethod());
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_MAP_INFO)) {
+            mInfoView.setText(savedInstanceState.getString(STATE_MAP_INFO));
+        }
+
         createToolbar(mRootView, LOG_TAG);
         updateToolbar();
 
@@ -111,6 +127,16 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
         startPopulateMap();
 
         return mRootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // TODO: make MarkerInfo parcelable... (later)
+        if (mInfoView != null) {
+            outState.putString(STATE_MAP_INFO, mInfoView.getText().toString());
+        }
+        outState.putBoolean(STATE_NAVIGATION_DONE, mAlreadyLoaded);
+        super.onSaveInstanceState(outState);
     }
 
     private void startPopulateMap() {
@@ -186,7 +212,6 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
     }
 
     private void addAllMarkersToMap() {
-        moveToFirstEntry();
         for (PopulateMapTask.MarkerInfo marker : mMarkers.values()) {
             mMap.addMarker(marker.getMarkerOptions());
         }
@@ -220,16 +245,24 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
     @Override
     public void onMapPopulated(Map<LatLng, PopulateMapTask.MarkerInfo> markers, String message) {
         Log.v(LOG_TAG, "onMapPopulated, hashCode=" + this.hashCode() + ", " + "markers = [" + markers + "], message = [" + message + "]");
+
+        if (!mAlreadyLoaded) {  // small workaround...
+            Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
+        }
+
         if (markers != null) {
             mMarkers = markers;
+            if (!mAlreadyLoaded){
+                moveToFirstEntry();
+                mAlreadyLoaded = true;
+
+            }
             if (mMapReady) {
                 addAllMarkersToMap();
             }
 
             fillInfoText();
         }
-
-        Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
 
     }
 }

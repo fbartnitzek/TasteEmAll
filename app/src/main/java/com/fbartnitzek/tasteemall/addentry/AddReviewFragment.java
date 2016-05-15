@@ -77,6 +77,7 @@ public class AddReviewFragment extends Fragment implements
     private static final String STATE_REVIEW_LOCATION = "STATE_ADD_REVIEW_LOCATION";
     private static final int DRINK_ACTIVITY_REQUEST_CODE = 999;
     private static final int EDIT_REVIEW_LOADER_ID = 57892;
+    private static final int REQUEST_LOCATION_PERMISSION_CODE = 43923;
     private View mRootView;
 
     private static AutoCompleteTextView mEditCompletionDrinkName;
@@ -548,43 +549,53 @@ public class AddReviewFragment extends Fragment implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.v(LOG_TAG, "onConnected, hashCode=" + this.hashCode() + ", " + "bundle = [" + bundle + "]");
+        initLocationAndGeoCoder();
+    }
+
+    private void initLocationAndGeoCoder() {
         if (ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            // TODO: request permissions
-            // https://developers.google.com/maps/documentation/android-api/location#request_runtime_permissions
-            // https://developer.android.com/training/permissions/requesting.html
+            handlePermission(); //request permissions - may help
 
-//            ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION);
-
-        //    ActivityCompat#requestPermissions
-        // here to request the missing permissions, and then overriding
-        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-        //                                          int[] grantResults)
-        // to handle the case where the user grants the permission. See the documentation
-        // for ActivityCompat#requestPermissions for more details.
-
-            Log.v(LOG_TAG, "onConnected - no permission");
+            Log.v(LOG_TAG, "initLocationAndGeoCoder - no permission");
             Toast.makeText(AddReviewFragment.this.getActivity(), R.string.toast_no_location_access, Toast.LENGTH_SHORT).show();
 
             return;
         } else {
-            Log.v(LOG_TAG, "onConnected - with permission");
+            Log.v(LOG_TAG, "initLocationAndGeoCoder - with permission");
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
 
-            // should also be callable later as special setting (geocode all)
             startGeocodeService();
         } else {
             Toast.makeText(AddReviewFragment.this.getActivity(), R.string.toast_no_location_provided, Toast.LENGTH_SHORT).show();
 
         }
-
     }
 
+    protected void handlePermission() {
+        // src: FilePickerFragment
+        // https://developer.android.com/training/permissions/requesting.html
+        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.v(LOG_TAG, "onRequestPermissionsResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], permissions = [" + permissions + "], grantResults = [" + grantResults + "]");
+        if (REQUEST_LOCATION_PERMISSION_CODE == requestCode && permissions.length > 0) {
+            if (PackageManager.PERMISSION_GRANTED == grantResults[0] ||
+                    PackageManager.PERMISSION_GRANTED == grantResults[grantResults.length - 1]) { // at least one allowed
+                Log.v(LOG_TAG, "onRequestPermissionsResult - permission granted, try again!");
+                initLocationAndGeoCoder();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     private void updateLocation() {
         Log.v(LOG_TAG, "updateLocation - mCurrentLocation: " + mCurrentLocation + ", hashCode=" + this.hashCode() + ", " + "");
