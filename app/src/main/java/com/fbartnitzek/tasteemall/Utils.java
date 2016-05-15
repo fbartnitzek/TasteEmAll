@@ -123,6 +123,28 @@ public class Utils {
         );
     }
 
+    public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
+        StringBuilder sb = new StringBuilder();
+        boolean firstTime = true;
+        int i = 0;
+        for (Object token: tokens) {
+            if (i > max) {
+                sb.append(delimiter);
+                sb.append("...");
+                return sb.toString();
+            } else {
+                if (firstTime) {
+                    firstTime = false;
+                } else {
+                    sb.append(delimiter);
+                }
+                sb.append(token);
+                ++i;
+            }
+        }
+        return sb.toString();
+    }
+
     public static String getCurrentLocalIso8601Time() {
         return iso8601Format.format(new java.util.Date());
     }
@@ -160,18 +182,26 @@ public class Utils {
         return finalDateTime;
     }
 
-//    public static Date getDate(String timeToFormat) {
-//
-//        Date date = null;
-//        if (timeToFormat != null) {
-//            try {
-//                date = iso8601Format.parse(timeToFormat);
-//            } catch (ParseException e) {
-//                date = null;
-//            }
-//        }
-//        return date;
-//    }
+    public static String getFormattedDate(Date date, String formatString) {
+        if (date != null) {
+            return new SimpleDateFormat(formatString).format(date);
+        } else {
+            return null;
+        }
+    }
+    
+    public static Date getDate(String isoTime) {
+        if (isoTime == null) {
+            return null;
+        }
+        Date date = null;
+        try {
+            date = iso8601Format.parse(isoTime);
+        } catch (ParseException e) {
+            return null;
+        }
+        return date;
+    }
 
 
     public static String getUserNameFromSharedPrefs(Context context) {

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -111,7 +112,15 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
     private void startShowMap() {
         Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
-        startActivity(new Intent(this, ShowMapActivity.class));
+        MainFragment fragment = getFragment();
+        Intent intent = new Intent(this, ShowMapActivity.class);
+        if (fragment != null) {
+            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI, fragment.getmCurrentReviewsUri());
+            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
+            intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
+            intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
+        }
+        startActivity(intent);
     }
 
     private void startExport() {
@@ -211,11 +220,13 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
     @Override
     public void onExportFinished(String message) {
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+//        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+        Snackbar.make(findViewById(R.id.fragment_container), message, Snackbar.LENGTH_LONG);
     }
 
     @Override
     public void onImportFinished(String message) {
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+//        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+        Snackbar.make(findViewById(R.id.fragment_container), message, Snackbar.LENGTH_LONG);
     }
 }

@@ -74,6 +74,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private TextView mReviewsHeading;
 
     private CustomSpinnerAdapter mSpinnerAdapter;
+    private Uri mCurrentReviewsUri;
+    private Uri mCurrentProducersUri;
+    private String mReviewsSortOrder;
+    private String mProducersSortOrder;
 
 
     public MainFragment() {
@@ -292,35 +296,37 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Log.v(LOG_TAG, "onCreateLoader, mSearchPattern=" + mSearchPattern + ", mDrinkType=" + mDrinkType + ", id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - first sort by insertDate?, max 50 entries?
 
-        String sortOrder;
+
         switch (id) {
             case PRODUCER_LOADER_ID:
-                sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
+                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
                     + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION;
+                mCurrentProducersUri = ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern);
                 return new CursorLoader(getActivity(),
-                        ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern),
+                        mCurrentProducersUri,
                         QueryColumns.MainFragment.ProducerQuery.COLUMNS,
                         null, null,
-                        sortOrder);
+                        mProducersSortOrder);
             case DRINK_LOADER_ID:
-                sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", " +
+                String sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", " +
                         DrinkEntry.TABLE_NAME + "." + Drink.NAME;
                 return new CursorLoader(getActivity(),
-                        DrinkEntry.buildUriWithNameAndType(
+                         DrinkEntry.buildUriWithNameAndType(
                                 mSearchPattern == null ? "" : mSearchPattern,
                                 mDrinkType == null ? Drink.TYPE_ALL : mDrinkType),
                         QueryColumns.MainFragment.DrinkWithProducerQuery.COLUMNS,
                         null, null,
                         sortOrder);
             case REVIEW_LOADER_ID:
-                sortOrder = ProducerEntry.ALIAS+ "." + Producer.NAME + ", " +
+                mReviewsSortOrder = ProducerEntry.ALIAS+ "." + Producer.NAME + ", " +
                         DrinkEntry.ALIAS + "." + Drink.NAME;
+                mCurrentReviewsUri = DatabaseContract.ReviewEntry.buildUriForShowReviewWithPatternAndType(
+                        mSearchPattern == null ? "" : mSearchPattern,
+                        mDrinkType == null ? Drink.TYPE_ALL : mDrinkType);
                 return new CursorLoader(getActivity(),
-                        DatabaseContract.ReviewEntry.buildUriForShowReviewWithPatternAndType(
-                                mSearchPattern == null ? "" : mSearchPattern,
-                                mDrinkType == null ? Drink.TYPE_ALL : mDrinkType),
+                        mCurrentReviewsUri,
                         QueryColumns.MainFragment.ReviewAllQuery.COLUMNS,
-                        null, null, sortOrder);
+                        null, null, mReviewsSortOrder);
             default:
                 throw new RuntimeException("wrong loader_id in MainFragment...");
         }
@@ -425,4 +431,19 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public Uri getmCurrentProducersUri() {
+        return mCurrentProducersUri;
+    }
+
+    public Uri getmCurrentReviewsUri() {
+        return mCurrentReviewsUri;
+    }
+
+    public String getmProducersSortOrder() {
+        return mProducersSortOrder;
+    }
+
+    public String getmReviewsSortOrder() {
+        return mReviewsSortOrder;
+    }
 }

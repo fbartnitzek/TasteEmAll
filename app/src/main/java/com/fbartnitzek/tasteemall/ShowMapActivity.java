@@ -1,6 +1,5 @@
 package com.fbartnitzek.tasteemall;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,12 +27,12 @@ import com.google.android.gms.maps.GoogleMap;
 
 public class ShowMapActivity extends AppCompatActivity {
 
-    public static final String EXTRA_SHOW_MAP_URI = "EXTRA_SHOW_MAP_URI";
-    private static final String FRAGMENT_TAG = "SHOW_MAP_FRAGMENT_TAG";
-
-
-    private Uri mContentUri;
     private static final String LOG_TAG = ShowMapActivity.class.getName();
+    public static final String EXTRA_REVIEWS_URI = LOG_TAG + ".EXTRA_REVIEWS_URI";
+    private static final String FRAGMENT_TAG = LOG_TAG + "_SHOW_MAP_FRAGMENT_TAG";
+    public static final String EXTRA_PRODUCERS_URI = LOG_TAG + ".EXTRA_PRODUCERS_URI";
+    public static final String EXTRA_REVIEWS_SORT_ORDER = LOG_TAG + ".EXTRA_REVIEWS_SORT_ORDER";
+    public static final String EXTRA_PRODUCERS_SORT_ORDER = LOG_TAG + ".EXTRA_PRODUCERS_SORT_ORDER";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,10 +49,20 @@ public class ShowMapActivity extends AppCompatActivity {
 
             ShowMapFragment fragment = new ShowMapFragment();
 
-            mContentUri = getIntent().getData();
-            if (mContentUri != null) {
+            if (getIntent() != null) {
                 Bundle args = new Bundle();
-                args.putParcelable(EXTRA_SHOW_MAP_URI, mContentUri);
+                if (getIntent().hasExtra(EXTRA_REVIEWS_URI)) {
+                    args.putParcelable(EXTRA_REVIEWS_URI, getIntent().getParcelableExtra(EXTRA_REVIEWS_URI));
+                }
+                if (getIntent().hasExtra(EXTRA_PRODUCERS_URI)) {
+                    args.putParcelable(EXTRA_PRODUCERS_URI, getIntent().getParcelableExtra(EXTRA_PRODUCERS_URI));
+                }
+                if (getIntent().hasExtra(EXTRA_REVIEWS_SORT_ORDER)) {
+                    args.putString(EXTRA_REVIEWS_SORT_ORDER, getIntent().getStringExtra(EXTRA_REVIEWS_SORT_ORDER));
+                }
+                if (getIntent().hasExtra(EXTRA_PRODUCERS_SORT_ORDER)) {
+                    args.putString(EXTRA_PRODUCERS_SORT_ORDER, getIntent().getStringExtra(EXTRA_PRODUCERS_SORT_ORDER));
+                }
                 fragment.setArguments(args);
             }
 

@@ -2,6 +2,8 @@ package com.fbartnitzek.tasteemall;
 
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -38,6 +40,18 @@ public class TestHelper {
         }
 
         assertFalse(Utils.checkGeocodeAddressFormat("geocode_me_lat49.9922412_long_8.660975"));;
+
+    }
+
+    @Test
+    public void testTimeHelper() throws Exception {
+        String iso= "2016-05-12 22:05:59";
+
+        Date date = Utils.getDate(iso);
+        assertTrue(date != null);
+        assertTrue("12.05.2016".equals(Utils.getFormattedDate(date, "dd.MM.yyyy")));
+        assertTrue("22:05:59".equals(Utils.getFormattedDate(date, "HH:mm:ss")));
+        assertTrue("12.05.16 22:05".equals(Utils.getFormattedDate(date, "dd.MM.yy HH:mm")));
 
     }
 }

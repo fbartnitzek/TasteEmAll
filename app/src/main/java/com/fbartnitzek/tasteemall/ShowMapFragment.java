@@ -4,10 +4,12 @@ package com.fbartnitzek.tasteemall;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +17,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fbartnitzek.tasteemall.tasks.PopulateMapTask;
+import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -36,14 +46,26 @@ import com.google.android.gms.maps.SupportMapFragment;
  * limitations under the License.
  */
 
-public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
+public class ShowMapFragment extends Fragment implements OnMapReadyCallback, PopulateMapTask.PopulateMapHandler {
 
     private static final String LOG_TAG = ShowMapFragment.class.getName();
+    private static final int MAP_REVIEWS_LOADER = 54356;
+    private static final int MAP_PRODUCERS_LOADER = 54357;
     GoogleMap mMap;
     boolean mMapReady = false;
-    private Uri mUri;
+    private Uri mReviewsUri;
+    private Uri mProducersUri;
+    private String mReviewsSortOrder;
+    private String mProducersSortOrder;
     private View mRootView;
     private int mMapType = -1;
+    private Map<LatLng, PopulateMapTask.MarkerInfo> mMarkers;
+    private TextView mInfoView;
+
+    // clustering and querying really bad ...
+    // TODO: new entry "Location" (with LatLng, name, ...)
+    // TODO: foreignKey in Review and Producer, queries and Adapter here
+
 
     @Nullable
     @Override
@@ -55,9 +77,23 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
         if (args == null) {
             Log.v(LOG_TAG, "onCreateView without args...");
         } else {
-            // TODO: something with args...
+            if (args.containsKey(ShowMapActivity.EXTRA_REVIEWS_URI)) {
+                mReviewsUri = args.getParcelable(ShowMapActivity.EXTRA_REVIEWS_URI);
+            }
+            if (args.containsKey(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER)) {
+                mReviewsSortOrder = args.getString(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER);
+            }
+            if (args.containsKey(ShowMapActivity.EXTRA_PRODUCERS_URI)) {
+                mProducersUri = args.getParcelable(ShowMapActivity.EXTRA_PRODUCERS_URI);
+            }
+            if (args.containsKey(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER)) {
+                mProducersSortOrder = args.getString(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER);
+            }
         }
 
+        mInfoView = (TextView) mRootView.findViewById(R.id.map_info);
+        // src: http://stackoverflow.com/questions/1748977/making-textview-scrollable-in-android
+        mInfoView.setMovementMethod(new ScrollingMovementMethod());
         createToolbar(mRootView, LOG_TAG);
         updateToolbar();
 
@@ -72,7 +108,28 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
             Log.v(LOG_TAG, "onCreateView, MapFragment found & set...");
         }
 
+        startPopulateMap();
+
         return mRootView;
+    }
+
+    private void startPopulateMap() {
+        Log.v(LOG_TAG, "startPopulateMap, mReviewsUri=" + mReviewsUri+ ", mReviewsSortOrder=" + mReviewsSortOrder);
+        if (mReviewsUri != null) {
+            new PopulateMapTask(getActivity(),
+                    QueryColumns.MapFragment.Reviews.COLUMNS,
+                    QueryColumns.MapFragment.Reviews.COL_REVIEW_LOCATION,
+                    mReviewsSortOrder, this).execute(mReviewsUri);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        Log.v(LOG_TAG, "onResume, hashCode=" + this.hashCode() + ", " + "");
+        // loaders don't help that much:
+        // instead: use async task to: query, reverse-geocode and add markers...
+        // getLoaderManager().initLoader(MAP_REVIEWS_LOADER, null, this);
+        super.onResume();
     }
 
     public void setMapType(int mapType) {
@@ -122,6 +179,57 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
         if (mMapType >= 0) {
             mMap.setMapType(mMapType);
         }
-        Toast.makeText(ShowMapFragment.this.getActivity(), "map is ready", Toast.LENGTH_SHORT).show();
+        if (mMarkers != null && !mMarkers.isEmpty()) {  //add all already populated markers
+
+            addAllMarkersToMap();
+        }
+    }
+
+    private void addAllMarkersToMap() {
+        moveToFirstEntry();
+        for (PopulateMapTask.MarkerInfo marker : mMarkers.values()) {
+            mMap.addMarker(marker.getMarkerOptions());
+        }
+    }
+
+    private void moveToFirstEntry() {
+        if (mMarkers != null && !mMarkers.isEmpty() && mMapReady) {
+            Map.Entry<LatLng, PopulateMapTask.MarkerInfo> first = mMarkers.entrySet().iterator().next();
+            Toast.makeText(
+                    getActivity(),
+                    getString(R.string.map_navigate_to, first.getValue().location),
+                    Toast.LENGTH_LONG).show();
+            mMap.moveCamera(
+                    CameraUpdateFactory.newLatLng(first.getKey()));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+        }
+    }
+
+    private void fillInfoText() {
+        List<String> rows = new ArrayList<>();
+        rows.add(getString(R.string.info_map_heading, mMarkers.size()));
+        for (PopulateMapTask.MarkerInfo marker : mMarkers.values()) {
+            rows.add(marker.getTitle() + ":");
+            rows.addAll(marker.reviews.values());
+            rows.add("");
+        }
+
+        mInfoView.setText(Utils.joinMax("\n", rows, 50));
+    }
+
+    @Override
+    public void onMapPopulated(Map<LatLng, PopulateMapTask.MarkerInfo> markers, String message) {
+        Log.v(LOG_TAG, "onMapPopulated, hashCode=" + this.hashCode() + ", " + "markers = [" + markers + "], message = [" + message + "]");
+        if (markers != null) {
+            mMarkers = markers;
+            if (mMapReady) {
+                addAllMarkersToMap();
+            }
+
+            fillInfoText();
+        }
+
+        Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
+
     }
 }

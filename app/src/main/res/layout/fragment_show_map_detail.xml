@@ -15,8 +15,11 @@
               tools:showIn="@layout/fragment_show_map">
 
     <TextView
-        android:text="some placeholder for later"
-        android:layout_width="wrap_content"
+        android:id="@+id/map_info"
+        android:text="@string/loading_map_entries"
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:maxLines="50"
         android:layout_height="120dp"/>
 
     <fragment

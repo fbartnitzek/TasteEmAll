@@ -337,4 +337,40 @@ public class QueryColumns {
 
 
     }
+
+    public static class MapFragment {
+
+        public static class Reviews {
+
+            public static final String[] COLUMNS = {
+                    ReviewEntry.ALIAS + "." + ReviewEntry._ID,
+                    Review.USER_NAME,
+                    Review.RATING,
+                    Review.DESCRIPTION,
+                    Review.READABLE_DATE,
+                    Review.LOCATION,
+                    DrinkEntry.ALIAS + "." + DrinkEntry._ID,
+                    Drink.NAME,
+                    Drink.TYPE,
+                    Drink.STYLE,
+                    ProducerEntry.ALIAS + "." + ProducerEntry._ID,
+                    Producer.NAME,
+                    Producer.LOCATION,
+            };
+
+            public static final int COL_REVIEW__ID = 0;
+            public static final int COL_REVIEW_USER_NAME = 1;
+            public static final int COL_REVIEW_RATING = 2;
+            public static final int COL_REVIEW_DESCRIPTION = 3;
+            public static final int COL_REVIEW_READABLE_DATE = 4;
+            public static final int COL_REVIEW_LOCATION = 5;
+            public static final int COL_DRINK__ID = 6;
+            public static final int COL_DRINK_NAME = 7;
+            public static final int COL_DRINK_TYPE = 8;
+            public static final int COL_DRINK_STYLE = 9;
+            public static final int COL_PRODUCER__ID = 10;
+            public static final int COL_PRODUCER_NAME = 11;
+            public static final int COL_PRODUCER_LOCATION = 12;
+        }
+    }
 }
