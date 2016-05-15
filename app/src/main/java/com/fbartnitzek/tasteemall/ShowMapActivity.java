@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+
+import com.google.android.gms.maps.GoogleMap;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -69,4 +72,36 @@ public class ShowMapActivity extends AppCompatActivity {
         return true;
     }
 
+    private ShowMapFragment getFragment() {
+        return (ShowMapFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        ShowMapFragment fragment = getFragment();
+        if (fragment != null) {
+            switch (item.getItemId()) {
+                case R.id.action_map_type_none:
+                    fragment.setMapType(GoogleMap.MAP_TYPE_NONE);
+                    return true;
+                case R.id.action_map_type_normal:
+                    fragment.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    return true;
+                case R.id.action_map_type_satellite:
+                    fragment.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    return true;
+                case R.id.action_map_type_terrain:
+                    fragment.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    return true;
+                case R.id.action_map_type_hybrid:
+                    fragment.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    return true;
+                default:
+                    // nothing
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall;
 
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,13 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 
 
 /**
@@ -43,6 +43,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
     boolean mMapReady = false;
     private Uri mUri;
     private View mRootView;
+    private int mMapType = -1;
 
     @Nullable
     @Override
@@ -60,58 +61,25 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
         createToolbar(mRootView, LOG_TAG);
         updateToolbar();
 
-        // get map - so it can be dynamically changed
-//        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        //src: http://stackoverflow.com/questions/15525111/getsupportfragmentmanager-findfragmentbyid-returns-null
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
 
-        // TODO: use FragmentManager instead of SupportFragmentManager everywhere...
-        MapFragment mapFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment == null) {
+            Log.e(LOG_TAG, "onCreateView, MapFragment not found...");
+        } else {
+            mapFragment.getMapAsync(this);
+            Log.v(LOG_TAG, "onCreateView, MapFragment found & set...");
+        }
 
-        createButtons();
         return mRootView;
     }
-    
-    private void createButtons() {
-        Button btnMap = (Button) mRootView.findViewById(R.id.btnMap);
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMapReady) {
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                }
-            }
-        });
 
-        Button btnSatellite = (Button) mRootView.findViewById(R.id.btnSatellite);
-        btnSatellite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMapReady) {
-                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                }
-            }
-        });
-
-        Button btnHybrid = (Button) mRootView.findViewById(R.id.btnHybrid);
-        btnHybrid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMapReady) {
-                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                }
-            }
-        });
-
-        Button btnTerrain = (Button) mRootView.findViewById(R.id.btnTerrain);
-        btnTerrain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMapReady) {
-                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                }
-            }
-        });
+    public void setMapType(int mapType) {
+        mMapType = mapType;
+        if (mMapReady) {
+            mMap.setMapType(mMapType);
+        }
     }
 
     void createToolbar(View rootView, String LOG_TAG) {
@@ -150,6 +118,10 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMapReady = true;
         mMap = googleMap;
+        Log.v(LOG_TAG, "onMapReady, mapType; " + mMap.getMapType() + ", hashCode=" + this.hashCode() + ", " + "googleMap = [" + googleMap + "]");
+        if (mMapType >= 0) {
+            mMap.setMapType(mMapType);
+        }
         Toast.makeText(ShowMapFragment.this.getActivity(), "map is ready", Toast.LENGTH_SHORT).show();
     }
 }

@@ -69,9 +69,10 @@
     <string name="label_producer_details">producer details</string>
     <string name="label_drink_details">drink details</string>
     <string name="label_review_details">review details</string>
-    <string name="label_list_of_producers">list of producers</string>
-    <string name="label_list_of_drinks">list of drinks</string>
-    <string name="label_list_of_reviews">list of reviews</string>
+    <string name="label_numberAppendix"> (<xliff:g id="number">%1$d</xliff:g>)</string>
+    <string name="label_list_of_producers">list of producers<xliff:g id="numberAppendix">%1$s</xliff:g></string>
+    <string name="label_list_of_drinks">list of drinks<xliff:g id="numberAppendix">%1$s</xliff:g></string>
+    <string name="label_list_of_reviews">list of reviews<xliff:g id="numberAppendix">%1$s</xliff:g></string>
     <string name="producer_details_label"><xliff:g id="producer">%1$s</xliff:g> details</string>
     <string name="drink_details_label"><xliff:g id="drink">%1$s</xliff:g> details</string>
 
@@ -127,6 +128,17 @@
     <string name="content_desc_choose_export_dir">choose the directory on your phone for exports</string>
     <string name="hint_choose_export_dir">choose export directory</string>
     <string name="action_export">Export database</string>
+    <string name="action_import">Import database</string>
+    <string name="action_geocode">Start geocode</string>
+    <string name="action_show_map">Show Map</string>
+
+    <!-- show map -->
+    <string name="action_map_type_terrain">terrain</string>
+    <string name="action_map_type_hybrid">hybrid</string>
+    <string name="action_map_type_satellite">satellite</string>
+    <string name="action_map_type_normal">normal</string>
+    <string name="action_map_type_none">none</string>
+    <string name="title_show_map">Show Map</string>
 
 
     <!-- Toast warnings / messages -->
@@ -183,12 +195,8 @@
     <string name="invalid_lat_long_used">invalid location input data</string>
     <string name="no_address_found">no address found</string>
     <string name="address_found">address found</string>
-    <string name="action_geocode">geocode</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
-    <string name="action_import">database import</string>
-    <string name="title_show_map">Show Map</string>
-    <string name="action_show_map">Show Map</string>
 
 
 </resources>

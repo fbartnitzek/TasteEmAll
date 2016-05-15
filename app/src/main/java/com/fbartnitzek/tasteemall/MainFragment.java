@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
@@ -67,6 +68,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private View mRootView;
     private String mSearchPattern;
     private Spinner mSpinnerType;
+
+    private TextView mProducersHeading;
+    private TextView mDrinksHeading;
+    private TextView mReviewsHeading;
 
     private CustomSpinnerAdapter mSpinnerAdapter;
 
@@ -114,7 +119,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mReviewAdapter = new ReviewAdapter(new ReviewAdapter.ReviewAdapterClickHandler() {
             @Override
             public void onClick(Uri contentUri, ReviewAdapter.ViewHolder viewHolder) {
-//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 startActivity(
                         new Intent(getActivity(), ShowReviewActivity.class)
                                 .setData(contentUri));
@@ -124,7 +128,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mDrinkAdapter = new DrinkAdapter(new DrinkAdapter.DrinkAdapterClickHandler() {
             @Override
             public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder viewHolder) {
-//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "drinkName = [" + drinkName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)
                         .setData(contentUri);
                 startActivity(intent);
@@ -134,12 +137,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
             public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
-//                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "], contentUri = [" + contentUri + "], viewHolder = [" + viewHolder + "]");
                 Intent intent = new Intent(getActivity(), ShowProducerActivity.class)
                         .setData(contentUri);
                 startActivity(intent);
             }
         });
+
+        mProducersHeading = (TextView) mRootView.findViewById(R.id.heading_producers);
+        mDrinksHeading = (TextView) mRootView.findViewById(R.id.heading_drinks);
+        mReviewsHeading = (TextView) mRootView.findViewById(R.id.heading_reviews);
 
         RecyclerView producerRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_producer);
         producerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -324,15 +330,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, " + "loader = [" + loader + "], data = [" + data + "]");
+
+        String numberAppendix = data == null ? "" : getString(R.string.label_numberAppendix, data.getCount());
         switch (loader.getId()) {
             case PRODUCER_LOADER_ID:
                 mProducerAdapter.swapCursor(data);
+                mProducersHeading.setText(getString(R.string.label_list_of_producers, numberAppendix));
                 break;
             case DRINK_LOADER_ID:
                 mDrinkAdapter.swapCursor(data);
+                mDrinksHeading.setText(getString(R.string.label_list_of_drinks, numberAppendix));
                 break;
             case REVIEW_LOADER_ID:
                 mReviewAdapter.swapCursor(data);
+                mReviewsHeading.setText(getString(R.string.label_list_of_reviews, numberAppendix));
                 break;
         }
     }
