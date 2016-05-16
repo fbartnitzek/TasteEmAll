@@ -6,7 +6,7 @@
     - App validates all input from servers and users. If data does not exist or is in the wrong format, the app logs this fact and does not crash. - mostly DONE
     - App includes support for accessibility. That includes content descriptions, navigation using a D-pad, and, if applicable, non-audio versions of audio cues. - TODO
     - App keeps all strings in a strings.xml file and enables RTL layout switching on all layouts. - TODO
-    - App provides a widget to provide relevant information to the user on the home screen. - TODO
+    - App provides a widget to provide relevant information to the user on the home screen. - DONE
 
 - GooglePlayServices
     - App integrates two or more Google services - DONE (map & location)
@@ -44,7 +44,7 @@
         - multiple notifications might stack in one notification object
         - indicate context change like incoming message
         - expose information/controls to ongoing events like music playback
-    - Sharing functionality (paragraph of text, link, description, image, ...)  - TODO (seems easiest and useful)
+    - Sharing functionality (paragraph of text, link, description, image, ...)  - DONE
     - custom view if needed
     
 ## essential further improvements
@@ -91,6 +91,7 @@
 - improve logo with https://romannurik.github.io/AndroidAssetStudio/
     
 ## bugs
+- wrong layout for widget (version-padding not working as expected)
 - back-button for add-Drink/Producer
 - export sometimes without message...!
 

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -17,8 +18,8 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns.ReviewFragment.ShowQuery;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.tasks.QueryColumns.ReviewFragment.ShowQuery;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -208,6 +209,9 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             mReviewLocationView.setText(data.getString(ShowQuery.COL_REVIEW_LOCATION));
             mReviewRecommendedSidesView.setText(data.getString(ShowQuery.COL_REVIEW_RECOMMENDED_SIDES));
 
+            FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab_share);
+            fab.setOnClickListener(this);
+
             updateToolbar();
         }
     }
@@ -228,6 +232,23 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             startActivity(
                     new Intent(getActivity(), ShowDrinkActivity.class)
                         .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)));
+        } else if (v.getId() == R.id.fab_share && mProducer_Id > -1) {  // all loaded
+            shareReview();
         }
+    }
+
+    private void shareReview() {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "\n\n");
+        String shareBody = getString(R.string.share_review_text,
+                mProducerNameView.getText().toString(),
+                mDrinkNameView.getText().toString(),
+                mReviewRatingView.getText().toString(),
+                mReviewDescriptionView.getText().toString(),
+                mReviewUserView.getText().toString(),
+                mReviewReadableDateView.getText().toString());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, getString(R.string.choose_share_provider)));
     }
 }

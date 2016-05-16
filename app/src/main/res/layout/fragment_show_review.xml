@@ -15,6 +15,15 @@
 
         <include layout="@layout/fragment_show_review_detail"/>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/cd_share_review"
+            android:src="@android:drawable/ic_menu_share"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
     </FrameLayout>
