@@ -88,6 +88,7 @@
     - more intelligent merging (might help for online-backend...)
     - optionally based on selection (like all reviews from vacation)
 - delete functionality...? (cascading...?)
+- improve logo with https://romannurik.github.io/AndroidAssetStudio/
     
 ## bugs
 - back-button for add-Drink/Producer
