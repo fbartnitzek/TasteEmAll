@@ -190,8 +190,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                 Log.e(LOG_TAG, "createToolbar - no actionbar found..., hashCode=" + this.hashCode() + ", " + "");
                 return;
             }
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayHomeAsUpEnabled(false);
+//            supportActionBar.setHomeButtonEnabled(true);
             supportActionBar.setDisplayShowTitleEnabled(false);
             supportActionBar.setCustomView(R.layout.action_bar_title_layout);
             supportActionBar.setDisplayShowCustomEnabled(true);
@@ -234,7 +234,15 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                getActivity().finish();
+//                return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

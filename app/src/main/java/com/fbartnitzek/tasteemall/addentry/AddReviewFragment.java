@@ -357,8 +357,8 @@ public class AddReviewFragment extends Fragment implements
         } else if ("".equals(mEditReviewUser.getText().toString().trim())) {
             Snackbar.make(mRootView, R.string.toast_no_username, Snackbar.LENGTH_SHORT).show();
             return;
-        } else if ("".equals(mEditReviewReadableDate.getText().toString().trim())) {
-            Snackbar.make(mRootView, R.string.toast_no_review_date, Snackbar.LENGTH_SHORT).show();
+        } else if (!Utils.checkTimeFormat(mEditReviewReadableDate.getText().toString().trim())) {
+            Snackbar.make(mRootView, R.string.toast_invalid_review_date, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (!validateLocation()) {
             Snackbar.make(mRootView, R.string.toast_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();

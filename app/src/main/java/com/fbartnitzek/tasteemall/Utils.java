@@ -1,7 +1,9 @@
 package com.fbartnitzek.tasteemall;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
@@ -311,6 +313,19 @@ public class Utils {
         return formattedAddress.matches(GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
     }
 
+    public static boolean checkTimeFormat(String timeFormat) {
+        if (timeFormat != null) {
+            Date date = getDate(timeFormat);
+            if (date != null) {
+                String newTime = iso8601Format.format(date);
+                if (timeFormat.equals(newTime)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static double getLatitude(String location) throws NumberFormatException {
         if (location != null && location.contains(LAT_PREFIX) && location.contains(LONG_PREFIX)) {
             String lat = location.substring(
@@ -326,5 +341,20 @@ public class Utils {
             return Double.parseDouble(longitude);
         }
         throw new NumberFormatException();
+    }
+
+    public static void openInBrowser(String website, Activity activity) {
+        if (website == null || website.length() == 0) {
+            return;
+        }
+        if (!website.startsWith("http://") && !website.startsWith("https://")) {
+            website = "http://" + website;
+        }
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(website));
+        if (intent.resolveActivity(activity.getPackageManager()) != null){
+            activity.startActivity(intent);
+        }
     }
 }

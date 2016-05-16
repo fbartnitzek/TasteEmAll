@@ -57,8 +57,11 @@
             android:name=".addentry.AddReviewActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
-        <!--TODO: parent = back-button OR Home-Symbol...-->
+        <!-- parent = back-button OR Home-Symbol... - still confusing...-->
         <activity
             android:name=".showentry.ShowProducerActivity"
             android:theme="@style/AppTheme">

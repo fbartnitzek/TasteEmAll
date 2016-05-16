@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
+import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 
@@ -72,7 +73,13 @@ public class ShowProducerFragment extends ShowBaseFragment {
         mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
         mProducerDescriptionView = (TextView) mRootView.findViewById(R.id.producer_description);
         mProducerWebsiteView = (TextView) mRootView.findViewById(R.id.producer_website);
-
+        mProducerWebsiteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String website = mProducerWebsiteView.getText().toString();
+                Utils.openInBrowser(website, getActivity());
+            }
+        });
         createToolbar(mRootView, LOG_TAG);
 
         return mRootView;

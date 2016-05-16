@@ -152,7 +152,7 @@
     <string name="toast_choose_existing_drink">choose an existing drink first...</string>
     <string name="toast_rate_drink">rate your drink first...</string>
     <string name="toast_no_username">no rating without username...</string>
-    <string name="toast_no_review_date">no rating without date...</string>
+    <string name="toast_invalid_review_date">invalid date for the review...</string>
     <string name="toast_choose_existing_provider">choose an existing producer first...</string>
     <string name="toast_choose_drink_name">choose a name first...</string>
     <string name="toast_no_address_found">no address was found by your coordinates - please enter the location manually</string>
