@@ -30,6 +30,7 @@ import java.util.Arrays;
 public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
 
     private static final String LOG_TAG = InsertEntryTask.class.getName();
+    public static final String ACTION_DATA_INSERTED = InsertEntryTask.class.getPackage().getName() + ".ACTION_DATA_INSERTED";
     private final Activity mActivity;
     private final View mRootView;
     private final String mEntryName;
@@ -61,6 +62,7 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
         Log.v(LOG_TAG, "onPostExecute, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "]");
 
         if (uri != null) {
+            updateWidgets();
             Intent output = new Intent();
             output.setData(uri);    //always returns single-uri
             mActivity.setResult(Activity.RESULT_OK, output);
@@ -69,6 +71,12 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
             Snackbar.make(mRootView, "Creating new entry " + mEntryName + " didn't work...",
                     Snackbar.LENGTH_SHORT).setAction("Action", null).show();
         }
+    }
 
+    private void updateWidgets() {
+        Log.v(LOG_TAG, "updateWidgets, hashCode=" + this.hashCode() + ", " + "");
+        // only TasteEmAll app can receive broadcast
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_INSERTED).setPackage(mActivity.getPackageName());
+        mActivity.sendBroadcast(dataUpdatedIntent);
     }
 }

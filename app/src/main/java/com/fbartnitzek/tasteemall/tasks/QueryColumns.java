@@ -334,8 +334,6 @@ public class QueryColumns {
 
 
         }
-
-
     }
 
     public static class MapFragment {
@@ -371,6 +369,37 @@ public class QueryColumns {
             public static final int COL_PRODUCER__ID = 10;
             public static final int COL_PRODUCER_NAME = 11;
             public static final int COL_PRODUCER_LOCATION = 12;
+        }
+    }
+
+    public static class Widget {
+
+        public static class ProviderQuery {
+
+            public static final String[] COLUMNS = {
+                    ProducerEntry._ID,
+                    Producer.NAME
+            };
+            public static final int COL_PRODUCER__ID = 0;
+            public static final int COL_NAME= 1;
+        }
+
+        public static class DrinkQuery {
+
+            public static final String[] COLUMNS = {
+                    DrinkEntry._ID,
+                    Drink.NAME
+            };
+            public static final int COL_DRINK__ID = 0;
+            public static final int COL_DRINK_NAME = 1;
+        }
+
+        public static class ReviewQuery {
+
+            public static final String[] COLUMNS = {
+                    ReviewEntry._ID
+            };
+            public static final int COL_REVIEW__ID = 0;
         }
     }
 }

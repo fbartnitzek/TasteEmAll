@@ -48,6 +48,8 @@
     - custom view if needed
     
 ## essential further improvements
+- ShowProducer with drinks and reviews
+- ShowDrinks with reviews
 - date and time picker for review timestamp
 - testCase for drinkType-validation (so it can be easily extended through configuration)
     - all drink / review attributes with optional specific drinkType-names (like producer_name_beer = brewer)
@@ -81,6 +83,15 @@
         - 2 or 3 loaders, all data prepared for displaying, way more queries if no limitation exists
     - some tests necessary (maybe based on selected filter different solution...)
 - insert and update date for each entry (to show recently added entries)
+- import / export 
+    - other formats (xml / json / exploded csv)
+    - more intelligent merging (might help for online-backend...)
+    - optionally based on selection (like all reviews from vacation)
+- delete functionality...? (cascading...?)
+    
+## bugs
+- back-button for add-Drink/Producer
+- export sometimes without message...!
 
 ## online backend
 - f.e. firebase as a start

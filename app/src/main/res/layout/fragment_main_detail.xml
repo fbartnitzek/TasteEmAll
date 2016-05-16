@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="12dp"
-            android:text="@string/label_list_of_reviews"/>
+            android:text="@string/label_list_of_reviews_preview"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_reviews"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="12dp"
-            android:text="@string/label_list_of_drinks"/>
+            android:text="@string/label_list_of_drinks_preview"/>
 
         <!-- TODO: dynamically shrinking size if less results? -->
         <android.support.v7.widget.RecyclerView
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="12dp"
-            android:text="@string/label_list_of_producers"/>
+            android:text="@string/label_list_of_producers_preview"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_producer"

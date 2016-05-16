@@ -73,8 +73,11 @@
     <string name="label_drink_details">drink details</string>
     <string name="label_review_details">review details</string>
     <string name="label_numberAppendix"> (<xliff:g id="number">%1$d</xliff:g>)</string>
+    <string name="label_list_of_producers_preview">list of producers</string>
     <string name="label_list_of_producers">list of producers<xliff:g id="numberAppendix">%1$s</xliff:g></string>
+    <string name="label_list_of_drinks_preview">list of drinks</string>
     <string name="label_list_of_drinks">list of drinks<xliff:g id="numberAppendix">%1$s</xliff:g></string>
+    <string name="label_list_of_reviews_preview">list of reviews</string>
     <string name="label_list_of_reviews">list of reviews<xliff:g id="numberAppendix">%1$s</xliff:g></string>
     <string name="producer_details_label"><xliff:g id="producer">%1$s</xliff:g> details</string>
     <string name="drink_details_label"><xliff:g id="drink">%1$s</xliff:g> details</string>
@@ -117,8 +120,8 @@
     <string name="hint_review_location">location of the review</string>
 
 
-
     <!-- menu and buttons -->
+    <string name="title_settings">Settings</string>
     <string name="menu_action_save">save</string>
     <string name="menu_action_edit">edit</string>
     <string name="text_choose_a_producer">choose a producer</string>
@@ -136,6 +139,7 @@
     <string name="action_show_map">Show Map</string>
 
     <!-- show map -->
+    <string name="loading_map_entries">loading map entries...</string>
     <string name="action_map_type_terrain">terrain</string>
     <string name="action_map_type_hybrid">hybrid</string>
     <string name="action_map_type_satellite">satellite</string>
@@ -147,6 +151,19 @@
     <!--<string name="marker_review_snippet"><xliff:g id="user">%1$s</xliff:g> on <xliff:g id="date">%2$s</xliff:g>: <xliff:g id="rating">%3$s</xliff:g> (<xliff:g id="description">%4$s</xliff:g>) at <xliff:g id="address">%5$s</xliff:g></string>-->
     <string name="marker_review_snippet"><xliff:g id="user">%1$s</xliff:g> on <xliff:g id="date">%2$s</xliff:g>: <xliff:g id="producerName">%3$s</xliff:g> - <xliff:g id="drinkName">%4$s</xliff:g></string>
     <string name="info_map_heading"><xliff:g id="number">%1$d</xliff:g> locations</string>
+
+
+    <!-- widget -->
+    <string name="widget_heading_statistics">TasteEmAll</string>
+    <string name="widget_statistics_producers"><xliff:g id="number">%1$d</xliff:g> Producers</string>
+    <string name="widget_statistics_producers_preview">Producers</string>
+    <string name="widget_statistics_drinks"><xliff:g id="number">%1$d</xliff:g> Drinks</string>
+    <string name="widget_statistics_drinks_preview">Drinks</string>
+    <string name="widget_statistics_reviews"><xliff:g id="number">%1$d</xliff:g> Reviews</string>
+    <string name="widget_statistics_reviews_preview">Reviews</string>
+    <string name="content_description_add_new_review">add a new review for a drink</string>
+    <string name="content_description_search_review">search for reviews of a drink</string>
+
 
     <!-- Toast warnings / messages -->
     <string name="toast_choose_existing_drink">choose an existing drink first...</string>
@@ -177,7 +194,7 @@
     <string name="toast_unused_column_names"> (detected some unknown columns: <xliff:g id="colNames">%1$s</xliff:g>)</string>
     <string name="toast_populated_map">populated the map with <xliff:g id="numSuccess">%1$d</xliff:g> entries (<xliff:g id="numFailed">%2$d</xliff:g> failed)</string>
     <string name="toast_map_no_cursor">querying the database failed</string>
-    <string name="toast_invalid_selection_for_map">no valid selection given to populate map</string>
+    <string name="msg_invalid_selection_for_map">no valid selection given to populate map</string>
     <string name="map_navigate_to">navigating to first entry <xliff:g id="location">%1$s</xliff:g></string>
 
 
@@ -199,7 +216,6 @@
     <string name="example_producer_description">since 1666</string>
     <string name="example_drink_name">some drink</string>
     <string name="example_location">TestLocation</string>
-    <string name="title_settings">Settings</string>
     <string name="example_review_count">5 Reviews</string>
 
 
@@ -210,7 +226,6 @@
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
-    <string name="loading_map_entries">loading map entries...</string>
 
 
 </resources>
