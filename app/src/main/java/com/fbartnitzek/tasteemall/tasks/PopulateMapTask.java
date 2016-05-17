@@ -121,16 +121,16 @@ public class PopulateMapTask extends AsyncTask<Uri, Void, Map<LatLng, PopulateMa
                     marker.initMarkerOptions();
                 }
 
-                mMessage = mActivity.getString(R.string.toast_populated_map, success, failed);
+                mMessage = mActivity.getString(R.string.msg_populated_map, success, failed);
             } catch (IOException e) {
-                mMessage = mActivity.getString(R.string.toast_mass_geocoder_unreachable);
+                mMessage = mActivity.getString(R.string.msg_mass_geocoder_unreachable);
                 return null;
             }
             cursor.close();
             return markers;
 
         } else {
-            mMessage =  mActivity.getString(R.string.toast_map_no_cursor);
+            mMessage =  mActivity.getString(R.string.msg_map_no_cursor);
             return null;
         }
 

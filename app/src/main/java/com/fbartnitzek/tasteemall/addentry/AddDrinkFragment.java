@@ -253,6 +253,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                 mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
             }
         }
+        setRetainInstance(true);
 
         super.onCreate(savedInstanceState);
     }
@@ -287,10 +288,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
         //validate
         if (mProducerId == null || mProducerName == null) {
-            Snackbar.make(mRootView, R.string.toast_choose_existing_provider, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_choose_existing_provider, Snackbar.LENGTH_SHORT).show();
             return;
         } else if ("".equals(drinkName)) {
-            Snackbar.make(mRootView, R.string.toast_choose_drink_name, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_choose_drink_name, Snackbar.LENGTH_SHORT).show();
             return;
         }
 

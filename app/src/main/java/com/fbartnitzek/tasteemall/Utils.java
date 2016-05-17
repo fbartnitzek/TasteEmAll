@@ -1,19 +1,18 @@
 package com.fbartnitzek.tasteemall;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
-import com.fbartnitzek.tasteemall.data.pojo.Producer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -116,14 +115,12 @@ public class Utils {
         }
     }
 
-
-
-    public static ContentValues getContentValues(Producer producer) {
-        return DatabaseHelper.buildProducerValues(
-                producer.getProducerId(), producer.getName(), producer.getDescription(),
-                producer.getWebsite(), producer.getLocation()
-        );
+    static public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
+
 
     public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
         StringBuilder sb = new StringBuilder();
@@ -289,7 +286,7 @@ public class Utils {
         return R.string.producer_show_generic;
     }
 
-    public static String formatLocation(Location currentLocation) {
+    public static String formatLocationForGeocoder(Location currentLocation) {
         return GEOCODE_ME + LAT_PREFIX + String.valueOf(currentLocation.getLatitude())
                 + LONG_PREFIX + String.valueOf(currentLocation.getLongitude());
     }

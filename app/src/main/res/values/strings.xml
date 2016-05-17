@@ -167,36 +167,43 @@
 
 
     <!-- Toast warnings / messages -->
-    <string name="toast_choose_existing_drink">choose an existing drink first...</string>
-    <string name="toast_rate_drink">rate your drink first...</string>
-    <string name="toast_no_username">no rating without username...</string>
-    <string name="toast_invalid_review_date">invalid date for the review...</string>
-    <string name="toast_choose_existing_provider">choose an existing producer first...</string>
-    <string name="toast_choose_drink_name">choose a name first...</string>
-    <string name="toast_no_address_found">no address was found by your coordinates - please enter the location manually</string>
-    <string name="toast_invalid_lat_long">invalid latitude and longitude values detected, please enter the location manually</string>
-    <string name="toast_no_location_provided">no location data provided (you might have deactivated location settings), please enter the location manually</string>
-    <string name="toast_no_location_access">no location access provided (you might activate it in your device location settings), please enter the location manually</string>
-    <string name="toast_service_not_available">Geocoder not available or unreachable - the location-values will be translated on next start with network services</string>
-    <string name="toast_no_location_generic">no location found, please enter the location manually</string>
-    <string name="toast_invalid_geocode_location">the geocode placeholder in review location was modified, please enter the location manually</string>
-    <string name="toast_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$d</xliff:g> Reviews failed)</string>
-    <string name="toast_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$d</xliff:g> Reviews failed)</string>
-    <string name="toast_no_export_directory">no export directory chosen</string>
-    <string name="toast_wrong_export_directory">the export directory does not exist or it cannot be written to (<xliff:g id="path">%1$s</xliff:g>)</string>
-    <string name="toast_export_files_no_write">files can not be created below this path (<xliff:g id="path">%1$s</xliff:g>)</string>
-    <string name="toast_writing_entries_failed">IOException while writing <xliff:g id="entries">%1$s</xliff:g></string>
-    <string name="toast_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g>"</string>
-    <string name="toast_export_entries_failed_no_cursor">no cursor found while exporting <xliff:g id="entries">%1$s</xliff:g></string>
-    <string name="toast_on_import_files_chosen">no import files chosen</string>
-    <string name="toast_no_entry_file_import">no <xliff:g id="entries">%1$s</xliff:g> file selected to import</string>
-    <string name="toast_invalid_import_file"><xliff:g id="entries">%1$s</xliff:g>-file <xliff:g id="filename">%2$s</xliff:g> could not be read or is empty...</string>
-    <string name="toast_entries_imported"><xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> imported into database<xliff:g id="optUnusedColText">%3$s</xliff:g></string>
-    <string name="toast_unused_column_names"> (detected some unknown columns: <xliff:g id="colNames">%1$s</xliff:g>)</string>
-    <string name="toast_populated_map">populated the map with <xliff:g id="numSuccess">%1$d</xliff:g> entries (<xliff:g id="numFailed">%2$d</xliff:g> failed)</string>
-    <string name="toast_map_no_cursor">querying the database failed</string>
+    <string name="msg_choose_existing_drink">choose an existing drink first...</string>
+    <string name="msg_rate_drink">rate your drink first...</string>
+    <string name="msg_no_username">no rating without username...</string>
+    <string name="msg_invalid_review_date">invalid date for the review...</string>
+    <string name="msg_choose_existing_provider">choose an existing producer first...</string>
+    <string name="msg_choose_drink_name">choose a name first...</string>
+
+    <string name="msg_no_address_found">no address was found by your coordinates - please enter the location manually</string>
+    <string name="msg_invalid_lat_long">invalid position detected, please enter the location manually</string>
+    <string name="msg_no_location_provided">no location data provided, please enter the location manually</string>
+    <string name="msg_no_location_access">no location access provided, please enter the location manually</string>
+    <string name="msg_service_not_available">Geocoder unreachable - geocoder can be called later from menu</string>
+    <string name="msg_service_network_not_available">no network is available - geocoder can be called later from menu</string>
+    <string name="msg_no_location_generic">no location found, please enter the location manually</string>
+    <string name="msg_invalid_geocode_location">the geocode pattern in review location was modified, please enter the location manually</string>
+    <string name="msg_mass_geocoder_no_network">network is not available, so geocoder is unreachable</string>
+    <string name="msg_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$d</xliff:g> Reviews failed)</string>
+    <string name="msg_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$d</xliff:g> Reviews failed)</string>
+
+    <string name="msg_no_export_directory">no export directory chosen</string>
+    <string name="msg_wrong_export_directory">the export directory does not exist or it cannot be written to (<xliff:g id="path">%1$s</xliff:g>)</string>
+    <string name="msg_export_files_no_write">files can not be created below this path (<xliff:g id="path">%1$s</xliff:g>)</string>
+    <string name="msg_writing_entries_failed">IOException while writing <xliff:g id="entries">%1$s</xliff:g></string>
+    <string name="msg_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g>"</string>
+    <string name="msg_export_entries_failed_no_cursor">no cursor found while exporting <xliff:g id="entries">%1$s</xliff:g></string>
+
+    <string name="msg_on_import_files_chosen">no import files chosen</string>
+    <string name="msg_no_entry_file_import">no <xliff:g id="entries">%1$s</xliff:g> file selected to import</string>
+    <string name="msg_invalid_import_file"><xliff:g id="entries">%1$s</xliff:g>-file <xliff:g id="filename">%2$s</xliff:g> could not be read or is empty...</string>
+    <string name="msg_entries_imported"><xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> imported into database<xliff:g id="optUnusedColText">%3$s</xliff:g></string>
+    <string name="msg_unused_column_names"> (detected some unknown columns: <xliff:g id="colNames">%1$s</xliff:g>)</string>
+
+    <string name="msg_populated_map">populated the map with <xliff:g id="numSuccess">%1$d</xliff:g> entries (<xliff:g id="numFailed">%2$d</xliff:g> failed)</string>
+    <string name="msg_map_no_cursor">querying the database failed</string>
     <string name="msg_invalid_selection_for_map">no valid selection given to populate map</string>
-    <string name="map_navigate_to">navigating to first entry <xliff:g id="location">%1$s</xliff:g></string>
+    <string name="msg_map_navigate_to">navigating to first entry <xliff:g id="location">%1$s</xliff:g></string>
+    <string name="msg_show_map_no_network">network is not available, so no map can be shown</string>
 
 
     <!-- sharing -->

@@ -26,7 +26,7 @@ public class ShowProducerActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_producer);
 
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_show_producer_fragment) != null) {
             if (savedInstanceState != null) {
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
@@ -42,7 +42,7 @@ public class ShowProducerActivity extends AppCompatActivity {
             }
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, FRAGMENT_TAG)
+                    .add(R.id.container_show_producer_fragment, fragment, FRAGMENT_TAG)
                     .commit();
 
         } else {

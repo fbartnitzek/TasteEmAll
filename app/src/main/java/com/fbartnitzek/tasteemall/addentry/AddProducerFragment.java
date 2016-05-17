@@ -68,6 +68,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                 mProducerId = savedInstanceState.getString(STATE_PRODUCER_ID);
             }
         }
+        setRetainInstance(true);
 
         super.onCreate(savedInstanceState);
     }

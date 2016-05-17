@@ -20,7 +20,7 @@ public class AddReviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_review);
 
         // explicitly add fragment, toolbar from fragment...
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_add_review_fragment) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -37,7 +37,7 @@ public class AddReviewActivity extends AppCompatActivity {
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment, ADD_REVIEW_FRAGMENT_TAG)
+                        .add(R.id.container_add_review_fragment, fragment, ADD_REVIEW_FRAGMENT_TAG)
                         .commit();
             } else {
                 Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");

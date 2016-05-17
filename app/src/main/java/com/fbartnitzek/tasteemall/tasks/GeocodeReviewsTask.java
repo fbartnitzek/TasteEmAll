@@ -113,13 +113,13 @@ public class GeocodeReviewsTask extends AsyncTask<Void, Void, String> {
                 // IO not available - stop
                 Log.v(LOG_TAG, "doInBackground - IOException");
                 cursor.close();
-                return mActivity.getString(R.string.toast_mass_geocoder_unreachable, cursor.getCount());
+                return mActivity.getString(R.string.msg_mass_geocoder_unreachable, cursor.getCount());
             }
         }
         cursor.close();
 
 
-        String string = mActivity.getString(R.string.toast_mass_geocoder_result, converted, failed);
+        String string = mActivity.getString(R.string.msg_mass_geocoder_result, converted, failed);
         Log.v(LOG_TAG, "doInBackground, msg: " + string);
         return string;
     }

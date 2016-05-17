@@ -27,7 +27,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_drink);
 
         // explicitly add fragment with pattern
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_show_drink_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
@@ -45,7 +45,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
             }
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, FRAGMENT_TAG)
+                    .add(R.id.container_show_drink_fragment, fragment, FRAGMENT_TAG)
                     .commit();
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + "]");

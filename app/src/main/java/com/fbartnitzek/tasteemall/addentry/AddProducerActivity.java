@@ -22,7 +22,7 @@ public class AddProducerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_producer);
 
         // explicitly add fragment with pattern
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_add_producer_fragment) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -43,7 +43,7 @@ public class AddProducerActivity extends AppCompatActivity {
 
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, ADD_PRODUCER_FRAGMENT_TAG)
+                    .add(R.id.container_add_producer_fragment, fragment, ADD_PRODUCER_FRAGMENT_TAG)
                     .commit();
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");

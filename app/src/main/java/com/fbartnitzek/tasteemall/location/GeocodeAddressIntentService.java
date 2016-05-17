@@ -79,7 +79,7 @@ public class GeocodeAddressIntentService extends IntentService {
         // Make sure that the location data was really sent over through an extra. If it wasn't,
         // send an error error message and return.
         if (location == null) {
-            errorMessage = getString(R.string.toast_no_location_provided);
+            errorMessage = getString(R.string.msg_no_location_provided);
             Log.wtf(LOG_TAG, errorMessage);
             deliverResultToReceiver(FAILURE_NO_LOCATION_DATA_PROVIDED, errorMessage);
             return;
@@ -111,13 +111,13 @@ public class GeocodeAddressIntentService extends IntentService {
         } catch (IOException ioException) {
             // Catch network or other I/O problems.
             errorMessage = getString(R.string.service_not_available);
-            Log.e(LOG_TAG, errorMessage, ioException);
+            Log.w(LOG_TAG, errorMessage, ioException);
             deliverResultToReceiver(FAILURE_SERVICE_NOT_AVAILABLE, errorMessage);
             return;
         } catch (IllegalArgumentException illegalArgumentException) {
             // Catch invalid latitude or longitude values.
             errorMessage = getString(R.string.invalid_lat_long_used);
-            Log.e(LOG_TAG, errorMessage + ". " +
+            Log.w(LOG_TAG, errorMessage + ". " +
                     "Latitude = " + location.getLatitude() +
                     ", Longitude = " + location.getLongitude(), illegalArgumentException);
             deliverResultToReceiver(FAILURE_INVALID_LAT_LONG_USED, errorMessage);
@@ -127,7 +127,7 @@ public class GeocodeAddressIntentService extends IntentService {
         // Handle case where no address was found.
         if (addresses == null || addresses.size()  == 0) {
             errorMessage = getString(R.string.no_address_found);
-            Log.e(LOG_TAG, errorMessage);
+            Log.w(LOG_TAG, errorMessage);
             deliverResultToReceiver(FAILURE_NO_RESULT_FOUND, errorMessage);
         } else {
             Address address = addresses.get(0);

@@ -22,7 +22,7 @@ public class AddDrinkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_drink);
 
         // explicitly add fragment, toolbar from fragment...
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_add_drink_fragment) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -42,7 +42,7 @@ public class AddDrinkActivity extends AppCompatActivity {
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment, ADD_DRINK_FRAGMENT_TAG)
+                        .add(R.id.container_add_drink_fragment, fragment, ADD_DRINK_FRAGMENT_TAG)
                         .commit();
             } else {
                 Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");

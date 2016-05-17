@@ -75,6 +75,9 @@ public class AddReviewFragment extends Fragment implements
     private static final String STATE_REVIEW_USER = "STATE_ADD_REVIEW_USER";
     private static final String STATE_REVIEW_READABLE_DATE = "STATE_ADD_REVIEW_READABLE_DATE";
     private static final String STATE_REVIEW_LOCATION = "STATE_ADD_REVIEW_LOCATION";
+    private static final String STATE_GEOCODING_DONE = "STATE_GEOCODING_DONE";
+    private static final String STATE_GEOCODING_RUNNING = "STATE_GEOCODING_RUNNING";
+
     private static final int DRINK_ACTIVITY_REQUEST_CODE = 999;
     private static final int EDIT_REVIEW_LOADER_ID = 57892;
     private static final int REQUEST_LOCATION_PERMISSION_CODE = 43923;
@@ -101,6 +104,8 @@ public class AddReviewFragment extends Fragment implements
     private String mCurrentLocation;
     private Location mLastLocation;
     private AddressResultReceiver mResultReceiver;
+    private boolean mGeocodingDone = false;
+    private boolean mGeocodingRunning = false;
 
     public AddReviewFragment() {
         // Required empty public constructor
@@ -112,7 +117,10 @@ public class AddReviewFragment extends Fragment implements
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_CONTENT_URI)) {
             mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+            mGeocodingDone = savedInstanceState.getBoolean(STATE_GEOCODING_DONE, false);
+            mGeocodingRunning = savedInstanceState.getBoolean(STATE_GEOCODING_RUNNING, false);
         }
+        setRetainInstance(true);
         buildGoogleApiClient();
         mResultReceiver = new AddressResultReceiver(new Handler());
         super.onCreate(savedInstanceState);
@@ -250,6 +258,8 @@ public class AddReviewFragment extends Fragment implements
         outState.putString(STATE_REVIEW_USER, mEditReviewUser.getText().toString().trim());
         outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
         outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
+        outState.putBoolean(STATE_GEOCODING_DONE, mGeocodingDone);
+        outState.putBoolean(STATE_GEOCODING_RUNNING, mGeocodingRunning);
 
         if (mDrinkId != null) {
             outState.putString(STATE_DRINK_ID, mDrinkId);
@@ -349,19 +359,19 @@ public class AddReviewFragment extends Fragment implements
     public void saveData() {
 
         if (mDrinkId == null || mDrinkName == null) {
-            Snackbar.make(mRootView, R.string.toast_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (getString(R.string.pre_filled_rating).equals(mSpinnerRating.getSelectedItem().toString())) {
-            Snackbar.make(mRootView, R.string.toast_rate_drink, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_rate_drink, Snackbar.LENGTH_SHORT).show();
             return;
         } else if ("".equals(mEditReviewUser.getText().toString().trim())) {
-            Snackbar.make(mRootView, R.string.toast_no_username, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_no_username, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (!Utils.checkTimeFormat(mEditReviewReadableDate.getText().toString().trim())) {
-            Snackbar.make(mRootView, R.string.toast_invalid_review_date, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_invalid_review_date, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (!validateLocation()) {
-            Snackbar.make(mRootView, R.string.toast_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.msg_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -441,7 +451,12 @@ public class AddReviewFragment extends Fragment implements
     private void showHelp() {
         // TODO: something better ;-)
         Toast.makeText(getActivity(),
-                "++ really good, + buy again, 0 neither good nor bad, - don't buy again, -- spit & spill it out, (the remaining for the uncertain ones :-p)",
+                        "++ really good\n" +
+                        "+ buy again\n" +
+                        "0 neither good nor bad\n" +
+                        "- don't buy again\n" +
+                        "-- spit & spill it out\n" +
+                        "(the remaining for the uncertain ones)",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -561,7 +576,7 @@ public class AddReviewFragment extends Fragment implements
             handlePermission(); //request permissions - may help
 
             Log.v(LOG_TAG, "initLocationAndGeoCoder - no permission");
-            Toast.makeText(AddReviewFragment.this.getActivity(), R.string.toast_no_location_access, Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddReviewFragment.this.getActivity(), R.string.msg_no_location_access, Toast.LENGTH_SHORT).show();
 
             return;
         } else {
@@ -572,7 +587,7 @@ public class AddReviewFragment extends Fragment implements
 
             startGeocodeService();
         } else {
-            Toast.makeText(AddReviewFragment.this.getActivity(), R.string.toast_no_location_provided, Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddReviewFragment.this.getActivity(), R.string.msg_no_location_provided, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -640,7 +655,12 @@ public class AddReviewFragment extends Fragment implements
 
 
     protected void startGeocodeService() {
-        Log.v(LOG_TAG, "startIntentService, hashCode=" + this.hashCode() + ", " + "");
+        Log.v(LOG_TAG, "startGeocodeService, mGeocodingDone=" + mGeocodingDone + ", hashCode=" + this.hashCode() + ", " + "");
+        if (mGeocodingDone || mGeocodingRunning) {
+            Log.v(LOG_TAG, "startGeocodeService, geocoding already done");
+            return;
+        }
+
         Intent intent = new Intent(this.getActivity(), GeocodeAddressIntentService.class);
         if (mResultReceiver == null) {
             Log.e(LOG_TAG, "startGeocodeService - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
@@ -649,6 +669,7 @@ public class AddReviewFragment extends Fragment implements
         intent.putExtra(GeocodeAddressIntentService.RECEIVER, mResultReceiver);
         intent.putExtra(GeocodeAddressIntentService.LOCATION_DATA_EXTRA, mLastLocation);
         getActivity().startService(intent);
+        mGeocodingRunning = true;
     }
 
     @SuppressLint("ParcelCreator")
@@ -664,6 +685,7 @@ public class AddReviewFragment extends Fragment implements
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             Log.v(LOG_TAG, "onReceiveResult, hashCode=" + this.hashCode() + ", " + "resultCode = [" + resultCode + "], resultData = [" + resultData + "]");
             // Display the address string or an error message sent from the intent service.
+            mGeocodingDone = true;
             if (GeocodeAddressIntentService.SUCCESS_RESULT == resultCode) {
                 if (resultData.containsKey(GeocodeAddressIntentService.RESULT_ADDRESS_KEY)) {
                     mCurrentLocation = Utils.formatAddress(
@@ -672,30 +694,47 @@ public class AddReviewFragment extends Fragment implements
                 } else {
                     Log.e(LOG_TAG, "onReceiveResult - SUCCESS without address - should never happen...");
                 }
-            } else if (GeocodeAddressIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
-                Toast.makeText(getActivity(), R.string.toast_service_not_available, Toast.LENGTH_LONG).show();
-                mCurrentLocation = Utils.formatLocation(mLastLocation);
-                updateLocation();
-            } else {
-                int toastRes;
-                switch (resultCode) {
-                    case GeocodeAddressIntentService.FAILURE_NO_RESULT_FOUND:
-                        toastRes = R.string.toast_no_address_found;
-                        break;
-                    case GeocodeAddressIntentService.FAILURE_INVALID_LAT_LONG_USED:
-                        toastRes = R.string.toast_invalid_lat_long;
-                        break;
-                    case GeocodeAddressIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
-                        toastRes = R.string.toast_no_location_provided;
-                        break;
-                    default:
-                        toastRes = R.string.toast_no_location_generic;
-                }
 
-                Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
-                mCurrentLocation = "";
-                updateLocation();
+            } else if (getActivity() == null) { // fast enough on back button - useless result
+
+                mGeocodingRunning = false;
+                mGeocodingDone = false;
+                return;
+
+            } else {  // somehow failed
+
+                if (!Utils.isNetworkAvailable(getActivity())) {
+                    Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
+                    mCurrentLocation = Utils.formatLocationForGeocoder(mLastLocation);
+                    updateLocation();
+                } else if (GeocodeAddressIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
+                    Toast.makeText(getActivity(), R.string.msg_service_not_available, Toast.LENGTH_LONG).show();
+                    mCurrentLocation = Utils.formatLocationForGeocoder(mLastLocation);
+                    updateLocation();
+                } else {
+                    int toastRes;
+                    switch (resultCode) {
+                        case GeocodeAddressIntentService.FAILURE_NO_RESULT_FOUND:
+                            toastRes = R.string.msg_no_address_found;
+                            break;
+                        case GeocodeAddressIntentService.FAILURE_INVALID_LAT_LONG_USED:
+                            toastRes = R.string.msg_invalid_lat_long;
+                            break;
+                        case GeocodeAddressIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
+                            toastRes = R.string.msg_no_location_provided;
+                            break;
+                        default:
+                            toastRes = R.string.msg_no_location_generic;
+                    }
+
+                    Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
+                    mCurrentLocation = "";
+                    updateLocation();
+                }
             }
+            mGeocodingRunning = false;
+
         }
+
     }
 }

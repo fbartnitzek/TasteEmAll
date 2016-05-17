@@ -222,7 +222,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
             Map.Entry<LatLng, PopulateMapTask.MarkerInfo> first = mMarkers.entrySet().iterator().next();
             Toast.makeText(
                     getActivity(),
-                    getString(R.string.map_navigate_to, first.getValue().location),
+                    getString(R.string.msg_map_navigate_to, first.getValue().location),
                     Toast.LENGTH_LONG).show();
             mMap.moveCamera(
                     CameraUpdateFactory.newLatLng(first.getKey()));

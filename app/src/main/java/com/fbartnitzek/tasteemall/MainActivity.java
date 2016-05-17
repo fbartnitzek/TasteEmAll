@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         setContentView(R.layout.activity_main);
 
         // explicitly add fragment, toolbar from fragment...
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_main_fragment) != null) {
 
             MainFragment fragment = getFragment();
             if (fragment == null) { //create new fragment
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                 fragment = new MainFragment();
 
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, fragment, MAIN_FRAGMENT_TAG)
+                        .add(R.id.container_main_fragment, fragment, MAIN_FRAGMENT_TAG)
                         .commit();
 
             } else {    // use old fragment
@@ -112,6 +112,10 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
     private void startShowMap() {
         Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
+        if (!Utils.isNetworkAvailable(this)) {
+            Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_show_map_no_network, Snackbar.LENGTH_LONG).show();
+            return;
+        }
         MainFragment fragment = getFragment();
         Intent intent = new Intent(this, ShowMapActivity.class);
         if (fragment != null) {
@@ -149,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     }
 
     private void startGeocoding() {
+        if (!Utils.isNetworkAvailable(this)) {
+            Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
+            return;
+        }
         Log.v(LOG_TAG, "startGeocoding, hashCode=" + this.hashCode() + ", " + "");
         new GeocodeReviewsTask(this, new GeocodeReviewsTask.GeocodeReviewsUpdatedHandler() {
             @Override
@@ -221,12 +229,12 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     @Override
     public void onExportFinished(String message) {
 //        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-        Snackbar.make(findViewById(R.id.fragment_container), message, Snackbar.LENGTH_LONG);
+        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void onImportFinished(String message) {
 //        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-        Snackbar.make(findViewById(R.id.fragment_container), message, Snackbar.LENGTH_LONG);
+        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
     }
 }

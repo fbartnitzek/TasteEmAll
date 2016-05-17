@@ -50,7 +50,7 @@
 ## essential further improvements
 - ShowProducer with drinks and reviews
 - ShowDrinks with reviews
-- date and time picker for review timestamp
+- date and time picker for review timestamp and filtering
 - testCase for drinkType-validation (so it can be easily extended through configuration)
     - all drink / review attributes with optional specific drinkType-names (like producer_name_beer = brewer)
 - update data model with 2 more entities
@@ -89,6 +89,8 @@
     - optionally based on selection (like all reviews from vacation)
 - delete functionality...? (cascading...?)
 - improve logo with https://romannurik.github.io/AndroidAssetStudio/
+- pictures for reviews and sharing
+- showHelpFragment/Dialog
     
 ## bugs
 - wrong layout for widget (version-padding not working as expected)

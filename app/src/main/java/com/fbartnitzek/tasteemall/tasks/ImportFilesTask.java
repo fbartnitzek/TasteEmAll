@@ -52,7 +52,7 @@ public class ImportFilesTask extends AsyncTask<List<File>, Void, String> {
     protected String doInBackground(List<File>... params) {
         Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0 || params[0] == null || params[0].isEmpty()) {
-            return mActivity.getString(R.string.toast_on_import_files_chosen);
+            return mActivity.getString(R.string.msg_on_import_files_chosen);
         }
         List<File> files = params[0];
 
@@ -86,7 +86,7 @@ public class ImportFilesTask extends AsyncTask<List<File>, Void, String> {
 
     private String importEntries(Uri contentUri, String[] dbColumns, File file, String entries) {
         if (file == null) {
-            return mActivity.getString(R.string.toast_no_entry_file_import, entries);
+            return mActivity.getString(R.string.msg_no_entry_file_import, entries);
         }
 
         List<String> expectedColumns = Arrays.asList(dbColumns);
@@ -94,7 +94,7 @@ public class ImportFilesTask extends AsyncTask<List<File>, Void, String> {
         List<List< String>> dataEntries = CsvFileReader.readCsvFileHeadingAndData(file, dataColumns);
 
         if (dataColumns.isEmpty() || dataEntries.isEmpty()) {
-            return mActivity.getString(R.string.toast_invalid_import_file, entries, file.getName());
+            return mActivity.getString(R.string.msg_invalid_import_file, entries, file.getName());
         }
 
         // TODO: some validation on nonEmpty and primaryKey (later)
@@ -129,10 +129,10 @@ public class ImportFilesTask extends AsyncTask<List<File>, Void, String> {
         String appendix = "";
         if (unknownColumnNames.length() > 0) {
             unknownColumnNames.substring(0, unknownColumnNames.length() - 2);
-            appendix = mActivity.getString(R.string.toast_unused_column_names, unknownColumnNames);
+            appendix = mActivity.getString(R.string.msg_unused_column_names, unknownColumnNames);
         }
 
-        return mActivity.getString(R.string.toast_entries_imported, number, entries, appendix);
+        return mActivity.getString(R.string.msg_entries_imported, number, entries, appendix);
     }
 
     private File getEntryFile(List<File> files, String prefix) {

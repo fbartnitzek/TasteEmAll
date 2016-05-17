@@ -41,7 +41,7 @@ public class ShowMapActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_show_map);
 
-        if (findViewById(R.id.fragment_container) != null) {
+        if (findViewById(R.id.container_show_map_fragment) != null) {
             if (savedInstanceState != null) {
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
@@ -67,7 +67,7 @@ public class ShowMapActivity extends AppCompatActivity {
             }
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, fragment, FRAGMENT_TAG)
+                    .add(R.id.container_show_map_fragment, fragment, FRAGMENT_TAG)
                     .commit();
 
         } else {

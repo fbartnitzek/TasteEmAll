@@ -52,11 +52,11 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
     protected String doInBackground(File... params) {
         Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0) {
-            return mActivity.getString(R.string.toast_no_export_directory);
+            return mActivity.getString(R.string.msg_no_export_directory);
         }
         File dir = params[0];
         if (dir == null || !dir.isDirectory() || !dir.canWrite()) {
-            return mActivity.getString(R.string.toast_export_files_no_write,
+            return mActivity.getString(R.string.msg_export_files_no_write,
                     dir == null ? "" : dir.getAbsolutePath());
         }
 
@@ -108,16 +108,16 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                     dataEntries,
                     file);
             if (error == null) {
-                message = mActivity.getString(R.string.toast_entries_exported_success,
+                message = mActivity.getString(R.string.msg_entries_exported_success,
                         entries, cursor.getCount(), file.getName());
             } else {
                 Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
-                message = mActivity.getString(R.string.toast_writing_entries_failed, entries);
+                message = mActivity.getString(R.string.msg_writing_entries_failed, entries);
             }
 
             cursor.close();
         } else {
-            message = mActivity.getString(R.string.toast_export_entries_failed_no_cursor, entries);
+            message = mActivity.getString(R.string.msg_export_entries_failed_no_cursor, entries);
         }
         return message;
     }
