@@ -4,17 +4,19 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
+    // THE multidexing solution: http://stackoverflow.com/questions/27698287/noclassdeffounderror-with-android-studio-on-android-4/27709640#27709640
     defaultConfig {
         applicationId "com.fbartnitzek.tasteemall"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
+        multiDexEnabled true    //enable multidex on v4.3 devices - part 1
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -44,4 +46,5 @@ dependencies {
 //    compile 'com.google.code.gson:gson:2.6'
     compile 'com.nononsenseapps:filepicker:2.5.2'
     compile 'org.apache.commons:commons-csv:1.0'
+    compile 'com.android.support:multidex:1.0.1'    //enable multidex on v4.3 devices - part 2
 }
