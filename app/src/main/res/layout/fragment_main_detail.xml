@@ -19,22 +19,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/margin_main_fragment_headings"
             android:text="@string/label_list_of_reviews_preview"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_reviews"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="@dimen/height_main_recyclerviews">
         </android.support.v7.widget.RecyclerView>
+
+        <!-- empty-views in other layout for each recyclerview seems to be overkill ... -->
 
         <TextView
             android:id="@+id/heading_drinks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/margin_main_fragment_headings"
             android:text="@string/label_list_of_drinks_preview"/>
 
         <!-- TODO: dynamically shrinking size if less results? -->
@@ -42,7 +44,7 @@
             android:id="@+id/recyclerview_drink"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="@dimen/height_main_recyclerviews">
         </android.support.v7.widget.RecyclerView>
 
         <TextView
@@ -50,14 +52,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/margin_main_fragment_headings"
             android:text="@string/label_list_of_producers_preview"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_producer"
             android:layout_width="match_parent"
             android:scrollbars="vertical"
-            android:layout_height="250dp">
+            android:layout_height="@dimen/height_main_recyclerviews">
         </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>

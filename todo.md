@@ -3,9 +3,9 @@
 ## needed for NanoDegree
 - Core Specs
     - App integrates a third-party library - DONE
-    - App validates all input from servers and users. If data does not exist or is in the wrong format, the app logs this fact and does not crash. - mostly DONE
-    - App includes support for accessibility. That includes content descriptions, navigation using a D-pad, and, if applicable, non-audio versions of audio cues. - TODO
-    - App keeps all strings in a strings.xml file and enables RTL layout switching on all layouts. - TODO
+    - App validates all input from servers and users. If data does not exist or is in the wrong format, the app logs this fact and does not crash. - DONE
+    - App includes support for accessibility. That includes content descriptions, navigation using a D-pad, and, if applicable, non-audio versions of audio cues. - mostly done
+    - App keeps all strings in a strings.xml file and enables RTL layout switching on all layouts. - mostly done
     - App provides a widget to provide relevant information to the user on the home screen. - DONE
 
 - GooglePlayServices
@@ -91,11 +91,14 @@
 - improve logo with https://romannurik.github.io/AndroidAssetStudio/
 - pictures for reviews and sharing
 - showHelpFragment/Dialog
+- icons for drinkTypes in MainFragment-lists, ...
+- use GridLayout for Add / ShowEntries ...
     
 ## bugs
 - wrong layout for widget (version-padding not working as expected)
 - back-button for add-Drink/Producer
-- export sometimes without message...!
+- back-button sometimes needs to be pressed multiple times to get away from MainActivity/AddReview...? - still analyzing...
+- RTL support not working for drinkTypeSpinner in toolbar and ratingSpinner, just for drinkTypeSpinner in AddDrinks!
 
 ## online backend
 - f.e. firebase as a start

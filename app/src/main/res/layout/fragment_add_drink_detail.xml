@@ -9,6 +9,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/fragment_add_drink">
 
+    <!-- TODO: big grid ... -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -38,7 +39,10 @@
 
             <AutoCompleteTextView
                 android:id="@+id/producer_name"
+                android:focusable="true"
                 android:layout_width="0dp"
+                android:contentDescription="@string/cd_enter_producer_name"
+                android:hint="@string/hint_search_producer"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"/>
 
@@ -47,8 +51,9 @@
                 style="@style/AddButtonSmall"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:focusable="true"
                 android:layout_weight="1"
-                android:contentDescription="@string/description_add_a_new_producer"
+                android:contentDescription="@string/cd_add_a_new_producer"
                 android:text="@string/text_plus"/>
 
         </LinearLayout>
@@ -72,11 +77,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd ="40dp"
                 android:text="@string/label_drink_name"/>
 
             <EditText
                 android:id="@+id/drink_name"
                 android:inputType="textCapWords"
+                android:focusable="true"
                 android:hint="@string/hint_drink_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -93,10 +100,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_drink_type"/>
 
             <Spinner
                 android:id="@+id/drink_type"
+                android:focusable="true"
+                android:contentDescription="@string/cd_choose_drinkType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/example_drink_type"/>
@@ -112,11 +122,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_drink_style"/>
 
             <EditText
                 android:id="@+id/drink_style"
                 android:inputType="textCapWords"
+                android:focusable="true"
                 android:hint="@string/hint_drink_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -133,10 +145,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_drink_ingredients"/>
 
             <EditText
                 android:id="@+id/drink_ingredients"
+                android:focusable="true"
                 android:hint="@string/hint_drink_ingredients"
                 android:inputType="textCapWords"
                 android:layout_width="match_parent"
@@ -154,11 +168,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_drink_specifics"/>
 
             <EditText
                 android:id="@+id/drink_specifics"
                 android:inputType="textCapWords"
+                android:focusable="true"
                 android:hint="@string/hint_drink_specifics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

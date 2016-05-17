@@ -32,11 +32,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_producer_name"/>
 
             <EditText
                 android:id="@+id/producer_name"
                 android:inputType="textCapWords"
+                android:focusable="true"
                 android:hint="@string/hint_producer_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -52,11 +54,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/producer_location"/>
 
             <EditText
                 android:id="@+id/producer_location"
                 android:inputType="textCapWords"
+                android:focusable="true"
                 android:hint="@string/hint_producer_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -71,11 +75,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_producer_website"/>
 
             <EditText
                 android:id="@+id/producer_website"
                 android:inputType="textUri"
+                android:focusable="true"
                 android:hint="@string/hint_producer_website"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -91,11 +97,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="40dp"
+                android:paddingEnd="40dp"
                 android:text="@string/label_producer_description"/>
 
             <EditText
                 android:id="@+id/producer_description"
                 android:inputType="textMultiLine"
+                android:focusable="true"
                 android:hint="@string/hint_producer_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

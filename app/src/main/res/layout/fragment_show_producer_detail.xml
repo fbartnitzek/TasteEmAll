@@ -73,6 +73,7 @@
                 android:text="@string/label_producer_website"/>
 
             <TextView
+                android:focusable="true"
                 android:id="@+id/producer_website"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

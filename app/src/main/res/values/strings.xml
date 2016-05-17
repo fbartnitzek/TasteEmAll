@@ -22,15 +22,15 @@
     <string name="title_edit_review_activity">edit <xliff:g id="producerName">%2$s</xliff:g> - <xliff:g id="drinkName">%1$s</xliff:g>-Review</string>
 
     <string name="search_title">search</string>
-    <string name="completion_subentry_formatting">(<xliff:g id="subentry">%1$s</xliff:g>)</string>
-    <string name="completion_prefix_formatting"><xliff:g id="subentry">%1$s</xliff:g>: </string>
+    <string name="completion_subentry_formatting" translatable="false">(<xliff:g id="subentry">%1$s</xliff:g>)</string>
+    <string name="completion_prefix_formatting" translatable="false"><xliff:g id="subentry">%1$s</xliff:g>: </string>
 
 
     <!-- settings -->
     <string name="pref_label_type">Type of drink</string>
-    <string name="pref_key_type">drink_type</string>
+    <string name="pref_key_type" translatable="false">drink_type</string>
     <string name="pref_label_user_name">Username</string>
-    <string name="pref_key_user_name">pref_key_user_name</string>
+    <string name="pref_key_user_name" translatable="false">pref_key_user_name</string>
     <string name="pref_value_user_name_empty"/>
     <string name="date_format">dd.MM.yyyy</string>
     <string name="hour_format">HH:mm:ss</string>
@@ -38,26 +38,26 @@
 
 
     <!-- drinkTypes values / labels - used in Utils -->
-    <string name="drink_key_all">all</string>
+    <string name="drink_key_all" translatable="false">all</string>
     <string name="drink_show_all">All</string>
 
-    <string name="drink_key_generic">generic</string>
+    <string name="drink_key_generic" translatable="false">generic</string>
     <string name="drink_show_generic">Drink</string>
     <string name="producer_show_generic">Producer</string>
 
-    <string name="drink_key_coffee">coffee</string>
+    <string name="drink_key_coffee" translatable="false">coffee</string>
     <string name="drink_show_coffee">Coffee</string>
     <string name="producer_show_coffee">Coffee Roaster</string>
 
-    <string name="drink_key_wine">wine</string>
+    <string name="drink_key_wine" translatable="false">wine</string>
     <string name="drink_show_wine">Wine</string>
     <string name="producer_show_wine">Winery</string>
 
-    <string name="drink_key_beer">beer</string>
+    <string name="drink_key_beer" translatable="false">beer</string>
     <string name="drink_show_beer">Beer</string>
     <string name="producer_show_beer">Brewery</string>
 
-    <string name="drink_key_whisky">whisky</string>
+    <string name="drink_key_whisky" translatable="false">whisky</string>
     <string name="drink_show_whisky">Whisk(e)y</string>
     <string name="producer_show_whisky">Distillery</string>
 
@@ -102,7 +102,7 @@
     <string name="label_drink_ingredients">Ingredients</string>
     <string name="hint_drink_ingredients">ingredients of the drink</string>
     <string name="label_drink_specifics">Specifics</string>
-    <string name="hint_drink_specifics">other specifics of the drink (like mixture of coffee-beans or ABV of an alcoholic drink</string>
+    <string name="hint_drink_specifics">other specifics of the drink (like mixture of coffee-beans or ABV of an alcoholic drink)</string>
 
     <!-- review attributes -->
     <string name="label_review_user_name">User</string>
@@ -125,12 +125,11 @@
     <string name="menu_action_edit">edit</string>
     <string name="text_choose_a_producer">choose a producer</string>
     <string name="text_choose_a_drink">choose a drink</string>
-    <string name="description_add_a_new_producer">create a new producer</string>
-    <string name="description_add_a_new_drink">create a new drink</string>
-    <string name="text_plus">+</string>
-    <string name="text_questionmark">\?</string>
-    <string name="pref_label_export_dir">Export directory</string>
-    <string name="content_desc_choose_export_dir">choose the directory on your phone for exports</string>
+    <string name="cd_add_a_new_producer">create a new producer</string>
+    <string name="cd_add_a_new_drink">create a new drink</string>
+    <string name="text_plus" translatable="false">+</string>
+    <string name="text_questionmark" translatable="false">\?</string>
+    <string name="cd_choose_export_dir">choose the directory on your phone for exports</string>
     <string name="hint_choose_export_dir">choose export directory</string>
     <string name="action_export">Export database</string>
     <string name="action_import">Import database</string>
@@ -162,8 +161,8 @@
     <string name="widget_statistics_drinks_preview">Drinks</string>
     <string name="widget_statistics_reviews"><xliff:g id="number">%1$d</xliff:g> Reviews</string>
     <string name="widget_statistics_reviews_preview">Reviews</string>
-    <string name="content_description_add_new_review">add a new review for a drink</string>
-    <string name="content_description_search_review">search for reviews of a drink</string>
+    <string name="cd_add_new_review">add a new review for a drink</string>
+    <string name="cd_search_review">search for reviews of a drink</string>
 
 
     <!-- Toast warnings / messages -->
@@ -206,6 +205,9 @@
     <string name="msg_show_map_no_network">network is not available, so no map can be shown</string>
 
 
+    <!-- empty views - unused for now... -->
+    <string name="empty_no_reviews_found">no reviews found</string>
+
     <!-- sharing -->
     <string name="share_review_text">Review for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g>: <xliff:g id="rating">%3$s</xliff:g> <xliff:g id="description">%4$s</xliff:g> (<xliff:g id="user">%5$s</xliff:g> on <xliff:g id="date">%6$s</xliff:g>) #TasteEmAll</string>
     <string name="cd_share_review">share the review</string>
@@ -232,11 +234,16 @@
     <string name="example_review_count">5 Reviews</string>
 
     <!-- logging -->
-    <string name="service_not_available">service not avaiable</string>
+    <string name="service_not_available">service not available</string>
     <string name="invalid_lat_long_used">invalid location input data</string>
     <string name="no_address_found">no address found</string>
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
+    <string name="cd_enter_producer_name">enter name of the producer</string>
+    <string name="hint_search_producer">search producer</string>
+    <string name="cd_choose_drinkType">choose a drinktype for your review</string>
+    <string name="cd_enter_drink_name_autocomplete">enter drink name for autocompletion</string>
+    <string name="help_show_review_rating_help"><![CDATA[++ really good\nbuy again\n0 neither good nor bad\n- don\'t buy again\n-- spit & spill it out\n(the remaining for the uncertain ones)]]></string>
 
 </resources>

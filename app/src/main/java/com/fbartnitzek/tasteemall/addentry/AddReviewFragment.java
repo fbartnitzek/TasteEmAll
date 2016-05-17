@@ -450,14 +450,7 @@ public class AddReviewFragment extends Fragment implements
 
     private void showHelp() {
         // TODO: something better ;-)
-        Toast.makeText(getActivity(),
-                        "++ really good\n" +
-                        "+ buy again\n" +
-                        "0 neither good nor bad\n" +
-                        "- don't buy again\n" +
-                        "-- spit & spill it out\n" +
-                        "(the remaining for the uncertain ones)",
-                Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),R.string.help_show_review_rating_help, Toast.LENGTH_LONG).show();
     }
 
     @Override
