@@ -170,6 +170,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
+            // each value has its label before - a11y should work that way...
             String drinkType = data.getString(ShowQuery.COL_DRINK_TYPE);
             int drinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);

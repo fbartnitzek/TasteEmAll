@@ -213,8 +213,9 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
 
     private void addAllMarkersToMap() {
         for (PopulateMapTask.MarkerInfo marker : mMarkers.values()) {
-            mMap.addMarker(marker.getMarkerOptions());
+            mMap.addMarker(marker.getMarkerOptions());  //no content description available for Marker
         }
+        mMap.setContentDescription(getActivity().getString(R.string.a11y_map_populated, mMarkers.size()));
     }
 
     private void moveToFirstEntry() {

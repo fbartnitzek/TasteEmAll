@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +29,7 @@ import com.fbartnitzek.tasteemall.tasks.QueryColumns;
  */
 
 public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> {
+    private final Context mContext;
     private Cursor mCursor;
 
 //    private static final String LOG_TAG = DrinkAdapter.class.getName();
@@ -39,8 +41,9 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
     private final DrinkAdapterClickHandler mClickHandler;
 
 
-    public DrinkAdapter(DrinkAdapterClickHandler clickHandler) {
+    public DrinkAdapter(DrinkAdapterClickHandler clickHandler, Context context) {
         this.mClickHandler = clickHandler;
+        mContext = context;
     }
 
     @Override
@@ -59,14 +62,26 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
-        holder.producerNameView.setText(
-                mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME));
-        holder.drinkNameView.setText(
-                mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_NAME));
-        holder.drinkTypeView.setText(
-                mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_TYPE));
-        holder.drinkStyleView.setText(
-                mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_STYLE));
+        String producerName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME);
+        holder.producerNameView.setText(producerName);
+        holder.producerNameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
+
+        String drinkName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_NAME);
+        holder.drinkNameView.setText(drinkName);
+        holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
+
+        String drinkType = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_TYPE);
+        holder.drinkTypeView.setText(drinkType);
+        holder.drinkTypeView.setContentDescription(mContext.getString(R.string.a11y_drink_type,
+                mContext.getString(Utils.getReadableDrinkNameId(mContext, drinkType))));
+
+        String drinkStyle = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_STYLE);
+        holder.drinkStyleView.setText(drinkStyle);
+        if (drinkStyle == null || drinkStyle.length() == 0) {
+            holder.drinkStyleView.setContentDescription(mContext.getString(R.string.a11y_no_drink_style));
+        } else {
+            holder.drinkStyleView.setContentDescription(mContext.getString(R.string.a11y_drink_style, drinkStyle));
+        }
 
     }
 

@@ -39,7 +39,7 @@ public class TestHelper {
             fail("Utils.getLat/Long with Exception");
         }
 
-        assertFalse(Utils.checkGeocodeAddressFormat("geocode_me_lat49.9922412_long_8.660975"));;
+        assertFalse(Utils.checkGeocodeAddressFormat("geocode_me_lat49.9922412_long_8.660975"));
 
     }
 

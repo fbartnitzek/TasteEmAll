@@ -33,15 +33,17 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private final Context context;
     private final ArrayList<String> data;
     private final int spinnerLayout;
+    private final int a11yStringId;
     public Resources res;
     private final LayoutInflater inflater;
 
 
-    public CustomSpinnerAdapter(Context context, ArrayList<String> objects, int spinnerLayout) {
+    public CustomSpinnerAdapter(Context context, ArrayList<String> objects, int spinnerLayout, int a11yStringId) {
         super(context, spinnerLayout, objects);
         this.spinnerLayout = spinnerLayout;
         this.context = context;
         data = objects;
+        this.a11yStringId = a11yStringId;
 
         inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -57,9 +59,19 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     }
 
     private View getCustomView(int position, View convertView, ViewGroup parent) {
-        View row = inflater.inflate(spinnerLayout, parent, false);
+        View row;
+        // reuse view
+//        View row = inflater.inflate(spinnerLayout, parent, false);
+        if (convertView == null) {
+            row = inflater.inflate(spinnerLayout, parent, false);
+        } else {
+            row = convertView;
+        }
+
         TextView tvType = (TextView) row.findViewById(R.id.tvEntry);
-        tvType.setText(data.get(position));
+        String text = data.get(position);
+        tvType.setText(text);
+        tvType.setContentDescription(context.getString(a11yStringId, text));
         return row;
     }
 

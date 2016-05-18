@@ -112,13 +112,14 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
     private void startShowMap() {
         Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
-        if (!Utils.isNetworkAvailable(this)) {
+        if (Utils.isNetworkUnavailable(this)) {
             Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_show_map_no_network, Snackbar.LENGTH_LONG).show();
             return;
         }
         MainFragment fragment = getFragment();
         Intent intent = new Intent(this, ShowMapActivity.class);
         if (fragment != null) {
+            Log.v(LOG_TAG, "startShowMap, currentReviewsUri=" + fragment.getmCurrentReviewsUri() + ", currentProducersUri=" + fragment.getmCurrentProducersUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI, fragment.getmCurrentReviewsUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
             intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
@@ -153,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     }
 
     private void startGeocoding() {
-        if (!Utils.isNetworkAvailable(this)) {
+        if (Utils.isNetworkUnavailable(this)) {
             Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
             return;
         }

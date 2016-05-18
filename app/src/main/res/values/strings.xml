@@ -91,6 +91,9 @@
     <string name="hint_producer_website">website of the producer</string>
     <string name="label_producer_description">description</string>
     <string name="hint_producer_description">description of the producer</string>
+    <string name="a11y_producer_name">name of producer is <xliff:g id="name">%1$s</xliff:g></string>
+    <string name="a11y_producer_location">location of producer is <xliff:g id="loc">%1$s</xliff:g></string>
+    <string name="a11y_producer_description">description for producer is <xliff:g id="desc">%1$s</xliff:g></string>
 
 
     <!-- drink attributes -->
@@ -103,6 +106,16 @@
     <string name="hint_drink_ingredients">ingredients of the drink</string>
     <string name="label_drink_specifics">Specifics</string>
     <string name="hint_drink_specifics">other specifics of the drink (like mixture of coffee-beans or ABV of an alcoholic drink)</string>
+    <string name="a11y_enter_producer_name">enter name of the producer</string>
+    <string name="hint_search_producer">search producer</string>
+    <string name="a11y_choose_drinkType_preview">choose a drinktype for your review</string>
+    <string name="a11y_chosen_drinkType">the selected type of drink is <xliff:g id="drinkType">%1$s</xliff:g></string>
+    <string name="a11y_drink_name">name of drink is <xliff:g id="name">%1$s</xliff:g></string>
+    <string name="a11y_drink_type">the drink is a <xliff:g id="readableDrinkTypeName">%1$s</xliff:g></string>
+    <string name="a11y_drink_type_simple">the type of the drink is <xliff:g id="drinkType">%1$s</xliff:g></string>
+    <string name="a11y_drink_style">the style of the drink is <xliff:g id="style">%1$s</xliff:g></string>
+    <string name="a11y_no_drink_style">no further style of the drink is given</string>
+
 
     <!-- review attributes -->
     <string name="label_review_user_name">User</string>
@@ -112,12 +125,19 @@
     <string name="description_help_review_rating">show explanation for the rating</string>
     <string name="label_review_description">Description</string>
     <string name="hint_review_description">detailed review text</string>
-    <string name="label_review_recommended_sides">Recommended sides</string>
+    <string name="label_review_recommended_sides">Recommended\nsides</string>
     <string name="hint_review_recommended_sides">f.e. a matching meal</string>
     <string name="label_review_readable_date">Date</string>
     <string name="hint_review_readable_date">date of the review (local time)</string>
     <string name="label_review_location">Location</string>
     <string name="hint_review_location">location of the review</string>
+    <string name="a11y_enter_drink_name_autocomplete">enter drink name for autocompletion</string>
+    <string name="a11y_choose_review_rating_preview">choose a review rating</string>
+    <string name="a11y_chosen_review_rating">chosen review rating is <xliff:g id="rating">%1$s</xliff:g></string>
+    <string name="a11y_review_rating">it got a <xliff:g id="rating">%1$s</xliff:g> as review rating</string>
+    <string name="a11y_review_date">the review was created at <xliff:g id="date">%1$s</xliff:g></string>
+    <string name="hint_search_drink">search the drink</string>
+
 
     <!-- menu and buttons -->
     <string name="title_settings">Settings</string>
@@ -125,18 +145,18 @@
     <string name="menu_action_edit">edit</string>
     <string name="text_choose_a_producer">choose a producer</string>
     <string name="text_choose_a_drink">choose a drink</string>
-    <string name="cd_add_a_new_producer">create a new producer</string>
-    <string name="cd_add_a_new_drink">create a new drink</string>
+    <string name="a11y_add_a_new_producer">create a new producer</string>
+    <string name="a11y_add_a_new_drink">create a new drink</string>
     <string name="text_plus" translatable="false">+</string>
     <string name="text_questionmark" translatable="false">\?</string>
-    <string name="cd_choose_export_dir">choose the directory on your phone for exports</string>
+    <string name="a11y_choose_export_dir">choose the directory on your phone for exports</string>
     <string name="hint_choose_export_dir">choose export directory</string>
     <string name="action_export">Export database</string>
     <string name="action_import">Import database</string>
     <string name="action_geocode">Start geocode</string>
     <string name="action_show_map">Show Map</string>
     <string name="action_share">share</string>
-    <string name="cd_add_review">add a new review</string>
+    <string name="a11y_add_review">add a new review</string>
 
     <!-- show map -->
     <string name="loading_map_entries">loading map entries...</string>
@@ -147,11 +167,12 @@
     <string name="action_map_type_none">none</string>
     <string name="title_show_map">Show Map</string>
     <!--<string name="marker_review_title">Review <xliff:g id="number">%3$s</xliff:g> for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g></string>-->
+    <!-- TODO: lint - special plural handling ...? - later -->
     <string name="marker_title"><xliff:g id="number">%1$d</xliff:g> Reviews for <xliff:g id="location">%2$s</xliff:g></string>
     <!--<string name="marker_review_snippet"><xliff:g id="user">%1$s</xliff:g> on <xliff:g id="date">%2$s</xliff:g>: <xliff:g id="rating">%3$s</xliff:g> (<xliff:g id="description">%4$s</xliff:g>) at <xliff:g id="address">%5$s</xliff:g></string>-->
     <string name="marker_review_snippet"><xliff:g id="user">%1$s</xliff:g> on <xliff:g id="date">%2$s</xliff:g>: <xliff:g id="producerName">%3$s</xliff:g> - <xliff:g id="drinkName">%4$s</xliff:g></string>
     <string name="info_map_heading"><xliff:g id="number">%1$d</xliff:g> locations</string>
-
+    <string name="a11y_map_populated">the map is populated with <xliff:g id="number">%1$d</xliff:g> markers</string>
 
     <!-- widget -->
     <string name="widget_heading_statistics">TasteEmAll</string>
@@ -161,8 +182,11 @@
     <string name="widget_statistics_drinks_preview">Drinks</string>
     <string name="widget_statistics_reviews"><xliff:g id="number">%1$d</xliff:g> Reviews</string>
     <string name="widget_statistics_reviews_preview">Reviews</string>
-    <string name="cd_add_new_review">add a new review for a drink</string>
-    <string name="cd_search_review">search for reviews of a drink</string>
+    <string name="a11y_add_new_review">add a new review for a drink</string>
+    <string name="a11y_search_review">search for reviews of a drink</string>
+    <string name="a11y_widget_statistics_all">there are currently <xliff:g id="producers">%1$d</xliff:g> producers, <xliff:g id="drinks">%2$d</xliff:g> drinks and <xliff:g id="reviews">%3$d</xliff:g> reviews in your Taste Em All database</string>
+    <!--<string name="a11y_statistics_drinks">there are currently <xliff:g id="number">%1$d</xliff:g> reviews in your Taste Em All database</string>-->
+    <!--<string name="a11y_statistics_producers">there are currently <xliff:g id="number">%1$d</xliff:g> reviews in your Taste Em All database</string>-->
 
 
     <!-- Toast warnings / messages -->
@@ -172,6 +196,8 @@
     <string name="msg_invalid_review_date">invalid date for the review...</string>
     <string name="msg_choose_existing_provider">choose an existing producer first...</string>
     <string name="msg_choose_drink_name">choose a name first...</string>
+
+    <string name="help_show_review_rating_help"><![CDATA[++ really good\n+ buy again\n0 neither good nor bad\n- don\'t buy again\n-- spit & spill it out\n(the remaining for the uncertain ones)]]></string>
 
     <string name="msg_no_address_found">no address was found by your coordinates - please enter the location manually</string>
     <string name="msg_invalid_lat_long">invalid position detected, please enter the location manually</string>
@@ -210,7 +236,7 @@
 
     <!-- sharing -->
     <string name="share_review_text">Review for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g>: <xliff:g id="rating">%3$s</xliff:g> <xliff:g id="description">%4$s</xliff:g> (<xliff:g id="user">%5$s</xliff:g> on <xliff:g id="date">%6$s</xliff:g>) #TasteEmAll</string>
-    <string name="cd_share_review">share the review</string>
+    <string name="a11y_share_review">share the review</string>
     <string name="choose_share_provider">choose an app to share</string>
 
     <!-- examples-->
@@ -240,10 +266,6 @@
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen...</string>
-    <string name="cd_enter_producer_name">enter name of the producer</string>
-    <string name="hint_search_producer">search producer</string>
-    <string name="cd_choose_drinkType">choose a drinktype for your review</string>
-    <string name="cd_enter_drink_name_autocomplete">enter drink name for autocompletion</string>
-    <string name="help_show_review_rating_help"><![CDATA[++ really good\nbuy again\n0 neither good nor bad\n- don\'t buy again\n-- spit & spill it out\n(the remaining for the uncertain ones)]]></string>
+
 
 </resources>

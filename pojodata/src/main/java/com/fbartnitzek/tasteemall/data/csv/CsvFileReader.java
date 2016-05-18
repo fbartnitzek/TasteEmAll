@@ -36,8 +36,8 @@ public class CsvFileReader {
 
     /**
      * reads CSV file in data and headers with same count, uses CSV_Format RFC4180 (, and "")
-     * @param file
-     * @param headers
+     * @param file file to read
+     * @param headers expected columns
      * @return data
      */
     public static List<List<String>> readCsvFileHeadingAndData(File file, List<String> headers) {

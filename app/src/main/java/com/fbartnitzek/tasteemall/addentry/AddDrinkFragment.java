@@ -133,10 +133,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             String drinkType = Utils.getDrinkTypeFromSharedPrefs(getActivity(), false);
             spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
         }
+        setSpinner(spinnerPosition);
 
-        if (spinnerPosition > -1) {
-            mSpinnerDrinkType.setSelection(spinnerPosition);
-        }
         mSpinnerDrinkType.setOnItemSelectedListener(this);
 
         mEditDrinkStyle = (EditText) mRootView.findViewById(R.id.drink_style);
@@ -155,6 +153,14 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         }
 
         return mRootView;
+    }
+
+    private void setSpinner(int spinnerPosition) {
+        if (spinnerPosition > -1) {
+            String drinkType = (String) mSpinnerDrinkType.getItemAtPosition(spinnerPosition);
+            mSpinnerDrinkType.setSelection(spinnerPosition);
+            mSpinnerDrinkType.setContentDescription(getString(R.string.a11y_chosen_drinkType, drinkType));
+        }
     }
 
     @Override
@@ -436,9 +442,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     mEditDrinkIngredients.setText(drinkIngredients);
                     mEditDrinkSpecifics.setText(drinkSpecifics);
                     int spinnerPosition = mDrinkTypeAdapter.getPosition(drinkType);
-                    if (spinnerPosition > -1) {
-                        mSpinnerDrinkType.setSelection(spinnerPosition);
-                    }
+                    setSpinner(spinnerPosition);
 
                     updateToolbar(drinkName, mProducerName);
 

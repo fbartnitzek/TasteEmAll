@@ -115,10 +115,10 @@ public class Utils {
         }
     }
 
-    static public boolean isNetworkAvailable(Context context) {
+    static public boolean isNetworkUnavailable(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return activeNetwork == null || !activeNetwork.isConnectedOrConnecting();
     }
 
 
@@ -304,10 +304,8 @@ public class Utils {
     }
 
     public static boolean checkGeocodeAddressFormat(String formattedAddress) {
-        if (formattedAddress == null) {
-            return false;
-        }
-        return formattedAddress.matches(GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
+        return formattedAddress != null
+                && formattedAddress.matches(GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
     }
 
     public static boolean checkTimeFormat(String timeFormat) {

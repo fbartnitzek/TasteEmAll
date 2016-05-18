@@ -15,6 +15,8 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- maxLines after grid ... -->
+
         <!--Producer-->
         <TextView
             android:id="@id/heading_choose_drink"

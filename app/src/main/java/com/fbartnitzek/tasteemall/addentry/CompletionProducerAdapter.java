@@ -52,8 +52,11 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
     @Override
     public void setViewText(TextView v, String text) {
         if (v.getId() == R.id.list_item_location_name) {
-            v.setText(mActivity.getString(
-                    R.string.completion_subentry_formatting, text));
+            v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
+            v.setContentDescription(mActivity.getString(R.string.a11y_producer_location, text));
+        } else if (v.getId() == R.id.list_item_producer_name) {
+            v.setText(text);
+            v.setContentDescription(mActivity.getString(R.string.a11y_producer_name, text));
         } else {
             super.setViewText(v, text);
         }

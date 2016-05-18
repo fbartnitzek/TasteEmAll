@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryLight"
+    android:id="@+id/widget_layout"
     android:padding="@dimen/widget_margin">
 
     <LinearLayout
@@ -47,6 +48,7 @@
 
         <TextView
             android:id="@+id/stats_reviews"
+            android:focusable="true"
             android:paddingLeft="@dimen/widget_vertical_tab"
             android:paddingStart="@dimen/widget_vertical_tab"
             android:fontFamily="sans-serif"
@@ -72,16 +74,18 @@
             android:layout_width="@dimen/widget_button_size"
             android:layout_height="@dimen/widget_button_size"
             android:gravity="center"
+            android:focusable="true"
             android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="@string/cd_search_review"/>
+            android:contentDescription="@string/a11y_search_review"/>
 
         <ImageButton
             android:id="@+id/widget_add_button"
             android:layout_width="@dimen/widget_button_size"
             android:layout_height="@dimen/widget_button_size"
             android:gravity="center"
+            android:focusable="true"
             android:src="@android:drawable/ic_menu_add"
-            android:contentDescription="@string/cd_add_new_review"
+            android:contentDescription="@string/a11y_add_new_review"
             android:layout_gravity="center_vertical|end"/>
 
     </LinearLayout>

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
+import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -46,7 +47,7 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
                 null,
                 new String[]{Drink.NAME, Drink.TYPE, Producer.NAME},
                 new int[]{R.id.list_item_drink_name, R.id.list_item_drink_type,
-                        R.id.list_item_producer_name},
+                        R.id.list_item_producer_name},  //quite useless now...
                 0);
         mActivity = activity;
         mSelectHandler = selectHandler;
@@ -57,12 +58,17 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
         Log.v(LOG_TAG, "setViewText, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], text = [" + text + "]");
         switch (v.getId()) {
             case R.id.list_item_producer_name:
-                v.setText(mActivity.getString(
-                        R.string.completion_subentry_formatting, text));
+                v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
+                v.setContentDescription(mActivity.getString(R.string.a11y_producer_name, text));
+                break;
+            case R.id.list_item_drink_name:
+                v.setText(text);
+                v.setContentDescription(mActivity.getString(R.string.a11y_drink_name, text));
                 break;
             case R.id.list_item_drink_type:
-                v.setText(mActivity.getString(
-                        R.string.completion_prefix_formatting, text));
+                v.setText(mActivity.getString(R.string.completion_prefix_formatting, text));
+                v.setContentDescription(mActivity.getString(R.string.a11y_drink_type,
+                        mActivity.getString(Utils.getReadableDrinkNameId(mContext, text))));
                 break;
             default:
                 super.setViewText(v, text);

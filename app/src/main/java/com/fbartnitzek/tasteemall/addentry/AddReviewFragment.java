@@ -172,24 +172,24 @@ public class AddReviewFragment extends Fragment implements
 
         mSpinnerRating = (Spinner) mRootView.findViewById(R.id.review_rating);
 
-        // TODO: spinner with invalid start-text...?
+
         // try later: http://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
         String[] reviewRatings = getActivity().getResources().getStringArray(R.array.pref_rating_values);
         mRatingAdapter = new CustomSpinnerAdapter(getActivity(),
-                new ArrayList<>(Arrays.asList(reviewRatings)), R.layout.spinner_small_row);
+                new ArrayList<>(Arrays.asList(reviewRatings)), R.layout.spinner_small_row,
+                R.string.a11y_review_rating);
         mSpinnerRating.setAdapter(mRatingAdapter);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_RATING_POSITION)) {
             mRatingPosition = savedInstanceState.getInt(STATE_REVIEW_RATING_POSITION);
-            if (mRatingPosition > -1) {
-                mSpinnerRating.setSelection(mRatingPosition);
-                mSpinnerRating.clearFocus();    //TODO: needed?
-            }
+            setSpinner();
         }
         mSpinnerRating.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mRatingPosition = position;
+                mSpinnerRating.setContentDescription(
+                        getString(R.string.a11y_chosen_drinkType, mSpinnerRating.getSelectedItem()));
             }
 
             @Override
@@ -236,6 +236,16 @@ public class AddReviewFragment extends Fragment implements
         }
 
         return mRootView;
+    }
+
+    private void setSpinner() {
+        Log.v(LOG_TAG, "setSpinner, mRatingPosition=" + mRatingPosition);
+        if (mRatingPosition > -1) {
+            String rating = (String) mSpinnerRating.getItemAtPosition(mRatingPosition);
+            mSpinnerRating.setSelection(mRatingPosition);
+            mSpinnerRating.setContentDescription(getString(R.string.a11y_chosen_review_rating, rating));
+            mSpinnerRating.clearFocus();    //TODO: needed?
+        }
     }
 
     @Override
@@ -383,11 +393,8 @@ public class AddReviewFragment extends Fragment implements
     }
 
     private boolean validateLocation() {
-        if (mEditReviewLocation.getText().toString().startsWith(Utils.GEOCODE_ME)) {
-            return Utils.checkGeocodeAddressFormat(mEditReviewLocation.getText().toString());
-        } else {
-            return true;
-        }
+        return !mEditReviewLocation.getText().toString().startsWith(Utils.GEOCODE_ME)
+                || Utils.checkGeocodeAddressFormat(mEditReviewLocation.getText().toString());
     }
 
     private void updateReview() {
@@ -520,9 +527,7 @@ public class AddReviewFragment extends Fragment implements
                     mEditCompletionDrinkName.setText(mDrinkName);
                     mEditCompletionDrinkName.dismissDropDown();
                     mRatingPosition = mRatingAdapter.getPosition(rating);
-                    if (mRatingPosition > -1) {
-                        mSpinnerRating.setSelection(mRatingPosition);
-                    }
+                    setSpinner();
                     mEditReviewDescription.setText(reviewDesc);
                     mEditReviewRecommendedSides.setText(recommendedSides);
                     mEditReviewUser.setText(userName);
@@ -696,7 +701,7 @@ public class AddReviewFragment extends Fragment implements
 
             } else {  // somehow failed
 
-                if (!Utils.isNetworkAvailable(getActivity())) {
+                if (Utils.isNetworkUnavailable(getActivity())) {
                     Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
                     mCurrentLocation = Utils.formatLocationForGeocoder(mLastLocation);
                     updateLocation();

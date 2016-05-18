@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,7 @@ import com.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder>{
 
+    private final Context mContext;
     private Cursor mCursor;
     private final ReviewAdapterClickHandler mClickHandler;
 
@@ -36,8 +38,9 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         void onClick(Uri contentUri, ViewHolder viewHolder);
     }
 
-    public ReviewAdapter(ReviewAdapterClickHandler mClickHandler) {
+    public ReviewAdapter(ReviewAdapterClickHandler mClickHandler, Context context) {
         this.mClickHandler = mClickHandler;
+        this.mContext = context;
     }
 
     @Override
@@ -56,17 +59,26 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
-        holder.drinkNameView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_NAME));
-        holder.producerNameView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_PRODUCER_NAME));
-        holder.drinkTypeView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_TYPE));
-        holder.reviewRatingView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_RATING));
-        holder.reviewDateView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_READABLE_DATE));
+        String drinkName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_NAME);
+        holder.drinkNameView.setText(drinkName);
+        holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
 
+        String producerName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_PRODUCER_NAME);
+        holder.producerNameView.setText(producerName);
+        holder.producerNameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
+
+        String drinkType = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_TYPE);
+        holder.drinkTypeView.setText(drinkType);
+        holder.drinkTypeView.setContentDescription(mContext.getString(R.string.a11y_drink_type,
+                mContext.getString(Utils.getReadableDrinkNameId(mContext, drinkType))));
+
+        String reviewRating = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_RATING);
+        holder.reviewRatingView.setText(reviewRating);
+        holder.reviewRatingView.setContentDescription(mContext.getString(R.string.a11y_review_rating, reviewRating));
+
+        String readableDate = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_READABLE_DATE);
+        holder.reviewDateView.setText(readableDate);
+        holder.reviewDateView.setContentDescription(mContext.getString(R.string.a11y_review_date, readableDate));
     }
 
     @Override
@@ -91,7 +103,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             super(view);
             this.drinkNameView = (TextView) view.findViewById(R.id.list_item_drink_name);
             this.producerNameView = (TextView) view.findViewById(R.id.list_item_producer_name);
-            this.drinkTypeView = (TextView) view.findViewById(R.id.list_item_drink_type);;
+            this.drinkTypeView = (TextView) view.findViewById(R.id.list_item_drink_type);
             this.reviewRatingView = (TextView) view.findViewById(R.id.list_item_review_rating);
             this.reviewDateView = (TextView) view.findViewById(R.id.list_item_review_date);
             view.setOnClickListener(this);

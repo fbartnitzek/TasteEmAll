@@ -35,24 +35,29 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_drink_name"/>
 
             <AutoCompleteTextView
                 android:id="@+id/drink_name"
                 android:layout_width="0dp"
-                android:contentDescription="@string/cd_enter_drink_name_autocomplete"
-                android:focusable="true"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"/>
+                android:layout_weight="5"
+                android:focusable="true"
+                android:hint="@string/hint_search_drink"/>
+            <!-- hopefully the hint gets read out -->
+            <!--android:contentDescription="@string/a11y_enter_drink_name_autocomplete"-->
+
 
             <Button
                 android:id="@+id/add_drink_button"
                 style="@style/AddButtonSmall"
                 android:layout_width="0dp"
-                android:focusable="true"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="@string/cd_add_a_new_drink"
+                android:contentDescription="@string/a11y_add_a_new_drink"
+                android:focusable="true"
                 android:text="@string/text_plus"/>
 
         </LinearLayout>
@@ -76,29 +81,32 @@
             <TextView
                 android:id="@+id/label_review_rating"
                 android:layout_width="0dp"
-                android:layout_weight="2"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:layout_weight="2"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_rating"/>
+            <!-- too much: spinner madness -->
+            <!--android:paddingRight="40dp"-->
+            <!--android:paddingEnd="40dp"-->
 
             <Spinner
                 android:id="@+id/review_rating"
                 android:layout_width="0dp"
-                android:layout_weight="5"
-                android:focusable="true"
-                android:contentDescription="choose a review rating"
                 android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:contentDescription="@string/a11y_choose_review_rating_preview"
+                android:focusable="true"
                 android:text="@string/pre_filled_rating"/>
 
             <Button
                 android:id="@+id/help_review_rating_button"
                 style="@style/AddButtonSmall"
                 android:layout_width="0dp"
-                android:focusable="true"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:contentDescription="@string/description_help_review_rating"
+                android:focusable="true"
                 android:text="@string/text_questionmark"/>
         </LinearLayout>
 
@@ -113,8 +121,8 @@
                 android:id="@+id/label_review_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_description"/>
 
             <EditText
@@ -122,8 +130,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="true"
-                android:inputType="textMultiLine|textAutoComplete"
-                android:hint="@string/hint_review_description"/>
+                android:hint="@string/hint_review_description"
+                android:inputType="textMultiLine|textAutoComplete"/>
         </LinearLayout>
 
         <!-- recommended sides -->
@@ -137,17 +145,18 @@
                 android:id="@+id/label_review_recommended_sides"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:maxLines="2"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_recommended_sides"/>
 
             <EditText
                 android:id="@+id/review_recommended_sides"
-                android:focusable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine"
-                android:hint="@string/hint_review_recommended_sides"/>
+                android:focusable="true"
+                android:hint="@string/hint_review_recommended_sides"
+                android:inputType="text|textMultiLine"/>
         </LinearLayout>
 
         <!-- auto-filled values: userName, readable date, location -->
@@ -160,18 +169,20 @@
                 android:id="@+id/label_review_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_user_name"/>
 
             <EditText
                 android:id="@+id/review_user_name"
-                android:inputType="textNoSuggestions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:focusable="true"
                 android:hint="@string/hint_review_user_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:inputType="textNoSuggestions"/>
         </LinearLayout>
+
+        <!-- confusing in RTL mode: user is left aligned, date is right aligned... -->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -182,17 +193,17 @@
                 android:id="@+id/label_review_readable_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_readable_date"/>
 
             <EditText
                 android:id="@+id/review_readable_date"
-                android:inputType="datetime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:focusable="true"
                 android:hint="@string/hint_review_readable_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:inputType="datetime"/>
         </LinearLayout>
 
         <LinearLayout
@@ -204,19 +215,18 @@
                 android:id="@+id/label_review_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_review_location"/>
 
             <EditText
                 android:id="@+id/review_location"
-                android:inputType="textPostalAddress|textMultiLine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:focusable="true"
                 android:hint="@string/hint_review_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:inputType="textPostalAddress|textMultiLine"/>
         </LinearLayout>
-
 
     </LinearLayout>
 

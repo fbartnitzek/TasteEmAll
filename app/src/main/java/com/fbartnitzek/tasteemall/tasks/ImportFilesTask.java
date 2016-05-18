@@ -49,7 +49,7 @@ public class ImportFilesTask extends AsyncTask<List<File>, Void, String> {
     }
 
     @Override
-    protected String doInBackground(List<File>... params) {
+    protected String doInBackground(List<File>... params) { //TODO: don't understand lint-warning
         Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0 || params[0] == null || params[0].isEmpty()) {
             return mActivity.getString(R.string.msg_on_import_files_chosen);

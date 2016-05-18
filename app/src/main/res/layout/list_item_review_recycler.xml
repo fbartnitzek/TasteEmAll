@@ -16,12 +16,16 @@
             android:id="@+id/list_item_producer_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:gravity="center"
             android:text="@string/example_brewery"/>
 
         <TextView
             android:id="@+id/list_item_drink_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:gravity="center"
             android:text="@string/example_drink_name"/>
     </LinearLayout>
 
@@ -46,12 +50,14 @@
             android:id="@+id/list_item_review_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/example_review_rating"/>
 
         <TextView
             android:id="@+id/list_item_review_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/example_review_date"/>
     </LinearLayout>
 

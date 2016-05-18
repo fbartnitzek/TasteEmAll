@@ -127,7 +127,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         new Intent(getActivity(), ShowReviewActivity.class)
                                 .setData(contentUri));
             }
-        });
+        }, getActivity());
 
         mDrinkAdapter = new DrinkAdapter(new DrinkAdapter.DrinkAdapterClickHandler() {
             @Override
@@ -136,7 +136,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         .setData(contentUri);
                 startActivity(intent);
             }
-        });
+        }, getActivity());
 
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
@@ -145,7 +145,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         .setData(contentUri);
                 startActivity(intent);
             }
-        });
+        }, getActivity());
 
         mProducersHeading = (TextView) mRootView.findViewById(R.id.heading_producers);
         mDrinksHeading = (TextView) mRootView.findViewById(R.id.heading_drinks);
@@ -241,7 +241,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         ArrayList<String> typesList = new ArrayList<>(Arrays.asList(typesArray));
 
         mSpinnerAdapter = new CustomSpinnerAdapter(getActivity().getApplicationContext(), typesList,
-                R.layout.spinner_row);
+                R.layout.spinner_row, R.string.a11y_drink_type_simple);
         mSpinnerType.setAdapter(mSpinnerAdapter);
 
         updateSpinnerType();
@@ -262,6 +262,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             if (spinnerPosition > -1) {
                 Log.v(LOG_TAG, "updateSpinnerType - spinner position found, hashCode=" + this.hashCode() + ", " + "");
                 mSpinnerType.setSelection(spinnerPosition);
+                mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
                 mSpinnerType.clearFocus();
             } else {
                 Log.v(LOG_TAG, "updateSpinnerType - no spinner position, hashCode=" + this.hashCode() + ", " + "");
@@ -393,6 +394,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
             mDrinkType = parent.getItemAtPosition(position).toString();
             Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
+            mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
             restartLoaders();
         }
 

@@ -67,10 +67,21 @@ public class StatsWidgetIntentService extends IntentService{
             // fill stats
             views.setTextViewText(R.id.stats_producers,
                     getString(R.string.widget_statistics_producers, numProducers));
+
             views.setTextViewText(R.id.stats_drinks,
                     getString(R.string.widget_statistics_drinks, numDrinks));
+
             views.setTextViewText(R.id.stats_reviews,
                     getString(R.string.widget_statistics_reviews, numReviews));
+
+            // seems to be impossible to get contentDescription for whole widget...
+            // TODO: might sometimes not update widget after update without delete ... later
+//            views.setContentDescription(R.id.widget_layout,
+//                    getString(R.string.a11y_widget_statistics_all, numProducers, numDrinks, numReviews));
+
+            views.setContentDescription(R.id.stats_reviews,
+                    getString(R.string.a11y_widget_statistics_all, numProducers, numDrinks, numReviews));
+
 
             // set on click listener for add and search on every update (kind of useless...)
             // add button

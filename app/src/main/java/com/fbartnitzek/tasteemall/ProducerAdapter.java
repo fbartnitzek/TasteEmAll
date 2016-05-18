@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -32,12 +33,14 @@ import com.fbartnitzek.tasteemall.tasks.QueryColumns;
 public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHolder>{
 
     private static final String LOG_TAG = ProducerAdapter.class.getName();
+    private final Context mContext;
 
     private Cursor mCursor;
     private final ProducerAdapterClickHandler mClickHandler;
 
-    public ProducerAdapter(ProducerAdapterClickHandler ch) {
+    public ProducerAdapter(ProducerAdapterClickHandler ch, Context context) {
         mClickHandler = ch;
+        mContext = context;
     }
 
 
@@ -61,18 +64,18 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         mCursor.moveToPosition(position);
 
-        viewHolder.nameView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME)
-        );
+        String producerName = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME);
+        viewHolder.nameView.setText(producerName);
+        viewHolder.nameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
 
         //TODO later with flag :-)
-        viewHolder.locationView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_LOCATION)
-        );
+        String producerLocation = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_LOCATION);
+        viewHolder.locationView.setText(producerLocation);
+        viewHolder.locationView.setContentDescription(mContext.getString(R.string.a11y_producer_location, producerLocation));
 
-        viewHolder.descriptionView.setText(
-                mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_DESCRIPTION)
-        );
+        String producerDescription = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_DESCRIPTION);
+        viewHolder.descriptionView.setText(producerDescription);
+        viewHolder.descriptionView.setContentDescription(mContext.getString(R.string.a11y_producer_description, producerDescription));
 
     }
 

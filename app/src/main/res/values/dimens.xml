@@ -17,4 +17,5 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="height_main_recyclerviews">250dp</dimen>
     <dimen name="activity_margin">16dp</dimen>
     <dimen name="margin_main_fragment_headings">12dp</dimen>
+    <dimen name="padding_label_value_add_fragments">10dp</dimen>
 </resources>

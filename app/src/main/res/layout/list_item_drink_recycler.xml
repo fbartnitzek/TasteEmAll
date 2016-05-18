@@ -16,11 +16,15 @@
             android:id="@+id/list_item_producer_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:gravity="center"
             android:text="@string/example_brewery"/>
 
         <TextView
             android:id="@+id/list_item_drink_name"
             android:layout_width="wrap_content"
+            android:maxLines="3"
+            android:gravity="center"
             android:layout_height="wrap_content"
             android:text="@string/example_drink_name"/>
     </LinearLayout>
@@ -35,12 +39,15 @@
         <TextView
             android:id="@+id/list_item_drink_type"
             android:layout_width="wrap_content"
+            android:gravity="center"
             android:layout_height="wrap_content"
             android:text="@string/example_drink_type"/>
 
         <TextView
             android:id="@+id/list_item_drink_style"
             android:layout_width="wrap_content"
+            android:gravity="center"
+            android:maxLines="2"
             android:layout_height="wrap_content"
             android:text="@string/example_drink_style"/>
     </LinearLayout>

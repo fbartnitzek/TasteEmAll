@@ -31,14 +31,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_producer_name"/>
 
             <EditText
                 android:id="@+id/producer_name"
                 android:inputType="textCapWords"
                 android:focusable="true"
+                android:maxLines="3"
                 android:hint="@string/hint_producer_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -53,8 +54,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
                 android:text="@string/producer_location"/>
 
             <EditText
@@ -62,6 +63,7 @@
                 android:inputType="textCapWords"
                 android:focusable="true"
                 android:hint="@string/hint_producer_location"
+                android:maxLines="3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -74,8 +76,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_producer_website"/>
 
             <EditText
@@ -96,14 +98,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="40dp"
-                android:paddingEnd="40dp"
+                android:paddingRight="@dimen/padding_label_value_add_fragments"
+                android:paddingEnd="@dimen/padding_label_value_add_fragments"
                 android:text="@string/label_producer_description"/>
 
             <EditText
                 android:id="@+id/producer_description"
                 android:inputType="textMultiLine"
                 android:focusable="true"
+                android:maxLines="5"
                 android:hint="@string/hint_producer_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
