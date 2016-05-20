@@ -60,7 +60,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         }
     }
 
-    //TODO: onSaveInstance?
+    //TODO: onSaveInstance? - seems to work out of the box ...
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,7 +79,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
             }
         }
 
-        mProducerLabelView = (TextView) mRootView.findViewById(R.id.heading_choose_drink);
+        mProducerLabelView = (TextView) mRootView.findViewById(R.id.heading_producer_details);
         mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
         mProducerNameLabelView = (TextView) mRootView.findViewById(R.id.label_producer_name);
         mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
@@ -105,8 +105,6 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
 
-
-//            String readableDrink = getString(Utils.getRgetDrinkName(mDrinkTypeIndex));
             String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), mDrinkTypeIndex));
             String drinkName = mDrinkNameView.getText().toString();
             String producerName= mProducerNameView.getText().toString();
@@ -144,10 +142,11 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         if (data != null && data.moveToFirst()) {
 
             String drinkType = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_TYPE);
-//            mDrinkTypeIndex = Utils.getDrinkTypeIndex(getActivity(), drinkType);
             mDrinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
             mDrinkTypeView.setText(drinkType);
 
+            //createView slower than loader - NO, every time it's the wrong id...
+            // onResume/ActivityCreated gets called after onCreateView!
             int readableProducerTypeIndex = Utils.getReadableProducerNameId(getActivity(), mDrinkTypeIndex);
             mProducerLabelView.setText(
                     getString(R.string.producer_details_label,
