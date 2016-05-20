@@ -159,7 +159,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
                             getString(readableDrinkTypeIndex)));
             mDrinkNameLabelView.setText(readableDrinkTypeIndex);
 
-            mProducer_Id = data.getInt(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_ID);
+            mProducer_Id = data.getInt(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER__ID);
             String producerName = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_NAME);
             mProducerNameView.setText(producerName);
             mProducerNameView.setOnClickListener(this);
@@ -192,6 +192,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
+            Log.v(LOG_TAG, "onClick, producerName=" + mProducerNameView.getText().toString() + ", " + "producerId = [" + mProducer_Id + "]");
             startActivity(
                     new Intent(getActivity(), ShowProducerActivity.class)
                             .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)));

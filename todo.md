@@ -4,8 +4,8 @@
 - Core Specs
     - App integrates a third-party library - DONE
     - App validates all input from servers and users. If data does not exist or is in the wrong format, the app logs this fact and does not crash. - DONE
-    - App includes support for accessibility. That includes content descriptions, navigation using a D-pad, and, if applicable, non-audio versions of audio cues. - mostly done
-    - App keeps all strings in a strings.xml file and enables RTL layout switching on all layouts. - mostly done
+    - App includes support for accessibility. That includes content descriptions, navigation using a D-pad, and, if applicable, non-audio versions of audio cues. - DONE
+    - App keeps all strings in a strings.xml file and enables RTL layout switching on all layouts. - DONE
     - App provides a widget to provide relevant information to the user on the home screen. - DONE
 
 - GooglePlayServices
@@ -37,7 +37,7 @@
     - App uses a Loader to move its data to its views. - DONE
     
 - optional Stand Out:
-    - Material Design (Shared element transitions, parallax scrolling)
+    - Material Design (Shared element transitions, parallax scrolling) - shared element (lots more to to...) 
     - Notifications 
         - relevant
         - persistent if needed
@@ -96,8 +96,7 @@
     
 ## bugs
 - wrong layout for widget (version-padding not working as expected)
-- back-button for add-Drink/Producer
-- back-button sometimes needs to be pressed multiple times to get away from MainActivity/AddReview...? - still analyzing...
+- back-button sometimes needs to be pressed multiple times to get away from MainActivity/AddReview...? - still analyzing... - might be gone
 - RTL support not working for drinkTypeSpinner in toolbar and ratingSpinner, just for drinkTypeSpinner in AddDrinks!
 
 ## online backend

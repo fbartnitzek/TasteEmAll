@@ -3,6 +3,7 @@ package com.fbartnitzek.tasteemall;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         mCursor.moveToPosition(position);
 
         String drinkName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_NAME);
+
+        int id = mCursor.getInt(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW__ID);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_producer) + id);
+            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink) + id);
+        }
+
         holder.drinkNameView.setText(drinkName);
         holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
 

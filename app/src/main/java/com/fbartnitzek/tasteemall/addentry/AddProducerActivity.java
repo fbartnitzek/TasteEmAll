@@ -69,6 +69,9 @@ public class AddProducerActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                return true;
             case R.id.action_save:
                 AddProducerFragment fragment = getFragment();
                 if (fragment != null) {

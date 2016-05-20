@@ -239,6 +239,14 @@
     <string name="a11y_share_review">share the review</string>
     <string name="choose_share_provider">choose an app to share</string>
 
+
+    <!-- transitions -->
+    <string name="shared_transition_drink" translatable="false">shared_transition_drink</string>
+    <string name="shared_transition_producer" translatable="false">shared_transition_producer</string>
+    <string name="shared_transition_producer_location" translatable="false">shared_transition_producer_location</string>
+    <string name="shared_transition_user" translatable="false">shared_transition_user</string>
+
+
     <!-- examples-->
     <string name="example_review_date">20160509</string>
     <string name="example_review_user_name">example_user</string>

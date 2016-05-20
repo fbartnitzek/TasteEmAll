@@ -3,6 +3,7 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -115,6 +116,9 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
         mReviewLocationView = (TextView) mRootView.findViewById(R.id.review_location);
         mReviewRecommendedSidesView = (TextView) mRootView.findViewById(R.id.review_recommended_sides);
 
+        FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab_share);
+        fab.setOnClickListener(this);
+
         createToolbar(mRootView, LOG_TAG);
 
         return mRootView;
@@ -190,12 +194,20 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             mDrink_Id = data.getInt(ShowQuery.COL_DRINK__ID);
             mProducer_Id = data.getInt(ShowQuery.COL_PRODUCER__ID);
 
+            int reviewId = DatabaseContract.getIdFromUri(mUri);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {    //shared element transition
+                mProducerNameView.setTransitionName(getString(R.string.shared_transition_producer) + reviewId);
+                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_drink) + reviewId);
+            }
+
             String producerName = data.getString(ShowQuery.COL_PRODUCER_NAME);
+            String drinkName = data.getString(ShowQuery.COL_DRINK_NAME);
+
             mProducerNameView.setText(producerName);
             mProducerNameView.setOnClickListener(this);
             mProducerLocationView.setText(data.getString(ShowQuery.COL_PRODUCER_LOCATION));
 
-            String drinkName = data.getString(ShowQuery.COL_DRINK_NAME);
             mDrinkNameView.setText(drinkName);
             mDrinkNameView.setOnClickListener(this);
 
@@ -210,10 +222,18 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             mReviewLocationView.setText(data.getString(ShowQuery.COL_REVIEW_LOCATION));
             mReviewRecommendedSidesView.setText(data.getString(ShowQuery.COL_REVIEW_RECOMMENDED_SIDES));
 
-            FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab_share);
-            fab.setOnClickListener(this);
-
             updateToolbar();
+
+            resumeActivityEnterTransition();
+        }
+    }
+
+    private void resumeActivityEnterTransition() {
+        Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // not that important which one - but is lowest :-)
+            ((ShowReviewActivity) getActivity()).scheduleStartPostponedTransition(mDrinkNameView);
         }
     }
 

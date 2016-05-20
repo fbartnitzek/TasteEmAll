@@ -136,9 +136,6 @@ public class AddReviewFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
     }
 
-    // TODO: save button (and therefore toolbar) should always be visible...
-    // tuning... later
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -198,7 +195,7 @@ public class AddReviewFragment extends Fragment implements
             }
         });
 
-        // TODO: might be buggy...
+        // might be buggy...
         mSpinnerRating.setOnTouchListener(new OnTouchHideKeyboardListener(this));
 
 

@@ -1,6 +1,7 @@
 package com.fbartnitzek.tasteemall;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -121,11 +123,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         createSpinner();
 
         mReviewAdapter = new ReviewAdapter(new ReviewAdapter.ReviewAdapterClickHandler() {
+
             @Override
-            public void onClick(Uri contentUri, ReviewAdapter.ViewHolder viewHolder) {
+            public void onClick(Uri contentUri, ReviewAdapter.ViewHolder vh) {
+                Bundle bundle = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    bundle = ActivityOptions.makeSceneTransitionAnimation(
+                                    getActivity(),
+                                    new Pair<View, String>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
+                                    new Pair<View, String>(vh.producerNameView, vh.producerNameView.getTransitionName())
+                            ).toBundle();
+                }
+
                 startActivity(
-                        new Intent(getActivity(), ShowReviewActivity.class)
-                                .setData(contentUri));
+                        new Intent(getActivity(), ShowReviewActivity.class).setData(contentUri),
+                        bundle);
             }
         }, getActivity());
 

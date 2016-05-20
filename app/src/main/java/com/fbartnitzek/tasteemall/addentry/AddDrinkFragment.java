@@ -196,8 +196,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                 Log.e(LOG_TAG, "createToolbar - no actionbar found..., hashCode=" + this.hashCode() + ", " + "");
                 return;
             }
-            supportActionBar.setDisplayHomeAsUpEnabled(false);
-//            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
             supportActionBar.setDisplayShowTitleEnabled(false);
             supportActionBar.setCustomView(R.layout.action_bar_title_layout);
             supportActionBar.setDisplayShowCustomEnabled(true);

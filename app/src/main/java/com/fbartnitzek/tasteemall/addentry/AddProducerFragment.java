@@ -112,8 +112,8 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             }
             //TODO: still wrong...
             // maybe try that: http://stackoverflow.com/questions/22194107/remove-action-bar-icon-with-custom-view-and-show-home-up-button
-            supportActionBar.setDisplayHomeAsUpEnabled(false);  //false: not visible anymore
-//            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);  //false: not visible anymore
+            supportActionBar.setHomeButtonEnabled(true);
             supportActionBar.setDisplayShowTitleEnabled(false);
             supportActionBar.setCustomView(R.layout.action_bar_title_layout);
             supportActionBar.setDisplayShowCustomEnabled(true);
@@ -146,17 +146,6 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
         }
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                getActivity().finish();
-//                return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

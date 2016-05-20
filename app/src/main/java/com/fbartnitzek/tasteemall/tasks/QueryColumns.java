@@ -197,6 +197,7 @@ public class QueryColumns {
                     Drink.SPECIFICS,
                     Drink.STYLE,
                     Drink.INGREDIENTS,
+                    ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID,
                     Producer.PRODUCER_ID,
                     Producer.NAME,
                     Producer.LOCATION};
@@ -208,9 +209,10 @@ public class QueryColumns {
             public static final int COL_DRINK_SPECIFICS = 4;
             public static final int COL_DRINK_STYLE = 5;
             public static final int COL_DRINK_INGREDIENTS = 6;
-            public static final int COL_PRODUCER_ID = 7;
-            public static final int COL_PRODUCER_NAME = 8;
-            public static final int COL_PRODUCER_LOCATION = 9;
+            public static final int COL_PRODUCER__ID = 7;
+            public static final int COL_PRODUCER_ID = 8;
+            public static final int COL_PRODUCER_NAME = 9;
+            public static final int COL_PRODUCER_LOCATION = 10;
         }
 
 
