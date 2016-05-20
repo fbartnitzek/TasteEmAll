@@ -19,6 +19,7 @@
             android:maxLines="3"
             android:gravity="center"
             android:layout_height="wrap_content"
+            android:transitionName="@string/shared_transition_producer_producer"
             android:text="@string/example_brewery"/>
 
         <TextView

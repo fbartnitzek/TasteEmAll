@@ -1,13 +1,17 @@
 package com.fbartnitzek.tasteemall.showentry;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewTreeObserver;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
@@ -25,6 +29,8 @@ public class ShowProducerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_producer);
+
+        supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
         if (findViewById(R.id.container_show_producer_fragment) != null) {
             if (savedInstanceState != null) {
@@ -92,5 +98,43 @@ public class ShowProducerActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Schedules the shared element transition to be started immediately
+     * after the shared element has been measured and laid out within the
+     * activity's view hierarchy. Some common places where it might make
+     * sense to call this method are:
+     *
+     * (1) Inside a Fragment's onCreateView() method (if the shared element
+     *     lives inside a Fragment hosted by the called Activity).
+     *
+     * (2) Inside a Picasso Callback object (if you need to wait for Picasso to
+     *     asynchronously load/scale a bitmap before the transition can begin).
+     *
+     * (3) Inside a LoaderCallback's onLoadFinished() method (if the shared
+     *     element depends on data queried by a Loader).
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void scheduleStartPostponedTransition(final View view) {
+        // http://www.androiddesignpatterns.com/2015/03/activity-postponed-shared-element-transitions-part3b.html
+        Log.v(LOG_TAG, "scheduleStartPostponedTransition, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+        if (view == null) {    //simple transition
+            supportStartPostponedEnterTransition(); //does not work as expected
+
+        } else {    // shared element transition
+            view.getViewTreeObserver().addOnPreDrawListener(
+                    new ViewTreeObserver.OnPreDrawListener() {
+                        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                        @Override
+                        public boolean onPreDraw() {
+                            view.getViewTreeObserver().removeOnPreDrawListener(this);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                supportStartPostponedEnterTransition();
+                            }
+                            return true;
+                        }
+                    });
+        }
     }
 }

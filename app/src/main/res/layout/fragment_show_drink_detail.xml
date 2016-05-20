@@ -43,6 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:transitionName="@string/shared_transition_drink_producer"
                 android:text="@string/example_brewery"/>
         </LinearLayout>
 
@@ -96,6 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:transitionName="@string/shared_transition_drink_drink"
                 android:text="@string/example_drink_name"/>
         </LinearLayout>
 

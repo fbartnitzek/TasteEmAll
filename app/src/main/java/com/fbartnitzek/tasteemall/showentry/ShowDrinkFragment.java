@@ -1,9 +1,11 @@
 package com.fbartnitzek.tasteemall.showentry;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
@@ -159,6 +161,12 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
                             getString(readableDrinkTypeIndex)));
             mDrinkNameLabelView.setText(readableDrinkTypeIndex);
 
+            int drinkId = DatabaseContract.getIdFromUri(mUri);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_drink_drink + drinkId));
+                mProducerNameView.setTransitionName(getString(R.string.shared_transition_drink_producer + drinkId));
+            }
+
             mProducer_Id = data.getInt(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER__ID);
             String producerName = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_NAME);
             mProducerNameView.setText(producerName);
@@ -173,6 +181,12 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
             mDrinkIngredientsView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_INGREDIENTS));
 
             updateToolbar();
+
+            // resume activity enter transition
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ((ShowDrinkActivity) getActivity()).scheduleStartPostponedTransition(mDrinkNameView);
+            }
+
         }
     }
 
@@ -193,9 +207,18 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     public void onClick(View v) {
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
             Log.v(LOG_TAG, "onClick, producerName=" + mProducerNameView.getText().toString() + ", " + "producerId = [" + mProducer_Id + "]");
+            Bundle bundle = null;
+            // TODO: just 1 direction...
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {;
+                bundle = ActivityOptions.makeSceneTransitionAnimation(
+                        getActivity(),
+                        mProducerNameView,
+                        getString(R.string.shared_transition_producer_producer) + mProducer_Id
+                ).toBundle();
+            }
             startActivity(
                     new Intent(getActivity(), ShowProducerActivity.class)
-                            .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)));
+                            .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)), bundle);
         }
     }
 }

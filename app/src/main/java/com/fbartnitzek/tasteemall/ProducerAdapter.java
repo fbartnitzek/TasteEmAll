@@ -3,6 +3,7 @@ package com.fbartnitzek.tasteemall;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,6 +66,12 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         mCursor.moveToPosition(position);
 
         String producerName = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int id = mCursor.getInt(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER__ID);
+            viewHolder.nameView.setTransitionName(mContext.getString(R.string.shared_transition_producer_producer) + id);
+        }
+
         viewHolder.nameView.setText(producerName);
         viewHolder.nameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
 

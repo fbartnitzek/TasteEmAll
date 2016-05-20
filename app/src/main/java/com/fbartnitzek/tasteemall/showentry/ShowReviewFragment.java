@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall.showentry;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -197,8 +199,8 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             int reviewId = DatabaseContract.getIdFromUri(mUri);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {    //shared element transition
-                mProducerNameView.setTransitionName(getString(R.string.shared_transition_producer) + reviewId);
-                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_drink) + reviewId);
+                mProducerNameView.setTransitionName(getString(R.string.shared_transition_review_producer) + reviewId);
+                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_review_drink) + reviewId);
             }
 
             String producerName = data.getString(ShowQuery.COL_PRODUCER_NAME);
@@ -246,13 +248,31 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     public void onClick(View v) {
         Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
+            Bundle bundle = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                bundle = ActivityOptions.makeSceneTransitionAnimation(
+                        getActivity(),
+                        new Pair<View, String>(mProducerNameView,
+                                getString(R.string.shared_transition_producer_producer) + mProducer_Id)
+                ).toBundle();
+            }
             startActivity(
                     new Intent(getActivity(), ShowProducerActivity.class)
-                        .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)));
+                        .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)), bundle);
         } else if (v.getId() == R.id.drink_name && mDrink_Id > -1) {    // open drink
+            Bundle bundle = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                bundle = ActivityOptions.makeSceneTransitionAnimation(
+                        getActivity(),
+                        new Pair<View, String>(mProducerNameView,
+                                getString(R.string.shared_transition_drink_producer) + mDrink_Id),
+                        new Pair<View, String>(mDrinkNameView,
+                                getString(R.string.shared_transition_drink_drink) + mDrink_Id)
+                ).toBundle();
+            }
             startActivity(
                     new Intent(getActivity(), ShowDrinkActivity.class)
-                        .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)));
+                        .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)), bundle);
         } else if (v.getId() == R.id.fab_share && mProducer_Id > -1) {  // all loaded
             shareReview();
         }

@@ -5,6 +5,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -143,19 +144,34 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         mDrinkAdapter = new DrinkAdapter(new DrinkAdapter.DrinkAdapterClickHandler() {
             @Override
-            public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder viewHolder) {
+            public void onClick(String drinkName, Uri contentUri, DrinkAdapter.ViewHolder vh) {
+                Bundle bundle = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    bundle = ActivityOptions.makeSceneTransitionAnimation(
+                            getActivity(),
+                            new Pair<View, String>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
+                            new Pair<View, String>(vh.producerNameView, vh.producerNameView.getTransitionName())
+                    ).toBundle();
+                }
                 Intent intent = new Intent(getActivity(), ShowDrinkActivity.class)
                         .setData(contentUri);
-                startActivity(intent);
+                startActivity(intent, bundle);
             }
         }, getActivity());
 
         mProducerAdapter = new ProducerAdapter(new ProducerAdapter.ProducerAdapterClickHandler() {
             @Override
-            public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder viewHolder) {
+            public void onClick(String producerName, Uri contentUri, ProducerAdapter.ViewHolder vh) {
+                Bundle bundle = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    bundle = ActivityOptions.makeSceneTransitionAnimation(
+                            getActivity(),
+                            new Pair<View, String>(vh.nameView, vh.nameView.getTransitionName())
+                    ).toBundle();
+                }
                 Intent intent = new Intent(getActivity(), ShowProducerActivity.class)
                         .setData(contentUri);
-                startActivity(intent);
+                startActivity(intent, bundle);
             }
         }, getActivity());
 
@@ -424,7 +440,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 //            Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
             Intent intent = new Intent(getActivity(), AddReviewActivity.class);
 //            startActivityForResult(intent, ADD_DRINK_REQUEST);
-            startActivityForResult(intent, ADD_REVIEW_REQUEST);
+
+
+            Bundle bundle = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                bundle = ActivityOptions.makeScaleUpAnimation(
+                        v, 0, 0, v.getWidth(), v.getHeight()).toBundle();
+            }
+
+            startActivityForResult(intent, ADD_REVIEW_REQUEST, bundle);
         }
     }
 

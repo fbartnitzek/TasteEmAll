@@ -4,12 +4,14 @@ package com.fbartnitzek.tasteemall.addentry;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
@@ -232,6 +234,10 @@ public class AddReviewFragment extends Fragment implements
             updateLocation();
         }
 
+        if (mContentUri == null) {
+            resumeActivityEnterTransition();    // from add
+        }
+
         return mRootView;
     }
 
@@ -446,9 +452,15 @@ public class AddReviewFragment extends Fragment implements
 
     private void createDrink() {
         Log.v(LOG_TAG, "createDrink, hashCode=" + this.hashCode() + ", " + "");
+        Bundle bundle = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            View button = mRootView.findViewById(R.id.add_drink_button);
+            bundle = ActivityOptions.makeScaleUpAnimation(
+                    button, 0, 0, button.getWidth(), button.getHeight()).toBundle();
+        }
         Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
         intent.putExtra(AddDrinkActivity.PATTERN_EXTRA, mEditCompletionDrinkName.getText().toString().trim());
-        startActivityForResult(intent, DRINK_ACTIVITY_REQUEST_CODE);
+        startActivityForResult(intent, DRINK_ACTIVITY_REQUEST_CODE, bundle);
     }
 
 
@@ -532,6 +544,8 @@ public class AddReviewFragment extends Fragment implements
                     mEditReviewLocation.setText(location);
 
                     updateToolbar();
+
+                    resumeActivityEnterTransition();    // from edit
 
                     Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
                 }
@@ -730,6 +744,15 @@ public class AddReviewFragment extends Fragment implements
             mGeocodingRunning = false;
 
         }
+    }
 
+
+    private void resumeActivityEnterTransition() {
+        Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // not that important which one - but is lowest :-)
+            ((AddReviewActivity) getActivity()).scheduleStartPostponedTransition(mEditReviewUser);
+        }
     }
 }

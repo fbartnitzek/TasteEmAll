@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:transitionName="@string/shared_transition_producer"
+                android:transitionName="@string/shared_transition_review_producer"
                 android:text="@string/example_brewery"/>
         </LinearLayout>
 
@@ -101,7 +101,7 @@
                 android:focusable="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:transitionName="@string/shared_transition_drink"
+                android:transitionName="@string/shared_transition_review_drink"
                 android:layout_gravity="center"
                 android:text="@string/example_drink_name"/>
         </LinearLayout>

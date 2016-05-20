@@ -2,9 +2,11 @@ package com.fbartnitzek.tasteemall.addentry;
 
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -240,16 +242,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                getActivity().finish();
-//                return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -354,11 +346,17 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     private void createProducer() {
         Log.v(LOG_TAG, "createProducer, hashCode=" + this.hashCode() + ", " + "");
+        Bundle bundle = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            View button = mRootView.findViewById(R.id.add_producer_button);
+            bundle = ActivityOptions.makeScaleUpAnimation(
+                    button, 0, 0, button.getWidth(), button.getHeight()).toBundle();
+        }
         Intent intent = new Intent(getActivity(), AddProducerActivity.class);
         // use pre filled name
         intent.putExtra(AddProducerActivity.PRODUCER_NAME_EXTRA,
                 mEditCompletionProducerName.getText().toString().trim());
-        startActivityForResult(intent, PRODUCER_ACTIVITY_REQUEST_CODE);
+        startActivityForResult(intent, PRODUCER_ACTIVITY_REQUEST_CODE, bundle);
     }
 
     @Override

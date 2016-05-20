@@ -3,6 +3,7 @@ package com.fbartnitzek.tasteemall;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,13 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int id = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
+            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink + id));
+            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer + id));
+        }
 
         String producerName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME);
         holder.producerNameView.setText(producerName);

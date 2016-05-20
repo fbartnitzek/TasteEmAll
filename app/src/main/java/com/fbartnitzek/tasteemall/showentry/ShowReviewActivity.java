@@ -142,19 +142,19 @@ public class ShowReviewActivity extends AppCompatActivity {
      *     element depends on data queried by a Loader).
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public void scheduleStartPostponedTransition(final View sharedElement) {
+    public void scheduleStartPostponedTransition(final View view) {
         // http://www.androiddesignpatterns.com/2015/03/activity-postponed-shared-element-transitions-part3b.html
-        Log.v(LOG_TAG, "scheduleStartPostponedTransition, hashCode=" + this.hashCode() + ", " + "sharedElement = [" + sharedElement + "]");
-        if (sharedElement == null) {    //simple transition
+        Log.v(LOG_TAG, "scheduleStartPostponedTransition, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+        if (view == null) {    //simple transition
             supportStartPostponedEnterTransition(); //does not work as expected
 
         } else {    // shared element transition
-                sharedElement.getViewTreeObserver().addOnPreDrawListener(
+                view.getViewTreeObserver().addOnPreDrawListener(
                         new ViewTreeObserver.OnPreDrawListener() {
                             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                             @Override
                             public boolean onPreDraw() {
-                                sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
+                                view.getViewTreeObserver().removeOnPreDrawListener(this);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                     supportStartPostponedEnterTransition();
                                 }

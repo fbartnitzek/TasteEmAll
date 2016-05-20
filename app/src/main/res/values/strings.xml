@@ -241,11 +241,13 @@
 
 
     <!-- transitions -->
-    <string name="shared_transition_drink" translatable="false">shared_transition_drink</string>
-    <string name="shared_transition_producer" translatable="false">shared_transition_producer</string>
-    <string name="shared_transition_producer_location" translatable="false">shared_transition_producer_location</string>
-    <string name="shared_transition_user" translatable="false">shared_transition_user</string>
-
+    <string name="shared_transition_review_drink" translatable="false">shared_transition_review_drink</string>
+    <string name="shared_transition_review_producer" translatable="false">shared_transition_review_producer</string>
+    <!--<string name="shared_transition_producer_location" translatable="false">shared_transition_producer_location</string>-->
+    <!--<string name="shared_transition_user" translatable="false">shared_transition_user</string>-->
+    <string name="shared_transition_drink_drink" translatable="false">shared_transition_drink_drink</string>
+    <string name="shared_transition_drink_producer" translatable="false">shared_transition_drink_producer</string>
+    <string name="shared_transition_producer_producer" translatable="false">shared_transition_producer_producer</string>
 
     <!-- examples-->
     <string name="example_review_date">20160509</string>

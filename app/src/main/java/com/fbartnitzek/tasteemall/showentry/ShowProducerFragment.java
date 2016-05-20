@@ -2,6 +2,7 @@ package com.fbartnitzek.tasteemall.showentry;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -141,6 +142,10 @@ public class ShowProducerFragment extends ShowBaseFragment {
             mProducerDescriptionView.setText(description);
 
             updateToolbar();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ((ShowProducerActivity) getActivity()).scheduleStartPostponedTransition(mProducerNameView);
+            }
 
             Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }

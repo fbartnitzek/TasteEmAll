@@ -34,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingBottom="8dp"
+                android:transitionName="@string/shared_transition_producer_producer"
                 android:text="@string/example_brewery"/>
         </LinearLayout>
 

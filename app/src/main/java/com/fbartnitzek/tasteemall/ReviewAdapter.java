@@ -62,11 +62,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
 
         String drinkName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_NAME);
 
-        int id = mCursor.getInt(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW__ID);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_producer) + id);
-            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink) + id);
+            int id = mCursor.getInt(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW__ID);
+            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_producer) + id);
+            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_drink) + id);
         }
 
         holder.drinkNameView.setText(drinkName);

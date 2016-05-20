@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:maxLines="3"
             android:gravity="center"
-            android:transitionName="@string/shared_transition_producer"
+            android:transitionName="@string/shared_transition_review_producer"
             android:text="@string/example_brewery"/>
 
         <TextView
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:maxLines="3"
             android:gravity="center"
-            android:transitionName="@string/shared_transition_drink"
+            android:transitionName="@string/shared_transition_review_drink"
             android:text="@string/example_drink_name"/>
     </LinearLayout>
 
