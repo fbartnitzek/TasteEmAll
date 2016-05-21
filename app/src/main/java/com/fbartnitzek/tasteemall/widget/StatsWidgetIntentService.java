@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -75,7 +76,6 @@ public class StatsWidgetIntentService extends IntentService{
                     getString(R.string.widget_statistics_reviews, numReviews));
 
             // seems to be impossible to get contentDescription for whole widget...
-            // TODO: might sometimes not update widget after update without delete ... later
 //            views.setContentDescription(R.id.widget_layout,
 //                    getString(R.string.a11y_widget_statistics_all, numProducers, numDrinks, numReviews));
 
@@ -84,15 +84,18 @@ public class StatsWidgetIntentService extends IntentService{
 
 
             // set on click listener for add and search on every update (kind of useless...)
-            // add button
-            PendingIntent pi = PendingIntent.getActivity(this,
-                    0, new Intent(this, AddReviewActivity.class), 0);
-            views.setOnClickPendingIntent(R.id.widget_add_button, pi);
+
+            // add button - create backStack for add
+            Intent addIntent = new Intent(this, AddReviewActivity.class);
+            PendingIntent addPendingIntent = TaskStackBuilder.create(this)
+                    .addNextIntentWithParentStack(addIntent)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_add_button, addPendingIntent);
 
             // search button
-            PendingIntent pi2 = PendingIntent.getActivity(this,
+            PendingIntent searchPendingIntent = PendingIntent.getActivity(this,
                     0, new Intent(this, MainActivity.class), 0);
-            views.setOnClickPendingIntent(R.id.widget_search_button, pi2);
+            views.setOnClickPendingIntent(R.id.widget_search_button, searchPendingIntent);
 
             // update each StatsWidget
             appWidgetManager.updateAppWidget(appWidgetId, views);
