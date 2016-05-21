@@ -297,7 +297,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         }
     }
 
-    private void restartLoaders() {
+    public void restartLoaders() {
         Log.v(LOG_TAG, "restartLoaders, hashCode=" + this.hashCode() + ", " + "");
         getLoaderManager().restartLoader(REVIEW_LOADER_ID, null, this);
         getLoaderManager().restartLoader(DRINK_LOADER_ID, null, this);

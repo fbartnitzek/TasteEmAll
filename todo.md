@@ -24,8 +24,8 @@
 
 - Building
     - App builds from a clean repository checkout with no additional configuration. - DONE
-    - App builds and deploys using the installRelease Gradle task. - TODO
-    - App is equipped with a signing configuration, and the keystore and passwords are included in the repository. Keystore is referred to by a relative path.  - TODO
+    - App builds and deploys using the installRelease Gradle task. - DONE
+    - App is equipped with a signing configuration, and the keystore and passwords are included in the repository. Keystore is referred to by a relative path.  - DONE
     - All app dependencies are managed by Gradle. - DONE
 
 - Data Persistence
@@ -95,6 +95,7 @@
 - use GridLayout for Add / ShowEntries ...
 - GeoCoder ask on start (with notification...)
     - ungeocoded entries in widget ;-)
+- proguard warnings in release: http://proguard.sourceforge.net/manual/troubleshooting.html#duplicateclass
     
 ## bugs
 - wrong layout for widget (version-padding not working as expected)

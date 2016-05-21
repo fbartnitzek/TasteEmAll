@@ -258,6 +258,10 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
         // need at least 3 lines => toast
 //        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
+        MainFragment fragment = getFragment();
+        if (fragment != null) {
+            fragment.restartLoaders();
+        }
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 }
