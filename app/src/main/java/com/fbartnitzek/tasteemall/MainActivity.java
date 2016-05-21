@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
             MainFragment fragment = getFragment();
             if (fragment == null) { //create new fragment
-                Log.v(LOG_TAG, "onCreate - add a new fragment, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - add a new fragment, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 fragment = new MainFragment();
 
                 getSupportFragmentManager().beginTransaction()
@@ -51,11 +51,11 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                         .commit();
 
             } else {    // use old fragment
-                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
             }
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
             }
 
         } else {
@@ -69,16 +69,8 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         return (MainFragment) getSupportFragmentManager().findFragmentByTag(MAIN_FRAGMENT_TAG);
     }
 
-    // might be better in the fragment...
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Log.v(LOG_TAG, "onSaveInstanceState - just call super, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
-        super.onSaveInstanceState(outState);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -105,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
             case R.id.action_show_map:
                 startShowMap();
                 return true;
-            default:
-
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
@@ -115,19 +105,21 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     private void startShowMap() {
         Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
         if (Utils.isNetworkUnavailable(this)) {
-            Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_show_map_no_network, Snackbar.LENGTH_LONG).show();
+            View view = findViewById(R.id.fragment_detail_layout);
+            if (view != null) {
+                Snackbar.make(view, R.string.msg_show_map_no_network, Snackbar.LENGTH_LONG).show();
+            }
             return;
         }
         MainFragment fragment = getFragment();
         Intent intent = new Intent(this, ShowMapActivity.class);
 
         if (fragment != null) {
-            Log.v(LOG_TAG, "startShowMap, currentReviewsUri=" + fragment.getmCurrentReviewsUri() + ", currentProducersUri=" + fragment.getmCurrentProducersUri());
+//            Log.v(LOG_TAG, "startShowMap, currentReviewsUri=" + fragment.getmCurrentReviewsUri() + ", currentProducersUri=" + fragment.getmCurrentProducersUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI, fragment.getmCurrentReviewsUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
             intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
             intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
-
         }
 
 //        item.expandActionView();
@@ -152,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     }
 
     private void startExport() {
-        Log.v(LOG_TAG, "startExport, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "startExport, hashCode=" + this.hashCode() + ", " + "");
         Intent intent = new Intent(this, FilePickerActivity.class);
 
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
@@ -165,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
     }
 
     private void startImport() {
-        Log.v(LOG_TAG, "startImport, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "startImport, hashCode=" + this.hashCode() + ", " + "");
         Intent intent = new Intent(this, FilePickerActivity.class);
 
         intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
@@ -178,10 +170,13 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
     private void startGeocoding() {
         if (Utils.isNetworkUnavailable(this)) {
-            Snackbar.make(findViewById(R.id.fragment_detail_layout), R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
+            View view = findViewById(R.id.fragment_detail_layout);
+            if (view != null) {
+                Snackbar.make(view, R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
+            }
             return;
         }
-        Log.v(LOG_TAG, "startGeocoding, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "startGeocoding, hashCode=" + this.hashCode() + ", " + "");
         new GeocodeReviewsTask(this, new GeocodeReviewsTask.GeocodeReviewsUpdatedHandler() {
             @Override
             public void onUpdatedReviews(String msg) {
@@ -197,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
         if (requestCode == REQUEST_EXPORT_DIR_CODE || requestCode == REQUEST_IMPORT_FILES_CODE
                 && resultCode == AppCompatActivity.RESULT_OK) {
-            Uri uri = null;
+            Uri uri;
             if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
 
                 List<File> files = new ArrayList<>();
@@ -208,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                     if (clip != null) {
                         for (int i = 0; i < clip.getItemCount(); i++) {
                             uri = clip.getItemAt(i).getUri();
-                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+//                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                             files.add(new File(uri.getPath()));
                             // Do something with the URI
                         }
@@ -221,19 +216,19 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                     if (paths != null) {
                         for (String path : paths) {
                             uri = Uri.parse(path);  // TODO: might be useless conversion...
-                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+//                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                             files.add(new File(uri.getPath()));
                         }
                     }
                 }
 
                 if (!files.isEmpty() && requestCode == REQUEST_IMPORT_FILES_CODE) {
-                    new ImportFilesTask(this, this).execute(files);
+                    new ImportFilesTask(this, this).execute(files.toArray(new File[files.size()]));
 
                 }
 
             } else {
-                Log.v(LOG_TAG, "onActivityResult - single file, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+//                Log.v(LOG_TAG, "onActivityResult - single file, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                 uri = data.getData();
                 // Do something with the URI
                 if (uri != null && requestCode == REQUEST_EXPORT_DIR_CODE) {

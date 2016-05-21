@@ -30,6 +30,7 @@ import com.fbartnitzek.tasteemall.data.pojo.Drink;
  * limitations under the License.
  */
 
+@SuppressWarnings("ALL")
 public class TestProvider extends AndroidTestCase {
 
     private void deleteAllRecordsThroughProvider() {
@@ -102,7 +103,7 @@ public class TestProvider extends AndroidTestCase {
 
     public void testInsertReadProvider() {
 
-        TestUtils.TestContentObserver tco = TestUtils.getTestContentObserver();
+        TestUtils.TestContentObserver tco;
 //        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
 //
 //        // location

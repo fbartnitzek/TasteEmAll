@@ -33,7 +33,7 @@ import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
  * A simple {@link Fragment} subclass.
  * to handle interaction events.
  */
-public class AddProducerFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class AddProducerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EDIT_PRODUCER_LOADER_ID = 12345;
     private static final String STATE_PRODUCER_NAME = "STATE_PRODUCER_NAME";
@@ -83,7 +83,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mRootView = inflater.inflate(R.layout.fragment_add_producer, container, false);
 
         mEditProducerName = (EditText) mRootView.findViewById(R.id.producer_name);
-        Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "producerName = " + mProducerName);
+//        Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "producerName = " + mProducerName);
         mEditProducerName.setText(mProducerName);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -118,7 +118,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
             activity.setSupportActionBar(toolbar);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar == null) {
-                Log.v(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
+//                Log.v(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
                 return;
             }
 
@@ -146,7 +146,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     }
 
     private void updateToolbar(String producerName) {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
+//        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         if (activity.getSupportActionBar() != null) {
             ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
@@ -179,19 +179,15 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
         if (mContentUri != null) {
-            Log.v(LOG_TAG, "onActivityCreated with contentUri - edit, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//            Log.v(LOG_TAG, "onActivityCreated with contentUri - edit, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
             getLoaderManager().initLoader(EDIT_PRODUCER_LOADER_ID, null, this);
-        } else {
-            Log.v(LOG_TAG, "onActivityCreated without contentUri - add, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//        } else {
+//            Log.v(LOG_TAG, "onActivityCreated without contentUri - add, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
-    public void onClick(View view) {
-        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
-    }
 
     private void insertData(String producerName, String location) {
         new InsertEntryTask(
@@ -294,14 +290,14 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
             resumeActivityEnterTransition();    // from edit
 
-            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website + "], description= [" + description + "]");
+//            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website + "], description= [" + description + "]");
         }
     }
 
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+//        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
 
     }
 

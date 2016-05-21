@@ -42,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity {
          * is changed.)
          */
         private void bindPreferenceSummaryToValue(Preference preference) {
-            Log.v(LOG_TAG, "bindPreferenceSummaryToValue, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "]");
+//            Log.v(LOG_TAG, "bindPreferenceSummaryToValue, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "]");
             // Set the listener to watch for value changes.
             preference.setOnPreferenceChangeListener(this);
 
@@ -56,7 +56,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 
         private void setPreferenceSummary(Preference preference, Object value) {
-            Log.v(LOG_TAG, "setPreferenceSummary, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "], value = [" + value + "]");
+//            Log.v(LOG_TAG, "setPreferenceSummary, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "], value = [" + value + "]");
             String stringValue = value.toString();
 //            String key = preference.getKey();
 
@@ -68,25 +68,6 @@ public class SettingsActivity extends PreferenceActivity {
                 if (prefIndex >= 0) {
                     preference.setSummary(listPreference.getEntries()[prefIndex]);
                 }
-
-//        } else if (getString(R.string.pref_location_key).equals(key)) {
-//            @SunshineSyncAdapter.LocationStatus int status = Utility.getLocationStatus(this);
-//            switch (status) {
-//                case SunshineSyncAdapter.LOCATION_STATUS_OK:
-//                    preference.setSummary(stringValue);
-//                    break;
-//                case SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN:
-//                    preference.setSummary(getString(R.string.pref_location_unknown_description,
-//                            value.toString()));
-//                    break;
-//                case SunshineSyncAdapter.LOCATION_STATUS_INVALID:
-//                    preference.setSummary(getString(R.string.pref_location_error_description,
-//                            value.toString()));
-//                    break;
-//                default:
-//                    // Note --- if the server is down we still assume the value is valid
-//                    preference.setSummary(stringValue);
-//            }
             } else {
                 // For other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);

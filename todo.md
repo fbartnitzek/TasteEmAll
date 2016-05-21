@@ -44,7 +44,7 @@
         - multiple notifications might stack in one notification object
         - indicate context change like incoming message
         - expose information/controls to ongoing events like music playback
-    - Sharing functionality (paragraph of text, link, description, image, ...)  - DONE
+    - Sharing functionality (paragraph of text, link, description, image, ...)  - DONE, pic would be nice
     - custom view if needed
     
 ## essential further improvements
@@ -93,6 +93,8 @@
 - showHelpFragment/Dialog
 - icons for drinkTypes in MainFragment-lists, ...
 - use GridLayout for Add / ShowEntries ...
+- GeoCoder ask on start (with notification...)
+    - ungeocoded entries in widget ;-)
     
 ## bugs
 - wrong layout for widget (version-padding not working as expected)

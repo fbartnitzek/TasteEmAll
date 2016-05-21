@@ -66,7 +66,7 @@ public class PopulateMapTask extends AsyncTask<Uri, Void, Map<LatLng, PopulateMa
 
     @Override
     protected Map<LatLng, PopulateMapTask.MarkerInfo> doInBackground(Uri... params) {
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
+//        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0 || params[0] == null) {
             mMessage = mActivity.getString(R.string.msg_invalid_selection_for_map);
             return null;
@@ -167,7 +167,7 @@ public class PopulateMapTask extends AsyncTask<Uri, Void, Map<LatLng, PopulateMa
         public LatLng latLng;
         public String location;
         private String title;
-        public Map<Long, String> reviews = new HashMap<>();
+        public final Map<Long, String> reviews = new HashMap<>();
         MarkerOptions markerOptions;
 
         public String getTitle() {

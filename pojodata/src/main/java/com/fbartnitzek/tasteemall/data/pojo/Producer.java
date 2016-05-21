@@ -31,6 +31,7 @@ public class Producer {
     private String website;
     private String location;
 
+    // currently not used
     public Producer(String producerId, String description, String location, String name, String website) {
         this.producerId = producerId;
         this.description= description;

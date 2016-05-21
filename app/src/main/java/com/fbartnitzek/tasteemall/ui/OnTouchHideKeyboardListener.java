@@ -26,7 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 
 public class OnTouchHideKeyboardListener implements View.OnTouchListener {
 
-    Fragment fragment;
+    private final Fragment fragment;
 
     public OnTouchHideKeyboardListener(Fragment fragment) {
         this.fragment = fragment;

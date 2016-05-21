@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,10 +115,10 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         @Override
         public void onClick(View view) {
             mCursor.moveToPosition(getAdapterPosition());
-            Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+//            Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
             int producerId = mCursor.getInt(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER__ID);
             Uri contentUri = DatabaseContract.ProducerEntry.buildUri(producerId);
-            Log.v(LOG_TAG, "onClick, producerId=" + producerId + ", contentUri= " +  contentUri + ", hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+//            Log.v(LOG_TAG, "onClick, producerId=" + producerId + ", contentUri= " +  contentUri + ", hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
             mClickHandler.onClick(
                     mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME),
                     contentUri,

@@ -29,7 +29,7 @@ public class AddDrinkActivity extends AppCompatActivity {
         if (findViewById(R.id.container_add_drink_fragment) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
@@ -49,7 +49,7 @@ public class AddDrinkActivity extends AppCompatActivity {
                         .add(R.id.container_add_drink_fragment, fragment, ADD_DRINK_FRAGMENT_TAG)
                         .commit();
             } else {
-                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
+//                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
         } else {
@@ -61,7 +61,6 @@ public class AddDrinkActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.menu_add, menu);
         return true;
     }
@@ -80,7 +79,6 @@ public class AddDrinkActivity extends AppCompatActivity {
             case R.id.action_save:
                 AddDrinkFragment fragment = getFragment();
                 if (fragment != null) {
-                    Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
                 }
                 return true;

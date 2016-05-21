@@ -39,6 +39,8 @@ public class Drink {
 
     private String producerId;
 
+    // currently not used
+
     public Drink(String drinkId, Producer producer, String name, String style, String specifics, String type, String ingredients) {
 
         this.drinkId = drinkId;

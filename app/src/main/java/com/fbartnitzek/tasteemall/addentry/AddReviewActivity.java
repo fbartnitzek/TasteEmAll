@@ -27,7 +27,7 @@ public class AddReviewActivity extends AppCompatActivity {
         if (findViewById(R.id.container_add_review_fragment) != null) {
 
             if (savedInstanceState != null) {   // no overlapping fragments on return
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
@@ -46,7 +46,7 @@ public class AddReviewActivity extends AppCompatActivity {
                         .add(R.id.container_add_review_fragment, fragment, ADD_REVIEW_FRAGMENT_TAG)
                         .commit();
             } else {
-                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
+//                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
         } else {
@@ -62,7 +62,6 @@ public class AddReviewActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.menu_add, menu);
         return true;
     }
@@ -77,7 +76,6 @@ public class AddReviewActivity extends AppCompatActivity {
             case R.id.action_save:
                 AddReviewFragment fragment = getFragment();
                 if (fragment != null) {
-                    Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
                 }
                 return true;

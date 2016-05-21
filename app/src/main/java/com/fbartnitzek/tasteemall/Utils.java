@@ -50,8 +50,8 @@ public class Utils {
 //        );
 //    }
 
-    static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    static final SimpleDateFormat filePrefixFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat filePrefixFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     public static final String GEOCODE_ME = "geocode_me";
     private static final String LAT_PREFIX = "_lat_";
     private static final String LONG_PREFIX = "_long_";
@@ -149,7 +149,7 @@ public class Utils {
     }
 
     public static String getCurrentLocalTimePrefix() {
-        return "_" + filePrefixFormat.format(new java.util.Date());
+        return filePrefixFormat.format(new java.util.Date());
     }
 
     public static String formatDateTime(Context context, String timeToFormat) {
@@ -158,7 +158,7 @@ public class Utils {
 
 //        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Date date = null;
+        Date date;
         if (timeToFormat != null) {
             try {
                 date = iso8601Format.parse(timeToFormat);
@@ -193,7 +193,7 @@ public class Utils {
         if (isoTime == null) {
             return null;
         }
-        Date date = null;
+        Date date;
         try {
             date = iso8601Format.parse(isoTime);
         } catch (ParseException e) {

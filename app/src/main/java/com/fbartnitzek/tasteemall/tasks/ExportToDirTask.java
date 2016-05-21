@@ -13,6 +13,7 @@ import com.fbartnitzek.tasteemall.data.csv.CsvFileWriter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
 
     @Override
     protected String doInBackground(File... params) {
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
+//        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0) {
             return mActivity.getString(R.string.msg_no_export_directory);
         }
@@ -84,10 +85,10 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
 
     private String exportEntries(Uri contentUri, String[] columns, File dir, String entries) {
 
-        String fileName = EXPORT_PREFIX + entries + Utils.getCurrentLocalTimePrefix() + ".csv";
+        String fileName = EXPORT_PREFIX + Utils.getCurrentLocalTimePrefix() + "_" + entries +  mActivity.getString(R.string.file_extension);
         File file = new File(dir, fileName);
 
-        Log.v(LOG_TAG, "exportEntries, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
+//        Log.v(LOG_TAG, "exportEntries, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
         
         Cursor cursor = mActivity.getContentResolver().query(
                 contentUri, columns, null, null, null);
@@ -112,7 +113,7 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                         entries, cursor.getCount());
 //                        entries, cursor.getCount(), file.getName());
             } else {
-                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
+                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], dir = [" + dir + "], entries = [" + entries + "]");
                 message = mActivity.getString(R.string.msg_writing_entries_failed, entries);
             }
 

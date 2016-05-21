@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.fbartnitzek.tasteemall.MainActivity;
@@ -44,7 +43,7 @@ public class StatsWidgetIntentService extends IntentService{
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Log.v(LOG_TAG, "onHandleIntent, hashCode=" + this.hashCode() + ", " + "intent = [" + intent + "]");
+//        Log.v(LOG_TAG, "onHandleIntent, hashCode=" + this.hashCode() + ", " + "intent = [" + intent + "]");
 
         // get all widget ids
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
@@ -58,7 +57,7 @@ public class StatsWidgetIntentService extends IntentService{
         int numReviews = queryAndGetCount(
                 DatabaseContract.ReviewEntry.CONTENT_URI, QueryColumns.Widget.ReviewQuery.COLUMNS);
 
-        Log.v(LOG_TAG, "onHandleIntent, producer=" + numProducers + ", drinks=" + numDrinks + ", reviews=" + numReviews);
+//        Log.v(LOG_TAG, "onHandleIntent, producer=" + numProducers + ", drinks=" + numDrinks + ", reviews=" + numReviews);
 
         for (int appWidgetId : appWidgetIds) {
             // dynamically adapt widget width ... later

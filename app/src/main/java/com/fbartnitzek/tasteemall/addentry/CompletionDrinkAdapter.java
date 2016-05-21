@@ -3,7 +3,6 @@ package com.fbartnitzek.tasteemall.addentry;
 import android.app.Activity;
 import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
@@ -55,7 +54,7 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
     @Override
     public void setViewText(TextView v, String text) {
-        Log.v(LOG_TAG, "setViewText, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], text = [" + text + "]");
+//        Log.v(LOG_TAG, "setViewText, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], text = [" + text + "]");
         switch (v.getId()) {
             case R.id.list_item_producer_name:
                 v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
@@ -78,7 +77,6 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         // uri with name for drink or producer... (currently just drink)
-        Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
         return mActivity.getContentResolver().query(
                 DatabaseContract.DrinkEntry.buildUriWithName(String.valueOf(constraint)),
                 QueryColumns.ReviewFragment.CompletionQuery.COLUMNS,
@@ -89,7 +87,6 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
         String drinkName = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_NAME);
         String drinkId = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_ID);
         int drink_Id = cursor.getInt(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK__ID);

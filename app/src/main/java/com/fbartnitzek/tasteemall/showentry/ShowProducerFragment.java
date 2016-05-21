@@ -66,7 +66,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
             if (args.containsKey(ShowProducerActivity.EXTRA_PRODUCER_URI)) {
                 mUri = args.getParcelable(ShowProducerActivity.EXTRA_PRODUCER_URI);
                 calcCompleteUri();
-                Log.v(LOG_TAG, "onCreateView, mUri=" + mUri + ", hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreateView, mUri=" + mUri + ", hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
             }
         }
 
@@ -111,7 +111,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
 
     @Override
     void updateToolbar() {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
@@ -147,7 +147,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
                 ((ShowProducerActivity) getActivity()).scheduleStartPostponedTransition(mProducerNameView);
             }
 
-            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
+//            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }
     }
 

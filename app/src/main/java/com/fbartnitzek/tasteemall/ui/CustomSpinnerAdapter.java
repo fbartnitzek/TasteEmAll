@@ -1,7 +1,6 @@
 package com.fbartnitzek.tasteemall.ui;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,6 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private final ArrayList<String> data;
     private final int spinnerLayout;
     private final int a11yStringId;
-    public Resources res;
     private final LayoutInflater inflater;
 
 

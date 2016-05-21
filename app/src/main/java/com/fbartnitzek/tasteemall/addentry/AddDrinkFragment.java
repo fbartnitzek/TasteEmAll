@@ -217,24 +217,22 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             String readableDrink = getString(Utils.getReadableDrinkNameId(activity, drinkType));
 
             if (mContentUri != null) {
-                Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_drink_activity_preview,
                                 readableDrink));
             } else {
-                Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                                 getString(R.string.title_add_drink_activity,
                                 readableDrink));
             }
 
         } else {
-            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
+//            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
         }
     }
 
     private void updateToolbar(String drinkNameOrDrinkType, String producerName) {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
+//        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
         if (activity.getSupportActionBar()!= null) {
@@ -248,7 +246,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                                 drinkNameOrDrinkType));
             }
         } else {
-            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
+//            Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "drinkNameOrDrinkType = [" + drinkNameOrDrinkType + "], producerName = [" + producerName + "]");
         }
     }
 
@@ -283,15 +281,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             case R.id.add_producer_button:
                 createProducer();
                 break;
-            default:
-                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "useless view = [" + view + "]");
         }
     }
 
 
     void saveData() {
-        Log.v(LOG_TAG, "saveData, hashCode=" + this.hashCode() + ", " + "");
-
         String drinkName = mEditDrinkName.getText().toString().trim();
 
         //validate
@@ -355,7 +349,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     }
 
     private void createProducer() {
-        Log.v(LOG_TAG, "createProducer, hashCode=" + this.hashCode() + ", " + "");
         Bundle bundle = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             bundle = ActivityOptions.makeSceneTransitionAnimation(
@@ -376,7 +369,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         if (mDrinkTypeAdapter == parent.getAdapter()) {
             // resets all to generic - but there is no better way...
             String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
-            Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+//            Log.v(LOG_TAG, "onItemSelected - changed drinkType to: " + drinkType + ", hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
 
             Utils.setSharedPrefsDrinkType(getActivity(), drinkType);
             int drinkTypeIndex = Utils.getDrinkTypeIndexFromSharedPrefs(getActivity(), false);
@@ -397,7 +390,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     }
 
     private void updateProvider(Uri producerUri) {
-        Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
+//        Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
 
         new QueryProducerTask(getActivity(), this).execute(producerUri);
     }

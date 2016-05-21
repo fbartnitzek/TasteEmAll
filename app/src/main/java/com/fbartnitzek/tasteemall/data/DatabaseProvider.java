@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -19,8 +20,6 @@ import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
-
-import java.util.Arrays;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -66,9 +65,8 @@ public class DatabaseProvider extends ContentProvider {
     private static final int REVIEWS_GEOCODE = 530;
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
+
 //    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
-
-
     static {
 //        sBreweryByNameQueryBuilder = new SQLiteQueryBuilder();
 //        sBreweryByNameQueryBuilder.setTables(
@@ -171,7 +169,7 @@ public class DatabaseProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 //        Log.v(LOG_TAG, "query, " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
         Cursor cursor;
         final SQLiteDatabase db = mHelper.getReadableDatabase();
@@ -181,20 +179,20 @@ public class DatabaseProvider extends ContentProvider {
         String drinkType;
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:
-                Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
             case PRODUCERS_BY_NAME:
                 pattern = ProducerEntry.getSearchString(uri);
                 mySelectionArgs = new String[]{"%" + pattern + "%"};
-                Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query - PRODUCERS_BY_NAME, " + pattern + ", uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
 
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_BY_NAME_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
             case PRODUCER_BY_ID:
-                Log.v(LOG_TAG, "query - PRODUCER_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query - PRODUCER_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection,
                         ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
@@ -217,13 +215,13 @@ public class DatabaseProvider extends ContentProvider {
                         mySelectionArgs, null, null, sortOrder);
                 break;
             case DRINK_BY_ID:
-                Log.v(LOG_TAG, "query - DRINK_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query - DRINK_BY_ID, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection,
                         DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
                 break;
             case DRINKS_WITH_PRODUCER_BY_NAME:
-                Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 pattern = DrinkEntry.getSearchString(uri, false);
                 mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
@@ -232,7 +230,7 @@ public class DatabaseProvider extends ContentProvider {
             case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
                 pattern = DrinkEntry.getSearchString(uri, true);
                 drinkType = DrinkEntry.getDrinkType(uri);
-                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 if (Drink.TYPE_ALL.equals(drinkType)){
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
@@ -267,7 +265,7 @@ public class DatabaseProvider extends ContentProvider {
             case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
                 pattern = ReviewEntry.getSearchString(uri, true);
                 drinkType = ReviewEntry.getDrinkType(uri);
-                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
+//                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 // more complicated stuff should be customizable (not by default OR concatenated
                 if (Drink.TYPE_ALL.equals(drinkType)){
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
@@ -295,7 +293,9 @@ public class DatabaseProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        if (getContext() != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
         return cursor;
     }
 
@@ -327,8 +327,8 @@ public class DatabaseProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        Log.v(LOG_TAG, "insert, " + "uri = [" + uri + "], values = [" + values + "]");
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
+//        Log.v(LOG_TAG, "insert, " + "uri = [" + uri + "], values = [" + values + "]");
         final SQLiteDatabase db = mHelper.getWritableDatabase();
         Uri returnUri;
         switch (mUriMatcher.match(uri)) {
@@ -363,13 +363,16 @@ public class DatabaseProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
         return returnUri;
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
-        Log.v(LOG_TAG, "bulkInsert, " + "uri = [" + uri + "], values = [" + Arrays.toString(values) + "]");
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+//        Log.v(LOG_TAG, "bulkInsert, " + "uri = [" + uri + "], values = [" + Arrays.toString(values) + "]");
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int returnCount = 0;
         switch (mUriMatcher.match(uri)) {
@@ -426,13 +429,15 @@ public class DatabaseProvider extends ContentProvider {
             default:
                 return super.bulkInsert(uri, values);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return returnCount;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        Log.v(LOG_TAG, "delete, " + "uri = [" + uri + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "]");
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+//        Log.v(LOG_TAG, "delete, " + "uri = [" + uri + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "]");
         final SQLiteDatabase db = mHelper.getWritableDatabase();
         int deletedRows;
         if (null == selection) selection = "1";
@@ -449,7 +454,7 @@ public class DatabaseProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri:" + uri);
         }
-        if (deletedRows > 0) {
+        if (deletedRows > 0 && getContext() != null) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
@@ -457,8 +462,8 @@ public class DatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        Log.v(LOG_TAG, "update, " + "uri = [" + uri + "], values = [" + values + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "]");
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+//        Log.v(LOG_TAG, "update, " + "uri = [" + uri + "], values = [" + values + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "]");
         final SQLiteDatabase db = mHelper.getWritableDatabase();
         int impactedRows;
         switch (mUriMatcher.match(uri)) {
@@ -489,7 +494,7 @@ public class DatabaseProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if (impactedRows > 0) {
+        if (impactedRows > 0 && getContext() != null) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return impactedRows;
@@ -497,8 +502,8 @@ public class DatabaseProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
-        Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
+    public String getType(@NonNull Uri uri) {
+//        Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
 
         switch (mUriMatcher.match(uri)) {
             case PRODUCERS:

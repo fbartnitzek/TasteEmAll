@@ -295,7 +295,7 @@ public class AddReviewFragment extends Fragment implements
     }
 
     private void createToolbar() {
-        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -314,11 +314,11 @@ public class AddReviewFragment extends Fragment implements
             String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), drinkType));
 
             if (mContentUri != null) {
-                Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
+//                Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_review_activity_preview, readableDrink));
             } else {
-                Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
+//                Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_add_review_activity_preview,
                                 readableDrink));
@@ -331,7 +331,7 @@ public class AddReviewFragment extends Fragment implements
 
 
     private void updateToolbar() {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode());
+//        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode());
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
         if (activity.getSupportActionBar() != null) {
@@ -363,13 +363,11 @@ public class AddReviewFragment extends Fragment implements
             updateDrink(drinkUri);
         }
 
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void updateDrink(Uri drinkUri) {
         Log.v(LOG_TAG, "updateDrink, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
-
         new QueryDrinkTask(getActivity(), this).execute(drinkUri);
     }
 
@@ -443,7 +441,7 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
+//        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
         switch (v.getId()) {
             case R.id.add_drink_button:
                 createDrink();
@@ -562,11 +560,11 @@ public class AddReviewFragment extends Fragment implements
 
                     resumeActivityEnterTransition();    // from edit
 
-                    Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+//                    Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
                 }
                 break;
             default:
-                Log.e(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+                Log.w(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         }
     }
 
@@ -575,7 +573,7 @@ public class AddReviewFragment extends Fragment implements
         // nothing
     }
 
-    protected synchronized void buildGoogleApiClient() {
+    private synchronized void buildGoogleApiClient() {
         Log.v(LOG_TAG, "buildGoogleApiClient, hashCode=" + this.hashCode() + ", " + "");
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
@@ -616,7 +614,7 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-    protected void handlePermission() {
+    private void handlePermission() {
         // src: FilePickerFragment
         // https://developer.android.com/training/permissions/requesting.html
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -625,11 +623,11 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.v(LOG_TAG, "onRequestPermissionsResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], permissions = [" + permissions + "], grantResults = [" + grantResults + "]");
+//        Log.v(LOG_TAG, "onRequestPermissionsResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], permissions = [" + Arrays.toString(permissions) + "], grantResults = [" + Arrays.toString(grantResults) + "]");
         if (REQUEST_LOCATION_PERMISSION_CODE == requestCode && permissions.length > 0) {
             if (PackageManager.PERMISSION_GRANTED == grantResults[0] ||
                     PackageManager.PERMISSION_GRANTED == grantResults[grantResults.length - 1]) { // at least one allowed
-                Log.v(LOG_TAG, "onRequestPermissionsResult - permission granted, try again!");
+//                Log.v(LOG_TAG, "onRequestPermissionsResult - permission granted, try again!");
                 initLocationAndGeoCoder();
             }
         }
@@ -637,7 +635,7 @@ public class AddReviewFragment extends Fragment implements
     }
 
     private void updateLocation() {
-        Log.v(LOG_TAG, "updateLocation - mCurrentLocation: " + mCurrentLocation + ", hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "updateLocation - mCurrentLocation: " + mCurrentLocation + ", hashCode=" + this.hashCode() + ", " + "");
         if (mCurrentLocation != null && mEditReviewLocation != null) {
             mEditReviewLocation.setText(mCurrentLocation);
         }
@@ -645,13 +643,13 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.v(LOG_TAG, "onConnectionSuspended - try again, hashCode=" + this.hashCode() + ", " + "i = [" + i + "]");
+//        Log.v(LOG_TAG, "onConnectionSuspended - try again, hashCode=" + this.hashCode() + ", " + "i = [" + i + "]");
         mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.v(LOG_TAG, "onConnectionFailed, hashCode=" + this.hashCode() + ", " + "connectionResult = [" + connectionResult + "]");
+//        Log.v(LOG_TAG, "onConnectionFailed, hashCode=" + this.hashCode() + ", " + "connectionResult = [" + connectionResult + "]");
     }
 
     @Override
@@ -678,7 +676,7 @@ public class AddReviewFragment extends Fragment implements
     }
 
 
-    protected void startGeocodeService() {
+    private void startGeocodeService() {
         Log.v(LOG_TAG, "startGeocodeService, mGeocodingDone=" + mGeocodingDone + ", hashCode=" + this.hashCode() + ", " + "");
         if (mGeocodingDone || mGeocodingRunning) {
             Log.v(LOG_TAG, "startGeocodeService, geocoding already done");

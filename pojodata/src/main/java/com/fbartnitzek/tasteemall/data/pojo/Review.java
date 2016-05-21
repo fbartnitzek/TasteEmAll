@@ -59,7 +59,7 @@ public class Review {
     private String drinkId;
     private String location;
 
-
+    // currently not used
     public Review(String description, String drinkId, String location, String rating,
                   String readableDate, String recommendedSides, String reviewId, String userName) {
         this.description = description;

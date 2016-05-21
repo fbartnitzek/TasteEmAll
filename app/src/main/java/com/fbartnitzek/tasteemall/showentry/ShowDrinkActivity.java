@@ -24,7 +24,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "SHOw_DRINK_TAG";
     private static final String LOG_TAG = ShowDrinkActivity.class.getName();
     public static final String EXTRA_DRINK_URI = "EXTRA_DRINK_URI";
-    public static final int EDIT_DRINK_REQUEST = 432;
+    private static final int EDIT_DRINK_REQUEST = 432;
     private Uri mContentUri;
 
     @Override
@@ -36,7 +36,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
         // explicitly add fragment with pattern
         if (findViewById(R.id.container_show_drink_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
@@ -65,7 +65,6 @@ public class ShowDrinkActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.menu_show, menu);
         return true;
     }

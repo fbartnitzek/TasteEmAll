@@ -30,10 +30,6 @@ import java.util.Map;
 
 public class CsvFileReader {
 
-    private static final String PRODUCER_LOCATION = "producer_location";
-    private static final String REVIEW_LOCATION = "review_location";
-
-
     /**
      * reads CSV file in data and headers with same count, uses CSV_Format RFC4180 (, and "")
      * @param file file to read
@@ -67,8 +63,12 @@ public class CsvFileReader {
             e.printStackTrace();
         } finally {
             try {
-                csvReader.close();
-                csvParser.close();
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+                if (csvParser != null) {
+                    csvParser.close();
+                }
             } catch (IOException e) {
 //                System.out.println("Error while closing fileReader/csvFileParser !!!");
                 e.printStackTrace();

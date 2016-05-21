@@ -108,7 +108,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.v(LOG_TAG, "onSaveInstanceState, mSearchPattern=" + mSearchPattern + ", hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
         outState.putString(STATE_SEARCH_PATTERN, mSearchPattern);
         super.onSaveInstanceState(outState);
     }
@@ -200,7 +199,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu with pattern:" + mSearchPattern + ", hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "], inflater = [" + inflater + "]");
+//        Log.v(LOG_TAG, "onCreateOptionsMenu with pattern:" + mSearchPattern + ", hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "], inflater = [" + inflater + "]");
         inflater.inflate(R.menu.menu_main_fragment, menu);
         final MenuItem item = menu.findItem(R.id.search_all);
 
@@ -236,7 +235,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void createToolbar() {
-        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -262,7 +261,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void createSpinner() {
-        Log.v(LOG_TAG, "createSpinner, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "createSpinner, hashCode=" + this.hashCode() + ", " + "");
 
         mSpinnerType = (Spinner) mRootView.findViewById(R.id.spinner_type);
         String[] typesArray = getResources().getStringArray(R.array.pref_type_filter_values);
@@ -279,21 +278,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void updateDrinkTypeFromPrefs() {
         mDrinkType = Utils.getDrinkTypeFromSharedPrefs(getActivity(), true);
-        Log.v(LOG_TAG, "updateDrinkTypeFromPrefs: " + mDrinkType + ", hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "updateDrinkTypeFromPrefs: " + mDrinkType + ", hashCode=" + this.hashCode() + ", " + "");
     }
 
     private void updateSpinnerType() {
-        Log.v(LOG_TAG, "updateSpinnerType - drinkType: " + mDrinkType + ", hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "updateSpinnerType - drinkType: " + mDrinkType + ", hashCode=" + this.hashCode() + ", " + "");
 
         if (mSpinnerAdapter != null) {
             int spinnerPosition = mSpinnerAdapter.getPosition(mDrinkType);
             if (spinnerPosition > -1) {
-                Log.v(LOG_TAG, "updateSpinnerType - spinner position found, hashCode=" + this.hashCode() + ", " + "");
+//                Log.v(LOG_TAG, "updateSpinnerType - spinner position found, hashCode=" + this.hashCode() + ", " + "");
                 mSpinnerType.setSelection(spinnerPosition);
                 mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
                 mSpinnerType.clearFocus();
-            } else {
-                Log.v(LOG_TAG, "updateSpinnerType - no spinner position, hashCode=" + this.hashCode() + ", " + "");
+//            } else {
+//                Log.v(LOG_TAG, "updateSpinnerType - no spinner position, hashCode=" + this.hashCode() + ", " + "");
             }
         }
     }
@@ -324,7 +323,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, mSearchPattern=" + mSearchPattern + ", mDrinkType=" + mDrinkType + ", id = [" + id + "], args = [" + args + "]");
         // TODO: get latest entries ... - first sort by insertDate?, max 50 entries?
-
 
         switch (id) {
             case PRODUCER_LOADER_ID:
@@ -357,7 +355,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         QueryColumns.MainFragment.ReviewAllQuery.COLUMNS,
                         null, null, mReviewsSortOrder);
             default:
-                throw new RuntimeException("wrong loader_id in MainFragment...");
+                throw new RuntimeException(getString(R.string.error_wrong_loader_in_main_fragment));
         }
 
     }
@@ -381,6 +379,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 mReviewsHeading.setText(getString(R.string.label_list_of_reviews, numberAppendix));
                 break;
         }
+
+        // TODO: check if network (wlan) and un-geocoded-cursors exist
+        // notification (msg would be a bit to disturbing):
+        //      Geocode all 20 producer-locations and 30 review-locations?
     }
 
     @Override
@@ -401,7 +403,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Log.v(LOG_TAG, "onQueryTextSubmit, hashCode=" + this.hashCode() + ", " + "query = [" + query + "]");
         mSearchPattern = query;
         restartLoaders();
         return true;
@@ -409,7 +410,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.v(LOG_TAG, "onQueryTextChange, hashCode=" + this.hashCode() + ", " + "newText = [" + newText + "]");
         mSearchPattern = newText;
         restartLoaders();
         return false;
@@ -419,7 +419,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         if (mSpinnerAdapter == parent.getAdapter()) {
-            Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
+//            Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
             mDrinkType = parent.getItemAtPosition(position).toString();
             Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
             mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
@@ -436,8 +436,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fab_add){
-            // TODO: twoPane-mode and maybe some other stuff
-
+            // TODO: twoPane-mode
 
             Intent intent = new Intent(getActivity(), AddReviewActivity.class);
 

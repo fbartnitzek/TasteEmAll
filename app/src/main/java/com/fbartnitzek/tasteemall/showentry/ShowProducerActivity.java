@@ -36,7 +36,7 @@ public class ShowProducerActivity extends AppCompatActivity {
 
         if (findViewById(R.id.container_show_producer_fragment) != null) {
             if (savedInstanceState != null) {
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
@@ -62,7 +62,6 @@ public class ShowProducerActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "]");
         getMenuInflater().inflate(R.menu.menu_show, menu);
         return true;
     }

@@ -67,7 +67,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     private TextView mReviewLocationView;
     private TextView mReviewRecommendedSidesView;
     private int mDrink_Id;
-    private int mProducer_Id;   //TODO: ids really needed?
+    private int mProducer_Id;
 
 
     public ShowReviewFragment() {
@@ -246,7 +246,6 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
             Bundle bundle = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -280,8 +279,9 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
     private void shareReview() {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "\n\n");
+        sharingIntent.setType(getString(R.string.share_content_type));
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+                getString(R.string.share_empty_subject));
         String shareBody = getString(R.string.share_review_text,
                 mProducerNameView.getText().toString(),
                 mDrinkNameView.getText().toString(),

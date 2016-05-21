@@ -49,13 +49,13 @@ import java.util.Map;
 public class ShowMapFragment extends Fragment implements OnMapReadyCallback, PopulateMapTask.PopulateMapHandler {
 
     private static final String LOG_TAG = ShowMapFragment.class.getName();
-    private static final int MAP_REVIEWS_LOADER = 54356;
-    private static final int MAP_PRODUCERS_LOADER = 54357;
+//    private static final int MAP_REVIEWS_LOADER = 54356;
+//    private static final int MAP_PRODUCERS_LOADER = 54357;
     private static final String STATE_MAP_INFO = "STATE_MAP_INFO";
     private static final String STATE_NAVIGATION_DONE = "STATE_NAVIGATION_DONE";
 
-    GoogleMap mMap;
-    boolean mMapReady = false;
+    private GoogleMap mMap;
+    private boolean mMapReady = false;
     private Uri mReviewsUri;
     private Uri mProducersUri;
     private String mReviewsSortOrder;
@@ -110,7 +110,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
             mInfoView.setText(savedInstanceState.getString(STATE_MAP_INFO));
         }
 
-        createToolbar(mRootView, LOG_TAG);
+        createToolbar(mRootView);
         updateToolbar();
 
         ((ShowMapActivity) getActivity()).scheduleStartPostponedTransition(mRootView);
@@ -123,7 +123,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
             Log.e(LOG_TAG, "onCreateView, MapFragment not found...");
         } else {
             mapFragment.getMapAsync(this);
-            Log.v(LOG_TAG, "onCreateView, MapFragment found & set...");
+//            Log.v(LOG_TAG, "onCreateView, MapFragment found & set...");
         }
 
         startPopulateMap();
@@ -167,7 +167,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
         }
     }
 
-    void createToolbar(View rootView, String LOG_TAG) {
+    private void createToolbar(View rootView) {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -187,7 +187,7 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
         }
     }
 
-    void updateToolbar() {
+    private void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();

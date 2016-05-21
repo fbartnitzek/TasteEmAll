@@ -102,8 +102,6 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
 
     @Override
     void updateToolbar() {
-        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
-
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
 
@@ -192,12 +190,12 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+//        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
     @Override
     public void updateFragment(Uri drinkUri) {
-        Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
+//        Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "drinkUri = [" + drinkUri + "]");
         mUri = drinkUri;
         calcCompleteUri();
         getLoaderManager().restartLoader(SHOW_DRINK_LOADER_ID, null, this);
@@ -206,9 +204,9 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
-            Log.v(LOG_TAG, "onClick, producerName=" + mProducerNameView.getText().toString() + ", " + "producerId = [" + mProducer_Id + "]");
+//            Log.v(LOG_TAG, "onClick, producerName=" + mProducerNameView.getText().toString() + ", " + "producerId = [" + mProducer_Id + "]");
             Bundle bundle = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 bundle = ActivityOptions.makeSceneTransitionAnimation(
                         getActivity(),
                         mProducerNameView,

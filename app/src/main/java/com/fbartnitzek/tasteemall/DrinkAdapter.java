@@ -55,7 +55,7 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
             view.setFocusable(true);
             return new ViewHolder(view);
         } else {
-            throw new RuntimeException("not bound to RecyclerView");
+            throw new RuntimeException(mContext.getString(R.string.error_not_bound_to_recycler_view));
         }
     }
 

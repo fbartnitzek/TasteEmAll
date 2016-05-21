@@ -39,7 +39,7 @@ public class GeocodeAddressIntentService extends IntentService {
     public static final int FAILURE_INVALID_LAT_LONG_USED = 3;
     public static final int FAILURE_NO_RESULT_FOUND = 4;
 
-    public static final String PACKAGE_NAME = GeocodeAddressIntentService.class.getPackage().getName();
+    private static final String PACKAGE_NAME = GeocodeAddressIntentService.class.getPackage().getName();
 
     public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
 
@@ -48,7 +48,7 @@ public class GeocodeAddressIntentService extends IntentService {
 
     public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
 
-    protected ResultReceiver mReceiver = null;
+    private ResultReceiver mReceiver = null;
     private static final String LOG_TAG = GeocodeAddressIntentService.class.getName();
 
     /**
@@ -131,7 +131,7 @@ public class GeocodeAddressIntentService extends IntentService {
             deliverResultToReceiver(FAILURE_NO_RESULT_FOUND, errorMessage);
         } else {
             Address address = addresses.get(0);
-            Log.i(LOG_TAG, getString(R.string.address_found));
+//            Log.i(LOG_TAG, getString(R.string.address_found));
             deliverResultToReceiver(SUCCESS_RESULT, address);
         }
     }
@@ -142,7 +142,7 @@ public class GeocodeAddressIntentService extends IntentService {
         mReceiver.send(resultCode, bundle);
     }
 
-    // TODO: for Geocoding by name: return multiple addresses...
+    // TODO: for Geocoding by name: return multiple addresses and show LocationPicker...
     private void deliverResultToReceiver(int resultCode, Address address) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(RESULT_ADDRESS_KEY, address);

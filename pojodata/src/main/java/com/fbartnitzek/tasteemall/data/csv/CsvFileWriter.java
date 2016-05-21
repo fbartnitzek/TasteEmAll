@@ -28,11 +28,11 @@ public class CsvFileWriter {
 
     //based on: https://examples.javacodegeeks.com/core-java/apache/commons/csv-commons/writeread-csv-files-with-apache-commons-csv-example/
 
-    public static final char DELIMITER = ';';
-    public static final char QUOTE_CHAR = '"';
+    private static final char DELIMITER = ';';
+    private static final char QUOTE_CHAR = '"';
 
     // Umlaute working - just not in excel android app :-p
-    public static CSVFormat CSV_FORMAT_RFC4180 = CSVFormat.RFC4180.withDelimiter(DELIMITER).withQuote(QUOTE_CHAR);
+    public static final CSVFormat CSV_FORMAT_RFC4180 = CSVFormat.RFC4180.withDelimiter(DELIMITER).withQuote(QUOTE_CHAR);
 
     public static String writeFile(String[] headers, List<List<String>> entries, File file) {
 

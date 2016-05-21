@@ -3,7 +3,6 @@ package com.fbartnitzek.tasteemall.addentry;
 import android.app.Activity;
 import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
@@ -64,8 +63,8 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
 
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-        Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
-        // TODO: matching Uri?
+//        Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
+
 //        Uri uri = DatabaseContract.ProducerEntry.buildUriWithName(String.valueOf(constraint));
         return mActivity.getContentResolver().query(
                 DatabaseContract.ProducerEntry.CONTENT_URI,
@@ -77,7 +76,7 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
+//        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
         String producerName = cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_NAME);
         String producerId = cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_ID);
         int producer_Id = cursor.getInt(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER__ID);
