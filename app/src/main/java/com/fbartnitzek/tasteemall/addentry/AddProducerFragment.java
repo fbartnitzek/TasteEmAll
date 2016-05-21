@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -40,7 +41,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     private static final String STATE_PRODUCER_WEBSITE = "STATE_PRODUCER_WEBSITE";
     private static final String STATE_PRODUCER_DESCRIPTION = "STATE_PRODUCER_DESCRIPTION";
     private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
-    private static final String STATE_PRODUCER_ID= "STATE_PRODUCER_ID";
+    private static final String STATE_PRODUCER_ID = "STATE_PRODUCER_ID";
     private static EditText mEditProducerName;
     private static EditText mEditProducerLocation;
     private static EditText mEditProducerWebsite;
@@ -147,7 +148,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     private void updateToolbar(String producerName) {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "producerName = [" + producerName + "]");
         AppCompatActivity activity = (AppCompatActivity) getActivity();
-        if (activity.getSupportActionBar()!= null) {
+        if (activity.getSupportActionBar() != null) {
             ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                     getString(R.string.title_edit_producer_activity,
                             producerName));
@@ -192,18 +193,18 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
     }
 
-    private void insertData(String producerName) {
+    private void insertData(String producerName, String location) {
         new InsertEntryTask(
-                getActivity(), ProducerEntry.CONTENT_URI, mRootView,mProducerName)
-                    .execute(DatabaseHelper.buildProducerValues(
-                            Utils.calcProducerId(producerName),
-                            producerName,
-                            mEditProducerDescription.getText().toString().trim(),
-                            mEditProducerWebsite.getText().toString().trim(),
-                            mEditProducerLocation.getText().toString().trim()));
+                getActivity(), ProducerEntry.CONTENT_URI, mRootView, mProducerName)
+                .execute(DatabaseHelper.buildProducerValues(
+                        Utils.calcProducerId(producerName, location),
+                        producerName,
+                        mEditProducerDescription.getText().toString().trim(),
+                        mEditProducerWebsite.getText().toString().trim(),
+                        location));
     }
 
-    private void updateData(String producerName) {
+    private void updateData(String producerName, String location) {
         Uri singleProducerUri = Utils.calcSingleProducerUri(mContentUri);
         new UpdateEntryTask(getActivity(), singleProducerUri, mProducerName, mRootView)
                 .execute(DatabaseHelper.buildProducerValues(
@@ -211,20 +212,30 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                         producerName,
                         mEditProducerDescription.getText().toString().trim(),
                         mEditProducerWebsite.getText().toString().trim(),
-                        mEditProducerLocation.getText().toString().trim()));
+                        location));
     }
 
     void saveData() {
 
         String producerName = mEditProducerName.getText().toString().trim();
+        String location = mEditProducerLocation.getText().toString().trim();
+
+        //validate
+        if (producerName.length() == 0) {
+            Snackbar.make(mRootView, R.string.msg_enter_producer_name, Snackbar.LENGTH_SHORT).show();
+            return;
+        } else if (location.length() == 0) {
+            Snackbar.make(mRootView, R.string.msg_enter_producer_location, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
 
         if (mContentUri != null) { //update
 
-            updateData(producerName);
+            updateData(producerName, location);
 
         } else { // insert
 
-            insertData(producerName);
+            insertData(producerName, location);
         }
 
     }
@@ -244,7 +255,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, mContentUri=" + mContentUri + ", hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
-        if (mContentUri!= null) {
+        if (mContentUri != null) {
             return new CursorLoader(
                     getActivity(),
                     mContentUri,
@@ -283,7 +294,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
             resumeActivityEnterTransition();    // from edit
 
-            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
+            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website + "], description= [" + description + "]");
         }
     }
 

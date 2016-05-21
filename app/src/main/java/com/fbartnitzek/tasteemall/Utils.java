@@ -58,8 +58,8 @@ public class Utils {
     private static final String D_DOT_D = "\\d+\\.\\d+";
 
     // TODO: might use some hash-function later...
-    public static String calcProducerId(String producerName) {
-        return "producer_" + producerName;
+    public static String calcProducerId(String producerName, String location) {
+        return "producer_" + producerName + "_;location_" + location;
     }
 
     public static String calcDrinkId(String drinkName, String producerId) {

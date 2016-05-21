@@ -190,12 +190,15 @@
 
 
     <!-- Toast warnings / messages -->
-    <string name="msg_choose_existing_drink">choose an existing drink first...</string>
-    <string name="msg_rate_drink">rate your drink first...</string>
-    <string name="msg_no_username">no rating without username...</string>
-    <string name="msg_invalid_review_date">invalid date for the review...</string>
-    <string name="msg_choose_existing_provider">choose an existing producer first...</string>
-    <string name="msg_choose_drink_name">choose a name first...</string>
+    <string name="msg_choose_existing_drink">choose an existing drink first</string>
+    <string name="msg_rate_drink">rate your drink first</string>
+    <string name="msg_no_username">no rating without username</string>
+    <string name="msg_invalid_review_date">invalid date for the review</string>
+    <string name="msg_choose_existing_provider">choose an existing producer first</string>
+    <string name="msg_choose_drink_name">choose a name first</string>
+
+    <string name="msg_enter_producer_name">enter a producer name first</string>
+    <string name="msg_enter_producer_location">enter the location first</string>
 
     <string name="help_show_review_rating_help"><![CDATA[++ really good\n+ buy again\n0 neither good nor bad\n- don\'t buy again\n-- spit & spill it out\n(the remaining for the uncertain ones)]]></string>
 

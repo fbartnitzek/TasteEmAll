@@ -40,11 +40,9 @@ public class AddDrinkActivity extends AppCompatActivity {
             if (fragment == null) {
                 fragment = new AddDrinkFragment();
                 if (getIntent().getData() != null) {
-//                    fragment = AddDrinkFragment.newInstance(getIntent().getData());
                     fragment.setContentUri(getIntent().getData());
                 } else if (getIntent().hasExtra(PATTERN_EXTRA)) {
                     fragment.setmPreFilledPattern(getIntent().getStringExtra(PATTERN_EXTRA));
-//                    fragment = AddDrinkFragment.newInstance();
                 }
 
                 getSupportFragmentManager().beginTransaction()
