@@ -2,12 +2,14 @@ package com.fbartnitzek.tasteemall.showentry;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,13 +17,14 @@ import android.view.ViewTreeObserver;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.addentry.AddDrinkActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
 
 public class ShowDrinkActivity extends AppCompatActivity {
 
     private static final String FRAGMENT_TAG = "SHOw_DRINK_TAG";
     private static final String LOG_TAG = ShowDrinkActivity.class.getName();
     public static final String EXTRA_DRINK_URI = "EXTRA_DRINK_URI";
-    private static final int EDIT_DRINK_REQUEST = 432;
+    public static final int EDIT_DRINK_REQUEST = 432;
     private Uri mContentUri;
 
     @Override
@@ -30,14 +33,14 @@ public class ShowDrinkActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_drink);
 
-        supportPostponeEnterTransition();   // wait until Fragment-Views are done
-
         // explicitly add fragment with pattern
         if (findViewById(R.id.container_show_drink_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
+
+            supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
             ShowDrinkFragment fragment = new ShowDrinkFragment();
 
@@ -67,7 +70,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
         return true;
     }
 
-    private ShowDrinkFragment getFragment(){
+    private ShowDrinkFragment getFragment() {
         return (ShowDrinkFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
     }
 
@@ -78,18 +81,46 @@ public class ShowDrinkActivity extends AppCompatActivity {
                 supportFinishAfterTransition();
                 return true;
             case R.id.action_edit:
-                Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-
-                Intent intent = new Intent(this, AddDrinkActivity.class);
-                intent.setData(mContentUri);
-                startActivityForResult(intent, EDIT_DRINK_REQUEST);
-
-                break;
-            default:
-//                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                startEditActivity();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startEditActivity() {
+        Intent intent = new Intent(this, AddDrinkActivity.class);
+        intent.setData(mContentUri);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            View rootView = findViewById(R.id.container_show_drink_fragment);
+            View drinkView = findViewById(R.id.drink_name);
+            View producerView = findViewById(R.id.producer_name);
+            int drink_Id = DatabaseContract.getIdFromUri(mContentUri);
+
+            // Transitions only seem to work with shared element transitions working ...
+            // the other sometimes (really redeploy the app) work, but only on enter
+//            Bundle bundle = ActivityOptions.makeScaleUpAnimation(
+//                    view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
+
+            // and the transitionsNames don't match, when used implicit:
+            // TODO: transitionName needs to be explicitly set - currently it returns anything ... - LATER
+//            Log.v(LOG_TAG, "startEditActivity, ddd_explicit=" + getString(R.string.shared_transition_drink_drink) + drink_Id
+//                    + ", ddd_implicit=" + drinkView.getTransitionName());       // returns completely wrong strings...
+//            Log.v(LOG_TAG, "startEditActivity, dpd_explicit=" + getString(R.string.shared_transition_drink_producer) + drink_Id
+//                    + ", dpd_implicit=" + producerView.getTransitionName());    // returns completely wrong strings...
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    this,
+                    new Pair<>(drinkView, //drinkView.getTransitionName()),
+                            getString(R.string.shared_transition_drink_drink) + drink_Id),
+                    new Pair<>(producerView, //producerView.getTransitionName())
+                            getString(R.string.shared_transition_drink_producer) + drink_Id)
+            ).toBundle();
+            startActivityForResult(intent, ShowDrinkActivity.EDIT_DRINK_REQUEST, bundle);
+        } else {
+            startActivityForResult(intent, ShowDrinkActivity.EDIT_DRINK_REQUEST);
+        }
+
     }
 
     @Override
@@ -115,13 +146,13 @@ public class ShowDrinkActivity extends AppCompatActivity {
      * sense to call this method are:
      *
      * (1) Inside a Fragment's onCreateView() method (if the shared element
-     *     lives inside a Fragment hosted by the called Activity).
+     * lives inside a Fragment hosted by the called Activity).
      *
      * (2) Inside a Picasso Callback object (if you need to wait for Picasso to
-     *     asynchronously load/scale a bitmap before the transition can begin).
+     * asynchronously load/scale a bitmap before the transition can begin).
      *
      * (3) Inside a LoaderCallback's onLoadFinished() method (if the shared
-     *     element depends on data queried by a Loader).
+     * element depends on data queried by a Loader).
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void scheduleStartPostponedTransition(final View view) {

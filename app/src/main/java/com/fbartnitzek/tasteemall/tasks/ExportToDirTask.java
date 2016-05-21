@@ -108,8 +108,9 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                     dataEntries,
                     file);
             if (error == null) {
-                message = mActivity.getString(R.string.msg_entries_exported_success,
-                        entries, cursor.getCount(), file.getName());
+                message = mActivity.getString(R.string.msg_entries_exported_success_shorter,
+                        entries, cursor.getCount());
+//                        entries, cursor.getCount(), file.getName());
             } else {
                 Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
                 message = mActivity.getString(R.string.msg_writing_entries_failed, entries);

@@ -163,8 +163,8 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
 
             int drinkId = DatabaseContract.getIdFromUri(mUri);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_drink_drink + drinkId));
-                mProducerNameView.setTransitionName(getString(R.string.shared_transition_drink_producer + drinkId));
+                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_drink_drink ) + drinkId);
+                mProducerNameView.setTransitionName(getString(R.string.shared_transition_drink_producer ) + drinkId);
             }
 
             mProducer_Id = data.getInt(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER__ID);
@@ -208,7 +208,6 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
             Log.v(LOG_TAG, "onClick, producerName=" + mProducerNameView.getText().toString() + ", " + "producerId = [" + mProducer_Id + "]");
             Bundle bundle = null;
-            // TODO: just 1 direction...
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {;
                 bundle = ActivityOptions.makeSceneTransitionAnimation(
                         getActivity(),

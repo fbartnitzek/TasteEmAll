@@ -115,6 +115,12 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         mRootView.findViewById(R.id.add_producer_button).setOnClickListener(this);
 
         mEditDrinkName = (EditText) mRootView.findViewById(R.id.drink_name);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mEditCompletionProducerName.setTransitionName(getString(R.string.shared_transition_add_producer_name));
+            mEditDrinkName.setTransitionName(getString(R.string.shared_transition_add_drink_name));
+        }
+
         mSpinnerDrinkType = (Spinner) mRootView.findViewById(R.id.drink_type);
 
         // fill type with drink_type from settings
@@ -152,6 +158,10 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
             if (mPreFilledPattern != null) {
                 mEditDrinkName.setText(mPreFilledPattern);
             }
+        }
+
+        if (mContentUri == null) {
+            resumeActivityEnterTransition();    // from add
         }
 
         return mRootView;
@@ -347,10 +357,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
     private void createProducer() {
         Log.v(LOG_TAG, "createProducer, hashCode=" + this.hashCode() + ", " + "");
         Bundle bundle = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            View button = mRootView.findViewById(R.id.add_producer_button);
-            bundle = ActivityOptions.makeScaleUpAnimation(
-                    button, 0, 0, button.getWidth(), button.getHeight()).toBundle();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    mEditCompletionProducerName, getString(R.string.shared_transition_add_producer_name)
+            ).toBundle();
         }
         Intent intent = new Intent(getActivity(), AddProducerActivity.class);
         // use pre filled name
@@ -436,6 +447,15 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     mEditCompletionProducerName.setText(mProducerName);
                     mEditCompletionProducerName.dismissDropDown();
                     mEditDrinkName.setText(drinkName);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        int drink_Id = DatabaseContract.getIdFromUri(mContentUri);
+                        mEditCompletionProducerName.setTransitionName(
+                                getString(R.string.shared_transition_drink_producer) + drink_Id);
+                        mEditDrinkName.setTransitionName(
+                                getString(R.string.shared_transition_drink_drink) + drink_Id);
+                    }
+
                     mEditDrinkStyle.setText(drinkStyle);
                     mEditDrinkIngredients.setText(drinkIngredients);
                     mEditDrinkSpecifics.setText(drinkSpecifics);
@@ -443,6 +463,8 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
                     setSpinner(spinnerPosition);
 
                     updateToolbar(drinkName, mProducerName);
+
+                    resumeActivityEnterTransition();
 
                     Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
                 }
@@ -479,5 +501,13 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         mProducer_Id = producer_Id;
         mProducerId = producerId;
         mProducerName = producerName;
+    }
+
+    private void resumeActivityEnterTransition() {
+        Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((AddDrinkActivity) getActivity()).scheduleStartPostponedTransition(mEditDrinkName);
+        }
     }
 }

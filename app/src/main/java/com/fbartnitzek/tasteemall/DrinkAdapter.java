@@ -66,8 +66,8 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int id = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
-            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink + id));
-            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer + id));
+            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink) + id);
+            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer) + id);
         }
 
         String producerName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME);

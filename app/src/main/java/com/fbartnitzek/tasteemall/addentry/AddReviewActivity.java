@@ -23,8 +23,6 @@ public class AddReviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_review);
 
-        supportPostponeEnterTransition();   // wait until Fragment-Views are done
-
         // explicitly add fragment, toolbar from fragment...
         if (findViewById(R.id.container_add_review_fragment) != null) {
 
@@ -34,6 +32,8 @@ public class AddReviewActivity extends AppCompatActivity {
             }
 
             // edit or add
+            supportPostponeEnterTransition();   // wait until Fragment-Views are done
+
             AddReviewFragment fragment = getFragment();
             if (fragment == null) {
 
@@ -80,7 +80,7 @@ public class AddReviewActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
                 }
-                break;
+                return true;
             default:
         }
 

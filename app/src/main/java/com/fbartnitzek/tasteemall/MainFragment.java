@@ -437,17 +437,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onClick(View v) {
         if (v.getId() == R.id.fab_add){
             // TODO: twoPane-mode and maybe some other stuff
-//            Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
-            Intent intent = new Intent(getActivity(), AddReviewActivity.class);
-//            startActivityForResult(intent, ADD_DRINK_REQUEST);
 
+
+            Intent intent = new Intent(getActivity(), AddReviewActivity.class);
 
             Bundle bundle = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                bundle = ActivityOptions.makeScaleUpAnimation(
-                        v, 0, 0, v.getWidth(), v.getHeight()).toBundle();
-            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // no really useful element name transition possible...
+                bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity(),
+                        v, getString(R.string.shared_transition_add_drink_name)
+                ).toBundle();
 
+            }
             startActivityForResult(intent, ADD_REVIEW_REQUEST, bundle);
         }
     }

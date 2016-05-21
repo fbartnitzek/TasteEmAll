@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall;
 
+import android.app.ActivityOptions;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.fbartnitzek.tasteemall.tasks.ExportToDirTask;
@@ -118,14 +120,35 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         }
         MainFragment fragment = getFragment();
         Intent intent = new Intent(this, ShowMapActivity.class);
+
         if (fragment != null) {
             Log.v(LOG_TAG, "startShowMap, currentReviewsUri=" + fragment.getmCurrentReviewsUri() + ", currentProducersUri=" + fragment.getmCurrentProducersUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI, fragment.getmCurrentReviewsUri());
             intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
             intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
             intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
+
         }
-        startActivity(intent);
+
+//        item.expandActionView();
+//        View menuView = item.getActionView();   // is null - no shared element transition...
+//        Log.v(LOG_TAG, "startShowMap, menuView=" + menuView);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
+            View rootView = findViewById(R.id.container_main_fragment);
+
+            // no useful element name transition possible
+//            menuView.setTransitionName(getString(R.string.shared_transition_show_map));
+
+            // workaround: start usual activity with wrong element transition ...
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this,
+                    rootView, getString(R.string.no_shared_element_transition)).toBundle();
+
+            startActivity(intent, bundle);
+        } else {
+            startActivity(intent);
+        }
     }
 
     private void startExport() {
@@ -225,17 +248,21 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // TODO: show Msg Activity/Dialog/Fragment (LONG is to short ...) with ok button
+    // TODO: show Msg Activity/Dialog/Fragment (LONG is to short ...) with ok button OR Notification
 
     @Override
     public void onExportFinished(String message) {
-//        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
+
+        // need at least 3 lines => toast
+//        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onImportFinished(String message) {
-//        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
+
+        // need at least 3 lines => toast
+//        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 }

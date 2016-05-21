@@ -215,7 +215,9 @@
     <string name="msg_wrong_export_directory">the export directory does not exist or it cannot be written to (<xliff:g id="path">%1$s</xliff:g>)</string>
     <string name="msg_export_files_no_write">files can not be created below this path (<xliff:g id="path">%1$s</xliff:g>)</string>
     <string name="msg_writing_entries_failed">IOException while writing <xliff:g id="entries">%1$s</xliff:g></string>
-    <string name="msg_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g>"</string>
+    <string name="msg_entries_exported_success">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported successfully to <xliff:g id="path">%3$s</xliff:g></string>
+    <string name="msg_entries_exported_success_shorter">all <xliff:g id="entries">%1$s</xliff:g> (<xliff:g id="number">%2$d</xliff:g>) exported</string>
+    <string name="msg_entries_exported_success_short">exported <xliff:g id="producers">%1$d</xliff:g> producers, <xliff:g id="drinks">%2$d</xliff:g> drinks and <xliff:g id="reviews">%3$d</xliff:g> reviews successfully</string>
     <string name="msg_export_entries_failed_no_cursor">no cursor found while exporting <xliff:g id="entries">%1$s</xliff:g></string>
 
     <string name="msg_on_import_files_chosen">no import files chosen</string>
@@ -248,6 +250,13 @@
     <string name="shared_transition_drink_drink" translatable="false">shared_transition_drink_drink</string>
     <string name="shared_transition_drink_producer" translatable="false">shared_transition_drink_producer</string>
     <string name="shared_transition_producer_producer" translatable="false">shared_transition_producer_producer</string>
+
+    <string name="shared_transition_add_producer_name" translatable="false">shared_transition_add_producer_name</string>
+    <string name="shared_transition_add_drink_name" translatable="false">shared_transition_add_drink_name</string>
+    <!--<string name="shared_transition_show_map" translatable="false">shared_transition_show_map</string>-->
+
+    <string name="no_shared_element_transition">no_shared_transition</string>
+
 
     <!-- examples-->
     <string name="example_review_date">20160509</string>

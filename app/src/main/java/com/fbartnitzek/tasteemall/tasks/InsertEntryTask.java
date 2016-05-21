@@ -63,6 +63,16 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
 
         if (uri != null) {
             updateWidgets();
+
+            /* notes on shared element transition for adding:
+             * - in theory for the same behaviour as in ShowEntities, the parent id is needed
+             * - but: it is not existing at the moment
+             * - solution/workaround: use the field without id - so it's
+             *     producer.name instead of drink.producer.drinkId
+             */
+            // TODO: still one problem - finish in addReview:
+            // no modification of bundle in Fragment/Activity to transitionName with id possible...
+
             Intent output = new Intent();
             output.setData(uri);    //always returns single-uri
             mActivity.setResult(Activity.RESULT_OK, output);

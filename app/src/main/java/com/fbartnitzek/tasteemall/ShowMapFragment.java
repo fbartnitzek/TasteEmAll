@@ -113,6 +113,8 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
         createToolbar(mRootView, LOG_TAG);
         updateToolbar();
 
+        ((ShowMapActivity) getActivity()).scheduleStartPostponedTransition(mRootView);
+
         //src: http://stackoverflow.com/questions/15525111/getsupportfragmentmanager-findfragmentbyid-returns-null
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -190,7 +192,8 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
-            ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
+            TextView titleView = (TextView) mRootView.findViewById(R.id.action_bar_title);
+            titleView.setText(
                     getString(R.string.title_show_map));
         } else {
             Log.v(LOG_TAG, "updateToolbar - no toolbar found, hashCode=" + this.hashCode() + ", " + "");
@@ -246,6 +249,11 @@ public class ShowMapFragment extends Fragment implements OnMapReadyCallback, Pop
     @Override
     public void onMapPopulated(Map<LatLng, PopulateMapTask.MarkerInfo> markers, String message) {
         Log.v(LOG_TAG, "onMapPopulated, hashCode=" + this.hashCode() + ", " + "markers = [" + markers + "], message = [" + message + "]");
+
+        // just if activity is still alive
+        if (getActivity() == null) {
+            return;
+        }
 
         if (!mAlreadyLoaded) {  // small workaround...
             Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();

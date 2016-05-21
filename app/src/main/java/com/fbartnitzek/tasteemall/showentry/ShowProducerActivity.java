@@ -2,12 +2,14 @@ package com.fbartnitzek.tasteemall.showentry;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.view.ViewTreeObserver;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
 
 public class ShowProducerActivity extends AppCompatActivity {
 
@@ -30,7 +33,6 @@ public class ShowProducerActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_producer);
 
-        supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
         if (findViewById(R.id.container_show_producer_fragment) != null) {
             if (savedInstanceState != null) {
@@ -38,6 +40,7 @@ public class ShowProducerActivity extends AppCompatActivity {
                 return;
             }
 
+            supportPostponeEnterTransition();   // wait until Fragment-Views are done
             ShowProducerFragment fragment = new ShowProducerFragment();
 
             mContentUri = getIntent().getData();
@@ -72,17 +75,29 @@ public class ShowProducerActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit:
-                Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-
-                Intent intent = new Intent(this, AddProducerActivity.class);
-                intent.setData(mContentUri);
-                startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
-                break;
-            default:
-                Log.v(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                startEditActivity();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void startEditActivity() {
+        Intent intent = new Intent(this, AddProducerActivity.class);
+        intent.setData(mContentUri);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            View view = findViewById(R.id.producer_name);
+            int producer_Id = DatabaseContract.getIdFromUri(mContentUri);
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    this,
+                    new Pair<>(view, //view.getTransitionName())
+                            getString(R.string.shared_transition_producer_producer) + producer_Id)
+            ).toBundle();
+            startActivityForResult(intent, EDIT_PRODUCER_REQUEST, bundle);
+        } else {
+            startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

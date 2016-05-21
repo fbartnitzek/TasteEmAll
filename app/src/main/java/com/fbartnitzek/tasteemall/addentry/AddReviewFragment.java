@@ -166,6 +166,10 @@ public class AddReviewFragment extends Fragment implements
         CompletionDrinkAdapter completionAdapter = new CompletionDrinkAdapter(getActivity(), this);
         mEditCompletionDrinkName.setAdapter(completionAdapter);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mEditCompletionDrinkName.setTransitionName(getString(R.string.shared_transition_add_drink_name));
+        }
+
         mRootView.findViewById(R.id.add_drink_button).setOnClickListener(this);
         mRootView.findViewById(R.id.help_review_rating_button).setOnClickListener(this);
 
@@ -453,10 +457,13 @@ public class AddReviewFragment extends Fragment implements
     private void createDrink() {
         Log.v(LOG_TAG, "createDrink, hashCode=" + this.hashCode() + ", " + "");
         Bundle bundle = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            View button = mRootView.findViewById(R.id.add_drink_button);
-            bundle = ActivityOptions.makeScaleUpAnimation(
-                    button, 0, 0, button.getWidth(), button.getHeight()).toBundle();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // with shared element transition every transition is working ...
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
+            ).toBundle();
+
         }
         Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
         intent.putExtra(AddDrinkActivity.PATTERN_EXTRA, mEditCompletionDrinkName.getText().toString().trim());
@@ -517,13 +524,15 @@ public class AddReviewFragment extends Fragment implements
         switch (loader.getId()) {
             case EDIT_REVIEW_LOADER_ID:
                 if (data != null && data.moveToFirst()) {
-                    // variables not really needed - optimize later...
+
+                    mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
+                    // animation might work with separate textView in toolbar...
                     mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
                     mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
                     mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
                     mDrink_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_DRINK__ID);
-                    mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
                     mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
+
                     // later for a matching icon...
 //                    String drinkType = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_TYPE);
                     String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
@@ -535,6 +544,12 @@ public class AddReviewFragment extends Fragment implements
 
                     mEditCompletionDrinkName.setText(mDrinkName);
                     mEditCompletionDrinkName.dismissDropDown();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        mEditCompletionDrinkName.setTransitionName(
+                                getString(R.string.shared_transition_review_drink) + mReview_Id);
+                    }
+
                     mRatingPosition = mRatingAdapter.getPosition(rating);
                     setSpinner();
                     mEditReviewDescription.setText(reviewDesc);
@@ -681,6 +696,7 @@ public class AddReviewFragment extends Fragment implements
         mGeocodingRunning = true;
     }
 
+
     @SuppressLint("ParcelCreator")
     class AddressResultReceiver extends ResultReceiver {
         public AddressResultReceiver(Handler handler) {
@@ -751,7 +767,6 @@ public class AddReviewFragment extends Fragment implements
         Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // not that important which one - but is lowest :-)
             ((AddReviewActivity) getActivity()).scheduleStartPostponedTransition(mEditReviewUser);
         }
     }

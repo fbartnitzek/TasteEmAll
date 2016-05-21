@@ -2,6 +2,7 @@ package com.fbartnitzek.tasteemall.addentry;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -83,6 +84,11 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         mEditProducerName = (EditText) mRootView.findViewById(R.id.producer_name);
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "producerName = " + mProducerName);
         mEditProducerName.setText(mProducerName);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mEditProducerName.setTransitionName(getString(R.string.shared_transition_add_producer_name));
+        }
+
         mEditProducerLocation = (EditText) mRootView.findViewById(R.id.producer_location);
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
@@ -95,6 +101,10 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
         }
 
         createToolbar();
+
+        if (mContentUri == null) {
+            resumeActivityEnterTransition();    // from add
+        }
 
         return mRootView;
     }
@@ -110,8 +120,7 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
                 Log.v(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");
                 return;
             }
-            //TODO: still wrong...
-            // maybe try that: http://stackoverflow.com/questions/22194107/remove-action-bar-icon-with-custom-view-and-show-home-up-button
+
             supportActionBar.setDisplayHomeAsUpEnabled(true);  //false: not visible anymore
             supportActionBar.setHomeButtonEnabled(true);
             supportActionBar.setDisplayShowTitleEnabled(false);
@@ -253,8 +262,15 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
         if (data != null && data.moveToFirst()) {
             // variables not really needed - optimize later...
+            int producer_Id = data.getInt(QueryColumns.ProducerFragment.COL_PRODUCER__ID);
             String name = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_NAME);
             mEditProducerName.setText(name);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mEditProducerName.setTransitionName(
+                        getString(R.string.shared_transition_producer_producer) + producer_Id);
+            }
+
             String location = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_LOCATION);
             mEditProducerLocation.setText(location);
             String website = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_WEBSITE);
@@ -265,6 +281,8 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
 
             updateToolbar(name);
 
+            resumeActivityEnterTransition();    // from edit
+
             Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }
     }
@@ -274,6 +292,14 @@ public class AddProducerFragment extends Fragment implements View.OnClickListene
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
 
+    }
+
+    private void resumeActivityEnterTransition() {
+        Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((AddProducerActivity) getActivity()).scheduleStartPostponedTransition(mEditProducerName);
+        }
     }
 
 }

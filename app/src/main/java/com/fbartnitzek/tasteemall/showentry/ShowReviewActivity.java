@@ -2,12 +2,14 @@ package com.fbartnitzek.tasteemall.showentry;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.view.ViewTreeObserver;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -46,14 +49,14 @@ public class ShowReviewActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_review);
 
-        supportPostponeEnterTransition();   // wait until Fragment-Views are done
-
         // explicitly add fragment with pattern
         if (findViewById(R.id.container_show_review_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
                 Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
+
+            supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
             ShowReviewFragment fragment = new ShowReviewFragment();
 
@@ -96,18 +99,30 @@ public class ShowReviewActivity extends AppCompatActivity {
                 supportFinishAfterTransition();
                 return true;
             case R.id.action_edit:
-                Log.v(LOG_TAG, "onOptionsItemSelected - action_edit, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-
-                Intent intent = new Intent(this, AddReviewActivity.class);
-                intent.setData(mContentUri);
-                startActivityForResult(intent, EDIT_REVIEW_REQUEST);
-
-                break;
-            default:
-//                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                startEditActivity();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startEditActivity() {
+        Intent intent = new Intent(this, AddReviewActivity.class);
+        intent.setData(mContentUri);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            View drinkName = findViewById(R.id.drink_name);
+            int review_Id = DatabaseContract.getIdFromUri(mContentUri);
+
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    this,
+                    new Pair<>(drinkName, //drinkName.getTransitionName())
+                            getString(R.string.shared_transition_review_drink) + review_Id)
+            ).toBundle();
+            startActivityForResult(intent, EDIT_REVIEW_REQUEST, bundle);
+        } else {
+            startActivityForResult(intent, EDIT_REVIEW_REQUEST);
+        }
     }
 
     @Override
