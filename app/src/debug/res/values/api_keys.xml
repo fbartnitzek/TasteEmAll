@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="GoogleMapsApiKey">INSERT_DEBUG_KEY_HERE</string>
+    <string name="GoogleMapsApiKey">@string/GoogleMapsDebugApiKey</string>
 </resources>
