@@ -11,3 +11,12 @@ Wouldn’t it be great to know when and where you tried them without typing and 
 And publish your review to the public if - and only if - you like?
 
 Here is a solution which hopefully will at least work for me. :-)
+
+
+## Installation
+For usage with a Google Maps API Key, add the key below **app/src/main/res/values** in a file f.e. **api_keys.xml** in the following format:
+```
+<resources>
+    <string name="GoogleMapsApiKey">INSERT_KEY_HERE</string>
+</resources>
+```

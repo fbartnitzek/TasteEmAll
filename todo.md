@@ -23,7 +23,7 @@
     - App uses standard and simple transitions between activities. - DONE
 
 - Building
-    - App builds from a clean repository checkout with no additional configuration. - DONE?
+    - App builds from a clean repository checkout with no additional configuration. - DONE
     - App builds and deploys using the installRelease Gradle task. - TODO
     - App is equipped with a signing configuration, and the keystore and passwords are included in the repository. Keystore is referred to by a relative path.  - TODO
     - All app dependencies are managed by Gradle. - DONE
