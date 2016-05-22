@@ -62,18 +62,17 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         }
 
         String message;
-        // TODO: different strings for message and filename (i18n between phones...)
         message = exportEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.ProducerColumns.COLUMNS,
-                dir, mActivity.getString(R.string.label_producers));
+                QueryColumns.ExportAndImport.ProducerColumns.COLUMNS, dir,
+                mActivity.getString(R.string.file_producers), mActivity.getString(R.string.label_producers));
 
         message += "\n" + exportEntries(DatabaseContract.DrinkEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.DrinkColumns.COLUMNS,
-                dir, mActivity.getString(R.string.label_drinks));
+                QueryColumns.ExportAndImport.DrinkColumns.COLUMNS, dir,
+                mActivity.getString(R.string.file_drinks), mActivity.getString(R.string.label_drinks));
 
         message += "\n" + exportEntries(DatabaseContract.ReviewEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.ReviewColumns.COLUMNS,
-                dir, mActivity.getString(R.string.label_reviews));
+                QueryColumns.ExportAndImport.ReviewColumns.COLUMNS, dir,
+                mActivity.getString(R.string.file_reviews), mActivity.getString(R.string.label_reviews));
 
         return message;
     }
@@ -83,9 +82,10 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         mExportHandler.onExportFinished(s);
     }
 
-    private String exportEntries(Uri contentUri, String[] columns, File dir, String entries) {
+    private String exportEntries(Uri contentUri, String[] columns, File dir, String fileEntries,
+                                 String msgEntries) {
 
-        String fileName = EXPORT_PREFIX + Utils.getCurrentLocalTimePrefix() + "_" + entries +  mActivity.getString(R.string.file_extension);
+        String fileName = EXPORT_PREFIX + Utils.getCurrentLocalTimePrefix() + "_" + fileEntries +  mActivity.getString(R.string.file_extension);
         File file = new File(dir, fileName);
 
 //        Log.v(LOG_TAG, "exportEntries, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
@@ -110,16 +110,16 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                     file);
             if (error == null) {
                 message = mActivity.getString(R.string.msg_entries_exported_success_shorter,
-                        entries, cursor.getCount());
+                        msgEntries, cursor.getCount());
 //                        entries, cursor.getCount(), file.getName());
             } else {
-                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], dir = [" + dir + "], entries = [" + entries + "]");
-                message = mActivity.getString(R.string.msg_writing_entries_failed, entries);
+                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], dir = [" + dir + "], fileEntries = [" + fileEntries+ "]");
+                message = mActivity.getString(R.string.msg_writing_entries_failed, msgEntries);
             }
 
             cursor.close();
         } else {
-            message = mActivity.getString(R.string.msg_export_entries_failed_no_cursor, entries);
+            message = mActivity.getString(R.string.msg_export_entries_failed_no_cursor, msgEntries);
         }
         return message;
     }

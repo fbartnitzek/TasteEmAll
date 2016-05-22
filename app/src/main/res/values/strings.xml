@@ -254,8 +254,8 @@
     <string name="share_review_text">Review for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g>: <xliff:g id="rating">%3$s</xliff:g> <xliff:g id="description">%4$s</xliff:g> (<xliff:g id="user">%5$s</xliff:g> on <xliff:g id="date">%6$s</xliff:g>) #TasteEmAll</string>
     <string name="a11y_share_review">share the review</string>
     <string name="choose_share_provider">choose an app to share</string>
-    <string name="share_content_type">text/plain</string>
-    <string name="share_empty_subject">\n\n</string>
+    <string name="share_content_type" translatable="false">text/plain</string>
+    <string name="share_empty_subject" translatable="false">\n\n</string>
 
 
     <!-- transitions -->
@@ -271,7 +271,7 @@
     <string name="shared_transition_add_drink_name" translatable="false">shared_transition_add_drink_name</string>
     <!--<string name="shared_transition_show_map" translatable="false">shared_transition_show_map</string>-->
 
-    <string name="no_shared_element_transition">no_shared_transition</string>
+    <string name="no_shared_element_transition" translatable="false">no_shared_transition</string>
 
 
     <!-- examples-->
