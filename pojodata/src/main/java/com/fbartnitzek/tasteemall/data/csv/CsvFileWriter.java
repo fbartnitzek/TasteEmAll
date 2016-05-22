@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVPrinter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public class CsvFileWriter {
         try {
             fileWriter = new FileWriter(file);  //initialize FileWriter object
             csvFilePrinter = new CSVPrinter(fileWriter, CSV_FORMAT_RFC4180);   //initialize CSVPrinter object
-            csvFilePrinter.printRecord(headers);    //Create CSV file header
+            csvFilePrinter.printRecord(Arrays.asList(headers));    //Create CSV file header
 
             //Write a new student object list to the CSV file
             for (List<String> dataEntry : entries) {

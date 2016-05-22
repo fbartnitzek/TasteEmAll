@@ -101,6 +101,10 @@
 - wrong layout for widget (version-padding not working as expected)
 - back-button sometimes needs to be pressed multiple times to get away from MainActivity/AddReview...? - still analyzing... - might be gone
 - RTL support not working for drinkTypeSpinner in toolbar and ratingSpinner, just for drinkTypeSpinner in AddDrinks!
+- when producer cannot bulk insert (f.e. reviews without drinks), they still count as inserted...
+- strange google maps signature problem: https://code.google.com/p/gmaps-api-issues/issues/detail?id=9784
+    - GoogleSignatureVerifier: com.fbartnitzek.tasteemall signature not valid.  - but still answers
+- widget on android_v4.3 is sometimes (when reboot is needed for deployment) not initially updated after creation - needs new review (or maybe 1 day waiting-time...)
 
 ## online backend
 - f.e. firebase as a start

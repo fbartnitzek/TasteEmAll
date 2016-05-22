@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# bugfix for searchview: http://stackoverflow.com/questions/27968537/search-widget-is-not-working-in-release-apk
+-keep class android.support.v7.widget.SearchView { *; }

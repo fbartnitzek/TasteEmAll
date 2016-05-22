@@ -402,7 +402,7 @@ public class DatabaseProvider extends ContentProvider {
                     for (ContentValues value : values) {
                         long id = db.insertWithOnConflict(DrinkEntry.TABLE_NAME, null, value,
                                 SQLiteDatabase.CONFLICT_REPLACE);
-                        if (id != -1) {
+                        if (id != -1) { // TODO: seems to be no error = -1 if foreign key is missing...
                             returnCount++;
                         }
                     }

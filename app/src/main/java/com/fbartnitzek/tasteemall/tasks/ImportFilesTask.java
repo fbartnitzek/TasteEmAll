@@ -139,6 +139,7 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
             allContentValues[j] = values;
         }
         //  modify bulkInsert to replace on demand - onConflict should work...
+        // TODO: when producer cannot bulk insert, it counts as inserted...
         int number = mActivity.getContentResolver().bulkInsert(contentUri, allContentValues);
 
         String appendix = "";
