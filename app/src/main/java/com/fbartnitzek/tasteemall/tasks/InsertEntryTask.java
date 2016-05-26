@@ -30,7 +30,6 @@ import java.util.Arrays;
 public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
 
     private static final String LOG_TAG = InsertEntryTask.class.getName();
-    public static final String ACTION_DATA_INSERTED = InsertEntryTask.class.getPackage().getName() + ".ACTION_DATA_INSERTED";
     private final Activity mActivity;
     private final View mRootView;
     private final String mEntryName;
@@ -62,7 +61,7 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
         Log.v(LOG_TAG, "onPostExecute, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "]");
 
         if (uri != null) {
-            updateWidgets();
+            TaskUtils.updateWidgets(mActivity);
 
             /* notes on shared element transition for adding:
              * - in theory for the same behaviour as in ShowEntities, the parent id is needed
@@ -83,10 +82,5 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
         }
     }
 
-    private void updateWidgets() {
-        Log.v(LOG_TAG, "updateWidgets, hashCode=" + this.hashCode() + ", " + "");
-        // only TasteEmAll app can receive broadcast
-        Intent dataUpdatedIntent = new Intent(ACTION_DATA_INSERTED).setPackage(mActivity.getPackageName());
-        mActivity.sendBroadcast(dataUpdatedIntent);
-    }
+
 }

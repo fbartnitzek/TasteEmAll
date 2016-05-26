@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
+import com.fbartnitzek.tasteemall.tasks.TaskUtils;
 
 /**
  * Implementation of App Widget functionality.
@@ -26,7 +26,7 @@ public class StatsWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
 //        Log.v(LOG_TAG, "onReceive, hashCode=" + this.hashCode() + ", " + "context = [" + context + "], intent = [" + intent + "]");
         super.onReceive(context, intent);
-        if (InsertEntryTask.ACTION_DATA_INSERTED.equals(intent.getAction())) {  //just on inserts (currently no delete...)
+        if (TaskUtils.ACTION_DATA_CHANGED.equals(intent.getAction())) {
             context.startService(new Intent(context, StatsWidgetIntentService.class));
         }
 

@@ -119,7 +119,7 @@
             android:label="@string/widget_heading_statistics">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-                <action android:name="com.fbartnitzek.tasteemall.tasks.ACTION_DATA_INSERTED"/>
+                <action android:name="com.fbartnitzek.tasteemall.tasks.ACTION_DATA_CHANGED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

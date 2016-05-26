@@ -3,10 +3,12 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
@@ -14,10 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import com.fbartnitzek.tasteemall.R;
+import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.addentry.AddDrinkActivity;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.tasks.DeleteEntryTask;
 
 public class ShowDrinkActivity extends AppCompatActivity {
 
@@ -82,9 +88,47 @@ public class ShowDrinkActivity extends AppCompatActivity {
             case R.id.action_edit:
                 startEditActivity();
                 return true;
+            case R.id.action_delete:
+                startDelete();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startDelete() {
+        Log.v(LOG_TAG, "startDelete, hashCode=" + this.hashCode() + ", " + "");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_really_delete_entry);
+        builder.setCancelable(true);
+
+        builder.setPositiveButton(
+                R.string.delete_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Uri deleteUri = Utils.calcSingleDrinkUri(mContentUri);
+                        // TODO: check for foreign keys ... generic seems unlikely...?
+//                        int id = DatabaseContract.getIdFromUri(deleteUri);
+//                        Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
+                        new DeleteEntryTask(
+                                ShowDrinkActivity.this,
+                                DatabaseContract.DrinkEntry.TABLE_NAME + "." + Drink.NAME)
+                                .execute(deleteUri);
+                    }
+                }
+        );
+        builder.setNegativeButton(
+                R.string.keep_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(ShowDrinkActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void startEditActivity() {

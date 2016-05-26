@@ -445,11 +445,26 @@ public class DatabaseProvider extends ContentProvider {
             case PRODUCERS:
                 deletedRows = db.delete(ProducerEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case PRODUCER_BY_ID:
+                deletedRows = db.delete(ProducerEntry.TABLE_NAME,
+                        ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             case DRINKS:
                 deletedRows = db.delete(DrinkEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case DRINK_BY_ID:
+                deletedRows = db.delete(DrinkEntry.TABLE_NAME,
+                        DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             case REVIEWS:
                 deletedRows = db.delete(ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REVIEW_BY_ID:
+                deletedRows = db.delete(ReviewEntry.TABLE_NAME,
+                        ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri:" + uri);

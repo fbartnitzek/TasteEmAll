@@ -96,6 +96,7 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        TaskUtils.updateWidgets(mActivity);
         mImportHandler.onImportFinished(s);
     }
 

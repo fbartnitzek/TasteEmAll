@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.fbartnitzek.tasteemall.MainActivity;
@@ -57,7 +58,10 @@ public class StatsWidgetIntentService extends IntentService{
         int numReviews = queryAndGetCount(
                 DatabaseContract.ReviewEntry.CONTENT_URI, QueryColumns.Widget.ReviewQuery.COLUMNS);
 
-//        Log.v(LOG_TAG, "onHandleIntent, producer=" + numProducers + ", drinks=" + numDrinks + ", reviews=" + numReviews);
+
+        // TODO: results are getting "cached" or something like that ...
+        // maybe that helps: http://stackoverflow.com/questions/9497270/widget-with-content-provider-impossible-to-use-readpermission
+        Log.v(LOG_TAG, "onHandleIntent, producer=" + numProducers + ", drinks=" + numDrinks + ", reviews=" + numReviews);
 
         for (int appWidgetId : appWidgetIds) {
             // dynamically adapt widget width ... later

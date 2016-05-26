@@ -123,6 +123,7 @@
     <string name="title_settings">Settings</string>
     <string name="menu_action_save">save</string>
     <string name="menu_action_edit">edit</string>
+    <string name="menu_action_delete">delete</string>
     <string name="text_choose_a_producer">choose a producer</string>
     <string name="text_choose_a_drink">choose a drink</string>
     <string name="a11y_add_a_new_producer">create a new producer</string>
@@ -281,7 +282,9 @@
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen</string>
-
+    <string name="msg_really_delete_entry">Do you really want to CASCADING delete the current entry?</string>
+    <string name="delete_button">delete</string>
+    <string name="keep_button">keep</string>
 
 
 </resources>
