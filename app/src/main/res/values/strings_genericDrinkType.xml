@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- add a new drinkType:
+        1) add new strings_file with these modified string-resources
+        2) add show-value to string-array 'pref_type_filter_titles' in arrays.xml
+        3) add key-value to string-array 'pref_type_filter_values' and 'pref_type_values' in arrays.xml-->
+
+    <string name="drink_key_generic" translatable="false">generic</string>
+    <string name="drink_show_generic">Drink</string>
+    <string name="producer_show_generic">Producer</string>
+
+    <!-- TODO: specific labels, contentDescription and hints ... -->
+
+
+</resources>

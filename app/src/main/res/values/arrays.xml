@@ -3,35 +3,38 @@
 
     <!-- TODO generic solution (additions just by xml-files) everywhere -->
     <string-array name="pref_type_filter_titles">
-        <!--<item>All</item>-->
         <item>@string/drink_show_all</item>
-        <!--<item>Beer</item>-->
         <item>@string/drink_show_beer</item>
-        <!--<item>Wine</item>-->
         <item>@string/drink_show_wine</item>
-        <!--<item>Whisk(e)y</item>-->
         <item>@string/drink_show_whisky</item>
-        <!--<item>Coffee</item>-->
         <item>@string/drink_show_coffee</item>
-        <!--<item>Generic</item>-->
+        <item>@string/drink_show_rum</item>
+        <item>@string/drink_show_tea</item>
+        <item>@string/drink_show_cocktail</item>
         <item>@string/drink_show_generic</item>
     </string-array>
 
     <string-array name="pref_type_filter_values">
-        <item>all</item>
-        <item>beer</item>
-        <item>wine</item>
-        <item>whisky</item>
-        <item>coffee</item>
-        <item>generic</item>
+        <item>@string/drink_key_all</item>
+        <item>@string/drink_key_beer</item>
+        <item>@string/drink_key_wine</item>
+        <item>@string/drink_key_whisky</item>
+        <item>@string/drink_key_coffee</item>
+        <item>@string/drink_key_rum</item>
+        <item>@string/drink_key_tea</item>
+        <item>@string/drink_key_cocktail</item>
+        <item>@string/drink_key_generic</item>
     </string-array>
 
     <string-array name="pref_type_values">
-        <item>beer</item>
-        <item>wine</item>
-        <item>whisky</item>
-        <item>coffee</item>
-        <item>generic</item>
+        <item>@string/drink_key_beer</item>
+        <item>@string/drink_key_wine</item>
+        <item>@string/drink_key_whisky</item>
+        <item>@string/drink_key_coffee</item>
+        <item>@string/drink_key_rum</item>
+        <item>@string/drink_key_tea</item>
+        <item>@string/drink_key_cocktail</item>
+        <item>@string/drink_key_generic</item>
     </string-array>
 
     <string-array name="pref_rating_values">

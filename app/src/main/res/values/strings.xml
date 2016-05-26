@@ -37,29 +37,9 @@
     <string name="short_format">dd.MM.yy HH:mm</string>
 
 
-    <!-- drinkTypes values / labels - used in Utils -->
+    <!-- drinkTypes values / labels - used in Utils - see separate files-->
     <string name="drink_key_all" translatable="false">all</string>
     <string name="drink_show_all">All</string>
-
-    <string name="drink_key_generic" translatable="false">generic</string>
-    <string name="drink_show_generic">Drink</string>
-    <string name="producer_show_generic">Producer</string>
-
-    <string name="drink_key_coffee" translatable="false">coffee</string>
-    <string name="drink_show_coffee">Coffee</string>
-    <string name="producer_show_coffee">Coffee Roaster</string>
-
-    <string name="drink_key_wine" translatable="false">wine</string>
-    <string name="drink_show_wine">Wine</string>
-    <string name="producer_show_wine">Winery</string>
-
-    <string name="drink_key_beer" translatable="false">beer</string>
-    <string name="drink_show_beer">Beer</string>
-    <string name="producer_show_beer">Brewery</string>
-
-    <string name="drink_key_whisky" translatable="false">whisky</string>
-    <string name="drink_show_whisky">Whisk(e)y</string>
-    <string name="producer_show_whisky">Distillery</string>
 
 
     <!-- headings -->

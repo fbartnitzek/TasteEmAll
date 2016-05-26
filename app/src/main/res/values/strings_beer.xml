@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="drink_key_beer" translatable="false">beer</string>
+    <string name="drink_show_beer">Beer</string>
+    <string name="producer_show_beer">Brewery</string>
+
+</resources>
