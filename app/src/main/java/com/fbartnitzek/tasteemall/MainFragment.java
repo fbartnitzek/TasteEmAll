@@ -33,11 +33,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
-import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.showentry.ShowDrinkActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowProducerActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
@@ -345,9 +346,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         null, null,
                         sortOrder);
             case REVIEW_LOADER_ID:
-                mReviewsSortOrder = ProducerEntry.ALIAS+ "." + Producer.NAME + ", " +
-                        DrinkEntry.ALIAS + "." + Drink.NAME;
-                mCurrentReviewsUri = DatabaseContract.ReviewEntry.buildUriForShowReviewWithPatternAndType(
+                mReviewsSortOrder = ReviewEntry.ALIAS + "." + Review.READABLE_DATE + " DESC";
+                mCurrentReviewsUri = ReviewEntry.buildUriForShowReviewWithPatternAndType(
                         mSearchPattern == null ? "" : mSearchPattern,
                         mDrinkType == null ? Drink.TYPE_ALL : mDrinkType);
                 return new CursorLoader(getActivity(),
