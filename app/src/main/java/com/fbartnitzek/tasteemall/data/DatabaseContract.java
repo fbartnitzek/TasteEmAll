@@ -26,23 +26,48 @@ public class DatabaseContract {
     private static final String LOG_TAG = DatabaseContract.class.getName();
 
 //    public static final String SQL_INSERT_OR_REPLACE = " sql insert or replace";
+    public static final String PATH_LOCATION = "location";
+
     public static final String PATH_PRODUCER = "producer";
     public static final String PATH_PRODUCER_BY_NAME = "producer_by_name";
     public static final String PATH_PRODUCER_BY_PATTERN = "producer_by_pattern";
-    public static final String PATH_DRINK_BY_NAME = "drink_by_name";
+
     public static final String PATH_DRINK = "drink";
+    public static final String PATH_DRINK_BY_NAME = "drink_by_name";
     public static final String PATH_DRINK_WITH_PRODUCER = "drink_with_producer";
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME = "drink_with_producer_by_name";
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE = "drink_with_producer_by_name_and_type";
+
+    public static final String PATH_USER = "user";
 
     public static final String PATH_REVIEW = "review";
     public static final String PATH_REVIEW_WITH_ALL = "review_with_all";
     public static final String PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE = "review_with_all_by_name_and_type";
     public static final String PATH_REVIEW_GEOCODE_LOCATION = "review_geocode_locations";
 
+
 //    //URI data
     public static final String CONTENT_AUTHORITY = "fbartnitzek.tasteemall";
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+
+    public static final class LocationEntry implements BaseColumns {
+        public static final String TABLE_NAME = "locations";
+        public static final String ALIAS_PRODUCER = "lp";
+        public static final String ALIAS_REVIEW = "lr";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+    }
 
 
     public static final class ProducerEntry implements BaseColumns {
@@ -146,6 +171,24 @@ public class DatabaseContract {
                     .build();
         }
     }
+
+    public static final class UserEntry implements BaseColumns {
+        public static final String TABLE_NAME = "users";
+        public static final String ALIAS = "u";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+
+        public static Uri buildUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+    }
+
 
     public static final class ReviewEntry implements BaseColumns {
         public static final String TABLE_NAME = "reviews";

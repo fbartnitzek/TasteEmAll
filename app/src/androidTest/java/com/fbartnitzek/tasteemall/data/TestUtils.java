@@ -28,19 +28,24 @@ class TestUtils {
 
     private static final String LOG_TAG = TestUtils.class.getName();
 
-//    public static ContentValues createLocationLeipzig() {
-//        return DatabaseHelper.buildLocationValues("1", "Leipzig", "GERMANY", "04103",
-//                "Bayrischer Platz 1", "", "", "");
-//    }
+    public static ContentValues createLocationLeipzig() {
+        return DatabaseHelper.buildLocationValues("1", "Leipzig, Bayr. Bhf 1", "51.3257686", "12.3861969",
+                "Germany", "Leipzig, Bayrischer Bahnhof", "");
+    }
+
+    public static ContentValues createLocationIslay() {
+        return DatabaseHelper.buildLocationValues("2", "Islay, Port Ellen", "55.7586424", "-6.4126686",
+                "UK", "Port Ellen, Isle of Islay", "");
+    }
 
     public static ContentValues createBreweryBayrischerBahnhof() {
         return DatabaseHelper.buildProducerValues("1", "Bayerischer Bahnhof", "Brauerei im ehemaligen Bahnhof",
-                "http://www.bayerischer-bahnhof.de", "Leipzig, Bayrischer Platz 1");
+                "http://www.bayerischer-bahnhof.de", "1");
     }
 
     public static ContentValues createDistilleryLaphroaig() {
         return DatabaseHelper.buildProducerValues("2", "Laphroaig", "The most richly flavoured of all Scotch whiskies",
-                "http://www.laphroaig.com", "Port Ellen, Isle of Islay");
+                "http://www.laphroaig.com", "2");
     }
 
     public static ContentValues createBeerGose() {
@@ -55,14 +60,21 @@ class TestUtils {
         return DatabaseHelper.buildDrinkValues("3", "10 year old", "ABV 4.5%", "peaty", "whisky", "usual + peat", "2");
     }
 
-//    public static ContentValues createUserFrank() {
-//        return DatabaseHelper.buildUserValues("1", "fbartnitzek", "Frank Bartnitzek",
-//                "frank_bartnitzek@test.de", "");
-//    }
+    public static ContentValues createUserFrank() {
+        return DatabaseHelper.buildUserValues("1", "Frank");
+    }
 
     public static ContentValues createReview1() {
         return DatabaseHelper.buildReviewValues("1", "++", "lecker", "2015-12-11 16:00:00",
-                "Kartoffelbrot", "1", "Leipzig, Bayrischer Platz 1", "Frank");
+                "Kartoffelbrot", "1", "Leipzig, Bayrischer Platz 1", "1");
+    }
+
+    public static ContentValues[] createBulkUsers(int n) {
+        ContentValues[] cvs = new ContentValues[n];
+        for (int i = 0; i < n; ++i) {
+            cvs[i] = DatabaseHelper.buildUserValues("bulk_" + i, "user_" + i);
+        }
+        return cvs;
     }
 
     public static ContentValues[] createBulkReviews(int n) {
@@ -93,7 +105,7 @@ class TestUtils {
 
     public static ContentValues updateDistilleryLaphroaig() {
         return DatabaseHelper.buildProducerValues("2", "Laphroaig", NEW_PRODUCER_LAPHROAIG_DESCRIPTION,
-                "http://www.laphroaig.com", "Port Ellen, Isle of Islay");
+                "http://www.laphroaig.com", "2");
     }
 
     private static final String OLD_BEER_GOSE_INGREDIENTS = "usual + salt + coriander";

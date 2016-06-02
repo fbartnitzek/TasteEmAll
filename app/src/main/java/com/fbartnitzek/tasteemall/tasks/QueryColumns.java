@@ -33,7 +33,7 @@ public class QueryColumns {
                     ProducerEntry.TABLE_NAME + "." +  ProducerEntry._ID,
                     Producer.NAME,
                     Producer.DESCRIPTION,
-                    Producer.LOCATION};
+                    Producer.LOCATION_ID};  //TODO
 
             public static final int COL_QUERY_PRODUCER__ID = 0;
             public static final int COL_QUERY_PRODUCER_NAME = 1;
@@ -50,7 +50,7 @@ public class QueryColumns {
                     Drink.SPECIFICS,
                     Drink.STYLE,
                     Producer.NAME,
-                    Producer.LOCATION};
+                    Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -83,7 +83,7 @@ public class QueryColumns {
         public static class GeocodingQuery {
             public static final String[] COLUMNS = {
                     ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID,
-                    Review.LOCATION
+                    Review.LOCATION_ID  //TODO
             };
 
             public static final int COL_REVIEW__ID = 0;
@@ -114,11 +114,11 @@ public class QueryColumns {
 
             public static final String[] COLUMNS = {
                     ReviewEntry.ALIAS + "." + ReviewEntry._ID,
-                    Review.USER_NAME,
+                    Review.USER_ID, //TODO
                     Review.RATING,
                     Review.DESCRIPTION,
                     Review.READABLE_DATE,
-                    Review.LOCATION,
+                    Review.LOCATION_ID, //TODO
                     Review.RECOMMENDED_SIDES,
                     DrinkEntry.ALIAS + "." + DrinkEntry._ID,
                     Drink.NAME,
@@ -128,7 +128,7 @@ public class QueryColumns {
                     Drink.INGREDIENTS,
                     ProducerEntry.ALIAS + "." + ProducerEntry._ID,
                     Producer.NAME,
-                    Producer.LOCATION,
+                    Producer.LOCATION_ID,   //TODO
             };
 
             public static final int COL_REVIEW__ID = 0;
@@ -154,11 +154,11 @@ public class QueryColumns {
             public static final String[] COLUMNS = {
                     ReviewEntry.ALIAS + "." + ReviewEntry._ID,
                     Review.REVIEW_ID,
-                    Review.USER_NAME,
+                    Review.USER_ID, //TODO
                     Review.RATING,
                     Review.DESCRIPTION,
                     Review.READABLE_DATE,
-                    Review.LOCATION,
+                    Review.LOCATION_ID, //TODO
                     Review.RECOMMENDED_SIDES,
                     DrinkEntry.ALIAS + "." + DrinkEntry._ID,
                     Drink.DRINK_ID,
@@ -200,7 +200,7 @@ public class QueryColumns {
                     ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID,
                     Producer.PRODUCER_ID,
                     Producer.NAME,
-                    Producer.LOCATION};
+                    Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -228,7 +228,7 @@ public class QueryColumns {
                     Drink.INGREDIENTS,
                     Producer.PRODUCER_ID,
                     Producer.NAME,
-                    Producer.LOCATION};
+                    Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -245,7 +245,7 @@ public class QueryColumns {
         public static final String[] PRODUCER_QUERY_COLUMNS = {
                 DatabaseContract.ProducerEntry.TABLE_NAME + "." +  DatabaseContract.ProducerEntry._ID,
                 Producer.NAME,
-                Producer.LOCATION,
+                Producer.LOCATION_ID,   //TODO
                 Producer.PRODUCER_ID};
 
         public static final int COL_QUERY_PRODUCER__ID = 0;
@@ -262,7 +262,7 @@ public class QueryColumns {
                 Producer.NAME,
                 Producer.DESCRIPTION,
                 Producer.WEBSITE,
-                Producer.LOCATION
+                Producer.LOCATION_ID    //TODO
         };
 
         public static final int COL_PRODUCER__ID = 0;
@@ -278,9 +278,9 @@ public class QueryColumns {
         public static class ReviewColumns {
             public static final String[] COLUMNS = {
                     Review.REVIEW_ID,
-                    Review.USER_NAME,
+                    Review.USER_ID, //TODO
                     Review.READABLE_DATE,
-                    Review.LOCATION,
+                    Review.LOCATION_ID, //TODO
                     Review.RATING,
                     Review.DESCRIPTION,
                     Review.RECOMMENDED_SIDES,
@@ -323,7 +323,7 @@ public class QueryColumns {
             public static final String[] COLUMNS = {
                     Producer.PRODUCER_ID,
                     Producer.NAME,
-                    Producer.LOCATION,
+                    Producer.LOCATION_ID,   //TODO
                     Producer.DESCRIPTION,
                     Producer.WEBSITE
             };
@@ -344,18 +344,18 @@ public class QueryColumns {
 
             public static final String[] COLUMNS = {
                     ReviewEntry.ALIAS + "." + ReviewEntry._ID,
-                    Review.USER_NAME,
+                    Review.USER_ID, //TODO
                     Review.RATING,
                     Review.DESCRIPTION,
                     Review.READABLE_DATE,
-                    Review.LOCATION,
+                    Review.LOCATION_ID, //TODO
                     DrinkEntry.ALIAS + "." + DrinkEntry._ID,
                     Drink.NAME,
                     Drink.TYPE,
                     Drink.STYLE,
                     ProducerEntry.ALIAS + "." + ProducerEntry._ID,
                     Producer.NAME,
-                    Producer.LOCATION,
+                    Producer.LOCATION_ID,   //TODO
             };
 
             public static final int COL_REVIEW__ID = 0;

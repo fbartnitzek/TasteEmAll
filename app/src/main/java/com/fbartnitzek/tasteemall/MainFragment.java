@@ -328,7 +328,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         switch (id) {
             case PRODUCER_LOADER_ID:
                 mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
-                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION;
+                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION_ID;    //TODO
                 mCurrentProducersUri = ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern);
                 return new CursorLoader(getActivity(),
                         mCurrentProducersUri,

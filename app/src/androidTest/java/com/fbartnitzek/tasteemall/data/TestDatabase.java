@@ -69,20 +69,20 @@ public class TestDatabase extends AndroidTestCase {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
 
-//        {// insert location
-//            long insertedRows = db.insert(DatabaseContract.LocationEntry.TABLE_NAME, null,
-//                    TestUtils.createLocationLeipzig());
-//            assertTrue(insertedRows > 0);
-//
-//            // Query the database and receive a Cursor back
-//            Cursor cursor = db.query(
-//                    DatabaseContract.LocationEntry.TABLE_NAME, null, null, null, null, null, null);
-//
-//            // Move the cursor to a valid database row
-//            assertTrue("Error: No Records returned from location query", cursor.moveToFirst());
-//            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
-//            cursor.close();
-//        }
+        {// insert location
+            long insertedRows = db.insert(DatabaseContract.LocationEntry.TABLE_NAME, null,
+                    TestUtils.createLocationLeipzig());
+            assertTrue(insertedRows > 0);
+
+            // Query the database and receive a Cursor back
+            Cursor cursor = db.query(
+                    DatabaseContract.LocationEntry.TABLE_NAME, null, null, null, null, null, null);
+
+            // Move the cursor to a valid database row
+            assertTrue("Error: No Records returned from location query", cursor.moveToFirst());
+            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
+            cursor.close();
+        }
 
         {// insert brewery
             long insertedRows = db.insert(DatabaseContract.ProducerEntry.TABLE_NAME, null,
@@ -95,7 +95,7 @@ public class TestDatabase extends AndroidTestCase {
 
             // Move the cursor to a valid database row
             assertTrue("Error: No Records returned from brewery query", cursor.moveToFirst());
-            assertTrue("wrong entry count...? ", cursor.getCount() > 0);    // with brewdog from testInsert
+            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
             cursor.close();
         }
 
@@ -110,24 +110,24 @@ public class TestDatabase extends AndroidTestCase {
 
             // Move the cursor to a valid database row
             assertTrue("Error: No Records returned from beer query", cursor.moveToFirst());
-            assertTrue("wrong entry count...? ", cursor.getCount() > 1);    // with brewdog from testInsert
+            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
             cursor.close();
         }
 
-//        {// insert user
-//            long insertedRows = db.insert(DatabaseContract.UserEntry.TABLE_NAME, null,
-//                    TestUtils.createUserFrank());
-//            assertTrue(insertedRows > 0);
-//
-//            // Query the database and receive a Cursor back
-//            Cursor cursor = db.query(
-//                    DatabaseContract.UserEntry.TABLE_NAME, null, null, null, null, null, null);
-//
-//            // Move the cursor to a valid database row
-//            assertTrue("Error: No Records returned from user query", cursor.moveToFirst());
-//            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
-//            cursor.close();
-//        }
+        {// insert user
+            long insertedRows = db.insert(DatabaseContract.UserEntry.TABLE_NAME, null,
+                    TestUtils.createUserFrank());
+            assertTrue(insertedRows > 0);
+
+            // Query the database and receive a Cursor back
+            Cursor cursor = db.query(
+                    DatabaseContract.UserEntry.TABLE_NAME, null, null, null, null, null, null);
+
+            // Move the cursor to a valid database row
+            assertTrue("Error: No Records returned from user query", cursor.moveToFirst());
+            assertTrue("wrong entry count...? ", cursor.getCount() == 1);
+            cursor.close();
+        }
 
         {// insert review
             long insertedRows = db.insert(DatabaseContract.ReviewEntry.TABLE_NAME, null,

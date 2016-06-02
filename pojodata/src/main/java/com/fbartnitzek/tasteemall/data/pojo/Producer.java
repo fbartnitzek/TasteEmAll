@@ -23,7 +23,7 @@ public class Producer {
     public static final String DESCRIPTION = "producer_description";
     //wikipedia-style for absolute age of a brewery => separate...?
     public static final String WEBSITE = "producer_website";
-    public static final String LOCATION = "producer_location";
+    public static final String LOCATION_ID = "producer_location_id";
 
     private String producerId;
     private String name;

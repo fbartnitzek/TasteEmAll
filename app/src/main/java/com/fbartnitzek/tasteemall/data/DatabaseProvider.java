@@ -14,9 +14,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.fbartnitzek.tasteemall.Utils;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
@@ -42,7 +40,8 @@ public class DatabaseProvider extends ContentProvider {
     private static DatabaseHelper mHelper;
     private static final String LOG_TAG = DatabaseProvider.class.getName();
 
-//    private static final int LOCATIONS = 100;
+    private static final int LOCATIONS = 100;
+    private static final int LOCATION_BY_ID = 102;
 
     private static final int PRODUCERS = 200;
     private static final int PRODUCERS_BY_NAME = 201;
@@ -56,9 +55,12 @@ public class DatabaseProvider extends ContentProvider {
     private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE = 320;
 
-//    private static final int USERS = 400;
+    private static final int USERS = 400;
+    private static final int USER_BY_ID = 402;
+
+
     private static final int REVIEWS = 500;
-//    private static final int REVIEW_WITH_ALL_BY_NAME = 502;
+    //    private static final int REVIEW_WITH_ALL_BY_NAME = 502;
     private static final int REVIEW_BY_ID = 503;
     private static final int REVIEW_WITH_ALL_BY_ID = 510;
     private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
@@ -66,7 +68,7 @@ public class DatabaseProvider extends ContentProvider {
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 
-//    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
+    //    private static final SQLiteQueryBuilder sBreweryByNameQueryBuilder;
     static {
 //        sBreweryByNameQueryBuilder = new SQLiteQueryBuilder();
 //        sBreweryByNameQueryBuilder.setTables(
@@ -80,16 +82,17 @@ public class DatabaseProvider extends ContentProvider {
 //            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
             ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
 
+    // TODO: adapt
     private static final String PRODUCERS_BY_NAME_OR_LOCATION_SELECTION =
-            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ? OR "
-                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION + " LIKE ?";
+            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ? OR ";
+//                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION + " LIKE ?";
 
     private static final String DRINKS_BY_NAME_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'";
 
     private static final String DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
-                + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
+                    + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
 
     private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
             DrinkEntry.ALIAS + "." + Drink.NAME + " LIKE ? OR "
@@ -98,11 +101,11 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final String DRINKS_BY_NAME_AND_TYPE_SELECTION =
             DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? AND "
-            + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
+                    + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
 
     private static final String DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
             "(" + DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? OR "
-                + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?)" +
+                    + ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?)" +
                     " AND " + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
 
     private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
@@ -119,16 +122,17 @@ public class DatabaseProvider extends ContentProvider {
         final String authority = DatabaseContract.CONTENT_AUTHORITY;
 
         // all locations
-//        matcher.addURI(authority, DatabaseContract.PATH_LOCATION, LOCATIONS);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION, LOCATIONS);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION + "/#", LOCATION_BY_ID);
 
         // all producers
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER, PRODUCERS);
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER + "/#", PRODUCER_BY_ID);
-            // needed for empty string ...
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/" , PRODUCERS_BY_NAME);
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME+ "/*", PRODUCERS_BY_NAME);
-            // producer.name and producer.location
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/" , PRODUCERS_BY_PATTERN);
+        // needed for empty string ...
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/", PRODUCERS_BY_NAME);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/*", PRODUCERS_BY_NAME);
+        // producer.name and producer.location
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/", PRODUCERS_BY_PATTERN);
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/*", PRODUCERS_BY_PATTERN);
         //TODO: all breweries in certain location - even better in area (center, radius)
 
@@ -146,7 +150,8 @@ public class DatabaseProvider extends ContentProvider {
         // TODO: all beers of certain brewery, of breweries in certain location / area
 
         // all users
-//        matcher.addURI(authority, DatabaseContract.PATH_USER, USERS);
+        matcher.addURI(authority, DatabaseContract.PATH_USER, USERS);
+        matcher.addURI(authority, DatabaseContract.PATH_USER + "/#", USER_BY_ID);
 //         TODO: all users in certain area (, with certain reviewed beers)
 
         // all reviews
@@ -178,6 +183,15 @@ public class DatabaseProvider extends ContentProvider {
         String pattern;
         String drinkType;
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS:
+                cursor = db.query(LocationEntry.TABLE_NAME, projection, selection,
+                        selectionArgs, null, null, sortOrder);
+                break;
+            case LOCATION_BY_ID:
+                cursor = db.query(LocationEntry.TABLE_NAME, projection,
+                        LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
             case PRODUCERS:
 //                Log.v(LOG_TAG, "query - PRODUCERS, " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, selection, selectionArgs,
@@ -231,7 +245,7 @@ public class DatabaseProvider extends ContentProvider {
                 pattern = DrinkEntry.getSearchString(uri, true);
                 drinkType = DrinkEntry.getDrinkType(uri);
 //                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
-                if (Drink.TYPE_ALL.equals(drinkType)){
+                if (Drink.TYPE_ALL.equals(drinkType)) {
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                     cursor = sDrinksWithProducersQueryBuilder.query(db,
                             projection, DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
@@ -245,6 +259,15 @@ public class DatabaseProvider extends ContentProvider {
             case DRINKS_WITH_PRODUCER_BY_ID:
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
                         projection, DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
+            case USERS:
+                cursor = db.query(UserEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case USER_BY_ID:
+                cursor = db.query(UserEntry.TABLE_NAME, projection,
+                        UserEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
                 break;
             case REVIEWS:
@@ -267,7 +290,7 @@ public class DatabaseProvider extends ContentProvider {
                 drinkType = ReviewEntry.getDrinkType(uri);
 //                Log.v(LOG_TAG, "query, pattern=" + pattern + ", drinkType=" + drinkType +", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + Arrays.toString(projection) + "], selection = [" + selection + "], selectionArgs = [" + Arrays.toString(selectionArgs) + "], sortOrder = [" + sortOrder + "]");
                 // more complicated stuff should be customizable (not by default OR concatenated
-                if (Drink.TYPE_ALL.equals(drinkType)){
+                if (Drink.TYPE_ALL.equals(drinkType)) {
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
                     cursor = sReviewWithDrinkAndProducerQueryBuilder.query(db,
                             projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
@@ -279,7 +302,8 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case REVIEWS_GEOCODE:
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection,
-                        Review.LOCATION + " LIKE '" + Utils.GEOCODE_ME + "%'",
+                        //TODO!!!
+                        Review.LOCATION_ID + " LIKE '" + Utils.GEOCODE_ME + "%'",
                         selectionArgs, null, null, sortOrder);
                 break;
             // TODO: special review-searches    - advanced search Fragment...
@@ -301,7 +325,7 @@ public class DatabaseProvider extends ContentProvider {
 
     private static final SQLiteQueryBuilder sDrinksWithProducersQueryBuilder;
 
-    static{
+    static {
         sDrinksWithProducersQueryBuilder = new SQLiteQueryBuilder();
         sDrinksWithProducersQueryBuilder.setTables(
                 DrinkEntry.TABLE_NAME + " INNER JOIN " + ProducerEntry.TABLE_NAME
@@ -313,13 +337,14 @@ public class DatabaseProvider extends ContentProvider {
     private static final String RA = ReviewEntry.ALIAS;   //ReviewAlias
     private static final String DA = DrinkEntry.ALIAS;   //DrinkAlias
     private static final String PA = ProducerEntry.ALIAS;   //ProducerAlias
+
     static {
         sReviewWithDrinkAndProducerQueryBuilder = new SQLiteQueryBuilder();
         // JoinOfJoin: http://stackoverflow.com/questions/11105895/sqlite-left-outer-join-multiple-tables
         sReviewWithDrinkAndProducerQueryBuilder.setTables(
                 ReviewEntry.TABLE_NAME + " " + RA + " INNER JOIN " + DrinkEntry.TABLE_NAME + " " + DA + " ON "
-                + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
-                + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
+                        + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
+                        + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
                         + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID
         );
     }
@@ -332,6 +357,15 @@ public class DatabaseProvider extends ContentProvider {
         final SQLiteDatabase db = mHelper.getWritableDatabase();
         Uri returnUri;
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS: {
+                long id = db.insert(LocationEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    returnUri = LocationEntry.buildUri(id);
+                } else {
+                    throw new SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
             case PRODUCERS: {
                 long id = db.insert(ProducerEntry.TABLE_NAME, null, values);
                 if (id > 0) {
@@ -345,6 +379,15 @@ public class DatabaseProvider extends ContentProvider {
                 long id = db.insert(DrinkEntry.TABLE_NAME, null, values);
                 if (id > 0) {
                     returnUri = DrinkEntry.buildUri(id);
+                } else {
+                    throw new SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case USERS: {
+                long id = db.insert(UserEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    returnUri = UserEntry.buildUri(id);
                 } else {
                     throw new SQLException("Failed to insert row into " + uri);
                 }
@@ -376,6 +419,21 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteDatabase db = mHelper.getWritableDatabase();
         int returnCount = 0;
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS:
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long id = db.insertWithOnConflict(LocationEntry.TABLE_NAME, null, value,
+                                SQLiteDatabase.CONFLICT_REPLACE);
+                        if (id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                break;
             case PRODUCERS:
                 db.beginTransaction();
                 try {
@@ -403,6 +461,21 @@ public class DatabaseProvider extends ContentProvider {
                         long id = db.insertWithOnConflict(DrinkEntry.TABLE_NAME, null, value,
                                 SQLiteDatabase.CONFLICT_REPLACE);
                         if (id != -1) { // TODO: seems to be no error = -1 if foreign key is missing...
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                break;
+            case USERS:
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long id = db.insertWithOnConflict(UserEntry.TABLE_NAME, null, value,
+                                SQLiteDatabase.CONFLICT_REPLACE);
+                        if (id != -1) {
                             returnCount++;
                         }
                     }
@@ -442,6 +515,14 @@ public class DatabaseProvider extends ContentProvider {
         int deletedRows;
         if (null == selection) selection = "1";
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS:
+                deletedRows = db.delete(LocationEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case LOCATION_BY_ID:
+                deletedRows = db.delete(LocationEntry.TABLE_NAME,
+                        LocationEntry.TABLE_NAME + "." + LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             case PRODUCERS:
                 deletedRows = db.delete(ProducerEntry.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -456,6 +537,14 @@ public class DatabaseProvider extends ContentProvider {
             case DRINK_BY_ID:
                 deletedRows = db.delete(DrinkEntry.TABLE_NAME,
                         DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
+            case USERS:
+                deletedRows = db.delete(UserEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case USER_BY_ID:
+                deletedRows = db.delete(UserEntry.TABLE_NAME,
+                        UserEntry.TABLE_NAME + "." + UserEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs);
                 break;
             case REVIEWS:
@@ -482,6 +571,14 @@ public class DatabaseProvider extends ContentProvider {
         final SQLiteDatabase db = mHelper.getWritableDatabase();
         int impactedRows;
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS:
+                impactedRows = db.update(LocationEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case LOCATION_BY_ID:
+                impactedRows = db.update(LocationEntry.TABLE_NAME, values,
+                        LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
             case PRODUCERS:
                 impactedRows = db.update(ProducerEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
@@ -496,6 +593,14 @@ public class DatabaseProvider extends ContentProvider {
             case DRINK_BY_ID:
                 impactedRows = db.update(DrinkEntry.TABLE_NAME, values,
                         DrinkEntry.TABLE_NAME + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs);
+                break;
+            case USERS:
+                impactedRows = db.update(UserEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case USER_BY_ID:
+                impactedRows = db.update(UserEntry.TABLE_NAME, values,
+                        UserEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs);
                 break;
             case REVIEWS:
@@ -521,6 +626,10 @@ public class DatabaseProvider extends ContentProvider {
 //        Log.v(LOG_TAG, "getType, " + "uri = [" + uri + "]");
 
         switch (mUriMatcher.match(uri)) {
+            case LOCATIONS:
+                return LocationEntry.CONTENT_TYPE;
+            case LOCATION_BY_ID:
+                return LocationEntry.CONTENT_ITEM_TYPE;
             case PRODUCERS:
                 return ProducerEntry.CONTENT_TYPE;
             case PRODUCERS_BY_NAME:
@@ -541,6 +650,10 @@ public class DatabaseProvider extends ContentProvider {
                 return DrinkEntry.CONTENT_ITEM_TYPE;
             case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:
                 return DrinkEntry.CONTENT_TYPE;
+            case USERS:
+                return UserEntry.CONTENT_TYPE;
+            case USER_BY_ID:
+                return UserEntry.CONTENT_ITEM_TYPE;
             case REVIEWS:
                 return ReviewEntry.CONTENT_TYPE;
             case REVIEW_BY_ID:

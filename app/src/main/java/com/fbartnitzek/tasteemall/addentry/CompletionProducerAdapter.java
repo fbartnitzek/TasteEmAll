@@ -41,7 +41,7 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
         super(activity,
                 R.layout.list_item_producer_completion,
                 null,
-                new String[]{Producer.NAME, Producer.LOCATION},
+                new String[]{Producer.NAME, Producer.LOCATION_ID},  //TODO
                 new int[]{R.id.list_item_producer_name, R.id.list_item_location_name},
                 0);
         mActivity = activity;

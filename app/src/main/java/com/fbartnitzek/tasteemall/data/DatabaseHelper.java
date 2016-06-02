@@ -6,12 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
-import com.fbartnitzek.tasteemall.data.pojo.Drink;
-import com.fbartnitzek.tasteemall.data.pojo.Producer;
-import com.fbartnitzek.tasteemall.data.pojo.Review;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.fbartnitzek.tasteemall.data.pojo.*;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -45,28 +41,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.v(LOG_TAG, "onCreate, " + "db = [" + db + "]");
 
-//        final String createLocationTable = "CREATE TABLE " + LocationEntry.TABLE_NAME + " ("
-//                + LocationEntry._ID + " INTEGER PRIMARY KEY,"
-//                + Location.LOCATION_ID + " TEXT NOT NULL,"
-//                + Location.LOCALITY + " TEXT NOT NULL,"
-//                + Location.COUNTRY + " TEXT NOT NULL,"
-//                + Location.POSTAL_CODE + " TEXT,"
-//                + Location.STREET + " TEXT,"
-//                + Location.LONGITUDE + " TEXT,"
-//                + Location.LATITUDE + " TEXT,"
-//                + Location.FORMATTED_ADDRESS + " TEXT,"
-//                //primary key
-//                + "UNIQUE (" + Location.LOCATION_ID + ") ON CONFLICT REPLACE" //obviously wrong...
-//                + " );";
-//        db.execSQL(createLocationTable);
+        final String createLocationTable = "CREATE TABLE " + LocationEntry.TABLE_NAME + " ("
+                + LocationEntry._ID + " INTEGER PRIMARY KEY,"
+                + Location.LOCATION_ID + " TEXT NOT NULL,"
+                + Location.INPUT + " TEXT NOT NULL,"
+                + Location.LATITUDE + " TEXT,"
+                + Location.LONGITUDE + " TEXT,"
+                + Location.COUNTRY + " TEXT,"
+                + Location.FORMATTED_ADDRESS + " TEXT,"
+                + Location.DESCRIPTION + " TEXT,"
 
-        final String createProducerTable = "CREATE TABLE " + DatabaseContract.ProducerEntry.TABLE_NAME + " ("
-                + DatabaseContract.ProducerEntry._ID + " INTEGER PRIMARY KEY,"
+                //primary key
+                + "UNIQUE (" + Location.LOCATION_ID + ") ON CONFLICT REPLACE" //obviously wrong...
+                + " );";
+        db.execSQL(createLocationTable);
+
+        final String createProducerTable = "CREATE TABLE " + ProducerEntry.TABLE_NAME + " ("
+                + ProducerEntry._ID + " INTEGER PRIMARY KEY,"
                 + Producer.PRODUCER_ID + " TEXT NOT NULL,"
                 + Producer.NAME + " TEXT NOT NULL, "
                 + Producer.DESCRIPTION + " TEXT,"
                 + Producer.WEBSITE + " TEXT,"
-                + Producer.LOCATION + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
+                + Producer.LOCATION_ID + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
+
+                + "FOREIGN KEY (" + Producer.LOCATION_ID + ") REFERENCES "
+                + LocationEntry.TABLE_NAME + " (" + Location.LOCATION_ID + "),"
 
                 + "UNIQUE (" + Producer.PRODUCER_ID + ") ON CONFLICT REPLACE"
                 + " );";
@@ -89,20 +88,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " );";
         db.execSQL(createDrinkTable);
 
-//        final String createUserTable = "CREATE TABLE " + UserEntry.TABLE_NAME + " ("
-//                + UserEntry._ID + " INTEGER PRIMARY KEY,"
-//                + User.USER_ID + " TEXT NOT NULL,"
-//                + User.LOGIN + " TEXT NOT NULL,"
-//                + User.NAME + " TEXT,"
-//                + User.EMAIL + " TEXT NOT NULL,"
-//                + User.HOME_LOCATION_ID + " TEXT,"
-//
-//                + "FOREIGN KEY (" + User.HOME_LOCATION_ID + ") REFERENCES "
-//                + LocationEntry.TABLE_NAME + " (" + Location.LOCATION_ID + "),"
-//
-//                + "UNIQUE (" + User.USER_ID + ") ON CONFLICT REPLACE"
-//                + " );";
-//        db.execSQL(createUserTable);
+
+        final String createUserTable = "CREATE TABLE " + UserEntry.TABLE_NAME + " ("
+                + UserEntry._ID + " INTEGER PRIMARY KEY,"
+                + User.USER_ID + " TEXT NOT NULL,"
+                + User.NAME + " TEXT NOT NULL,"
+
+                + "UNIQUE (" + User.USER_ID + ") ON CONFLICT REPLACE"
+                + " );";
+        db.execSQL(createUserTable);
+
 
         final String createReviewTable = "CREATE TABLE " + ReviewEntry.TABLE_NAME + " ("
                 + ReviewEntry._ID + " INTEGER PRIMARY KEY,"
@@ -113,11 +108,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Review.RECOMMENDED_SIDES + " TEXT,"
 
                 + Review.DRINK_ID + " TEXT NOT NULL,"
-                + Review.LOCATION + " TEXT,"
-                + Review.USER_NAME + " TEXT NOT NULL,"  // TODO: USER!
+                + Review.LOCATION_ID + " TEXT,"
+                + Review.USER_ID + " TEXT NOT NULL,"
 
                 + "FOREIGN KEY (" + Review.DRINK_ID + ") REFERENCES "
                 + DrinkEntry.TABLE_NAME + " (" + Drink.DRINK_ID + "),"
+                + "FOREIGN KEY (" + Review.LOCATION_ID + ") REFERENCES "
+                + LocationEntry.TABLE_NAME + " (" + Location.LOCATION_ID + "),"
+                + "FOREIGN KEY (" + Review.USER_ID + ") REFERENCES "
+                + UserEntry.TABLE_NAME + " (" + User.USER_ID + "),"
 
                 + "UNIQUE (" + Review.REVIEW_ID + ") ON CONFLICT REPLACE"
                 + " );";
@@ -132,31 +131,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         throw new UnsupportedOperationException("db upgrade not yet supported...");
     }
 
-//    public static ContentValues buildLocationValues(String locationId, String locality,
-//                                                    String country, String plz, String street,
-//                                                    String longitude, String latitude,
-//                                                    String formattedAddress) {
-//        ContentValues cv = new ContentValues();
-//        cv.put(Location.LOCATION_ID, locationId);
-//        cv.put(Location.LOCALITY, locality);
-//        cv.put(Location.COUNTRY, country);
-//        cv.put(Location.POSTAL_CODE, plz);
-//        cv.put(Location.STREET, street);
-//        cv.put(Location.LONGITUDE, longitude);
-//        cv.put(Location.LATITUDE, latitude);
-//        cv.put(Location.FORMATTED_ADDRESS, formattedAddress);
-//        return cv;
-//    }
+    public static ContentValues buildLocationValues(String locationId, String input,
+                                                    String latitude, String longitude,
+                                                    String country, String formattedAddress,
+                                                    String description) {
+        ContentValues cv = new ContentValues();
+        cv.put(Location.LOCATION_ID, locationId);
+        cv.put(Location.INPUT, input);
+        cv.put(Location.LATITUDE, latitude);
+        cv.put(Location.LONGITUDE, longitude);
+        cv.put(Location.COUNTRY, country);
+        cv.put(Location.FORMATTED_ADDRESS, formattedAddress);
+        cv.put(Location.DESCRIPTION, description);
+        return cv;
+    }
 
     public static ContentValues buildProducerValues(String producerId, String name,
                                                     String description, String website,
-                                                    String location) {
+                                                    String locationId) {
         ContentValues cv = new ContentValues();
         cv.put(Producer.PRODUCER_ID, producerId);
         cv.put(Producer.NAME, name);
         cv.put(Producer.DESCRIPTION, description);
         cv.put(Producer.WEBSITE, website);
-        cv.put(Producer.LOCATION, location);    //TODO: rawInput => formatted address, country
+//        cv.put(Producer.LOCATION, location);
+        cv.put(Producer.LOCATION_ID, locationId);
         return cv;
     }
 
@@ -174,20 +173,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cv;
     }
 
-//    public static ContentValues buildUserValues(String userId, String login, String name,
-//                                                String email, String homeLocationId) {
-//        ContentValues cv = new ContentValues();
-//        cv.put(User.USER_ID, userId);
-//        cv.put(User.LOGIN, login);
-//        cv.put(User.NAME, name);
-//        cv.put(User.EMAIL, email);
-//        cv.put(User.HOME_LOCATION_ID, homeLocationId);
-//        return cv;
-//    }
+    public static ContentValues buildUserValues(String userId, String name) {
+        ContentValues cv = new ContentValues();
+        cv.put(User.USER_ID, userId);
+        cv.put(User.NAME, name);
+        return cv;
+    }
 
     public static ContentValues buildReviewValues(String reviewId, String rating, String description,
                                                   String readableDate, String recommendedSides,
-                                                  String drinkId, String location, String userName) {
+                                                  String drinkId, String locationId, String userId) {
         ContentValues cv = new ContentValues();
         cv.put(Review.REVIEW_ID, reviewId);
         cv.put(Review.RATING, rating);
@@ -195,8 +190,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Review.READABLE_DATE, readableDate);
         cv.put(Review.RECOMMENDED_SIDES, recommendedSides);
         cv.put(Review.DRINK_ID, drinkId);
-        cv.put(Review.LOCATION, location);
-        cv.put(Review.USER_NAME, userName);
+        cv.put(Review.LOCATION_ID, locationId);
+        cv.put(Review.USER_ID, userId);
+//        cv.put(Review.LOCATION, location);
+//        cv.put(Review.USER_NAME, userName);
         return cv;
     }
 }

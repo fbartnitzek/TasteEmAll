@@ -92,7 +92,7 @@ public class GeocodeReviewsTask extends AsyncTask<Void, Void, String> {
                     location = Utils.formatAddress(addresses.get(0));
                     Log.v(LOG_TAG, "doInBackground location:" + location);
                     ContentValues cv = new ContentValues();
-                    cv.put(Review.LOCATION, location);
+                    cv.put(Review.LOCATION_ID, location);   //TODO
                     rows = mActivity.getContentResolver().update(
                             DatabaseContract.ReviewEntry.buildUri(id),
                             cv, null, null);
