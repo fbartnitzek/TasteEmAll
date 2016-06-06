@@ -1,10 +1,15 @@
-package com.fbartnitzek.tasteemall.tasks;
+package com.fbartnitzek.tasteemall.data;
 
-import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.UserEntry;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
+import com.fbartnitzek.tasteemall.data.pojo.User;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -23,6 +28,11 @@ import com.fbartnitzek.tasteemall.data.pojo.Review;
  */
 
 public class QueryColumns {
+
+    private static final String RA = ReviewEntry.ALIAS;   //ReviewAlias
+    private static final String UA = UserEntry.ALIAS;   //UserAlias
+    private static final String DA = DrinkEntry.ALIAS;   //DrinkAlias
+    private static final String PA = ProducerEntry.ALIAS;   //ProducerAlias
 
     // TODO: remove unused...
     public static class MainFragment {
@@ -43,14 +53,14 @@ public class QueryColumns {
 
         public static class DrinkWithProducerQuery {
             public static final String[] COLUMNS = {
-                    DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,
-                    Drink.NAME,
-                    Drink.PRODUCER_ID,
-                    Drink.TYPE,
-                    Drink.SPECIFICS,
-                    Drink.STYLE,
-                    Producer.NAME,
-                    Producer.LOCATION_ID};  //TODO
+                    DA + "." + DrinkEntry._ID,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.PRODUCER_ID,
+                    DA + "." + Drink.TYPE,
+                    DA + "." + Drink.SPECIFICS,
+                    DA + "." + Drink.STYLE,
+                    PA + "." + Producer.NAME,
+                    PA + "." + Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -64,12 +74,12 @@ public class QueryColumns {
 
         public static class ReviewAllQuery{
             public static final String[] COLUMNS = {
-                    ReviewEntry.ALIAS + "." +  ReviewEntry._ID,
-                    Review.RATING,
-                    Review.READABLE_DATE,
-                    Drink.NAME,
-                    Drink.TYPE,
-                    Producer.NAME};
+                    RA + "." + ReviewEntry._ID,
+                    RA + "." + Review.RATING,
+                    RA + "." + Review.READABLE_DATE,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.TYPE,
+                    PA + "." + Producer.NAME};
 
             public static final int COL_REVIEW__ID = 0;
             public static final int COL_REVIEW_RATING = 1;
@@ -93,14 +103,14 @@ public class QueryColumns {
 
     public static class ReviewFragment {
 
-        public static class CompletionQuery {
+        public static class DrinkCompletionQuery {
 
             public static final String[] COLUMNS = {
-                    DrinkEntry.TABLE_NAME + "." +  DrinkEntry._ID,
-                    Drink.NAME,
-                    Drink.DRINK_ID,
-                    Drink.TYPE,
-                    Producer.NAME};
+                    DA + "." + DrinkEntry._ID,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.DRINK_ID,
+                    DA + "." + Drink.TYPE,
+                    PA + "." + Producer.NAME};
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -109,35 +119,47 @@ public class QueryColumns {
             public static final int COL_PRODUCER_NAME = 4;
         }
 
+        public static class UserQuery {
+
+            public static final String[] COLUMNS = {
+                    UserEntry.TABLE_NAME + "." +  UserEntry._ID,
+                    User.NAME,
+                    User.USER_ID};
+
+            public static final int COL_USER__ID = 0;
+            public static final int COL_USER_NAME = 1;
+            public static final int COL_USER_ID = 2;
+        }
+
 
         public static class ShowQuery {
 
             public static final String[] COLUMNS = {
-                    ReviewEntry.ALIAS + "." + ReviewEntry._ID,
-                    Review.USER_ID, //TODO
-                    Review.RATING,
-                    Review.DESCRIPTION,
-                    Review.READABLE_DATE,
-                    Review.LOCATION_ID, //TODO
-                    Review.RECOMMENDED_SIDES,
-                    DrinkEntry.ALIAS + "." + DrinkEntry._ID,
-                    Drink.NAME,
-                    Drink.TYPE,
-                    Drink.STYLE,
-                    Drink.SPECIFICS,
-                    Drink.INGREDIENTS,
-                    ProducerEntry.ALIAS + "." + ProducerEntry._ID,
-                    Producer.NAME,
-                    Producer.LOCATION_ID,   //TODO
+                    RA + "." + ReviewEntry._ID,
+                    RA + "." + Review.RATING,
+                    RA + "." + Review.DESCRIPTION,
+                    RA + "." + Review.READABLE_DATE,
+                    RA + "." + Review.LOCATION_ID, //TODO
+                    RA + "." + Review.RECOMMENDED_SIDES,
+                    UA + "." + User.NAME,
+                    DA + "." + DrinkEntry.ALIAS + "." + DrinkEntry._ID,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.TYPE,
+                    DA + "." + Drink.STYLE,
+                    DA + "." + Drink.SPECIFICS,
+                    DA + "." + Drink.INGREDIENTS,
+                    PA + "." + ProducerEntry.ALIAS + "." + ProducerEntry._ID,
+                    PA + "." + Producer.NAME,
+                    PA + "." + Producer.LOCATION_ID,   //TODO
             };
 
             public static final int COL_REVIEW__ID = 0;
-            public static final int COL_REVIEW_USER_NAME = 1;
-            public static final int COL_REVIEW_RATING = 2;
-            public static final int COL_REVIEW_DESCRIPTION = 3;
-            public static final int COL_REVIEW_READABLE_DATE = 4;
-            public static final int COL_REVIEW_LOCATION = 5;
-            public static final int COL_REVIEW_RECOMMENDED_SIDES = 6;
+            public static final int COL_REVIEW_RATING = 1;
+            public static final int COL_REVIEW_DESCRIPTION = 2;
+            public static final int COL_REVIEW_READABLE_DATE = 3;
+            public static final int COL_REVIEW_LOCATION = 4;
+            public static final int COL_REVIEW_RECOMMENDED_SIDES = 5;
+            public static final int COL_USER_NAME = 6;
             public static final int COL_DRINK__ID = 7;
             public static final int COL_DRINK_NAME = 8;
             public static final int COL_DRINK_TYPE = 9;
@@ -152,33 +174,41 @@ public class QueryColumns {
         public static class EditQuery {
 
             public static final String[] COLUMNS = {
-                    ReviewEntry.ALIAS + "." + ReviewEntry._ID,
-                    Review.REVIEW_ID,
-                    Review.USER_ID, //TODO
-                    Review.RATING,
-                    Review.DESCRIPTION,
-                    Review.READABLE_DATE,
-                    Review.LOCATION_ID, //TODO
-                    Review.RECOMMENDED_SIDES,
-                    DrinkEntry.ALIAS + "." + DrinkEntry._ID,
-                    Drink.DRINK_ID,
-                    Drink.NAME,
-                    Drink.TYPE,
-                    Producer.NAME
+                    RA + "." + ReviewEntry._ID,
+                    RA + "." + Review.REVIEW_ID,
+                    RA + "." + Review.RATING,
+                    RA + "." + Review.DESCRIPTION,
+                    RA + "." + Review.READABLE_DATE,
+                    RA + "." + Review.RECOMMENDED_SIDES,
+
+                    RA + "." + Review.USER_ID,
+                    UA + "." + User.NAME,
+
+                    RA + "." + Review.LOCATION_ID, //TODO
+
+                    DA + "." + Drink.DRINK_ID,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.TYPE,
+
+                    PA + "." + Producer.NAME
             };
 
             public static final int COL_REVIEW__ID = 0;
             public static final int COL_REVIEW_ID = 1;
-            public static final int COL_REVIEW_USER_NAME = 2;
-            public static final int COL_REVIEW_RATING = 3;
-            public static final int COL_REVIEW_DESCRIPTION = 4;
-            public static final int COL_REVIEW_READABLE_DATE = 5;
-            public static final int COL_REVIEW_LOCATION = 6;
-            public static final int COL_REVIEW_RECOMMENDED_SIDES = 7;
-            public static final int COL_DRINK__ID = 8;
+            public static final int COL_REVIEW_RATING = 2;
+            public static final int COL_REVIEW_DESCRIPTION = 3;
+            public static final int COL_REVIEW_READABLE_DATE = 4;
+            public static final int COL_REVIEW_RECOMMENDED_SIDES = 5;
+
+            public static final int COL_USER_ID = 6;
+            public static final int COL_USER_NAME = 7;
+
+            public static final int COL_REVIEW_LOCATION = 8;
+
             public static final int COL_DRINK_ID = 9;
             public static final int COL_DRINK_NAME = 10;
             public static final int COL_DRINK_TYPE = 11;
+
             public static final int COL_PRODUCER_NAME = 12;
         }
 
@@ -190,17 +220,17 @@ public class QueryColumns {
         public static class ShowQuery {
 
             public static final String[] COLUMNS = {
-                    DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursorAdapter doesn't work
-                    Drink.NAME,
-                    Drink.DRINK_ID,
-                    Drink.TYPE,
-                    Drink.SPECIFICS,
-                    Drink.STYLE,
-                    Drink.INGREDIENTS,
-                    ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID,
-                    Producer.PRODUCER_ID,
-                    Producer.NAME,
-                    Producer.LOCATION_ID};  //TODO
+                    DA + "." + DrinkEntry._ID,  // without the CursorAdapter doesn't work
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.DRINK_ID,
+                    DA + "." + Drink.TYPE,
+                    DA + "." + Drink.SPECIFICS,
+                    DA + "." + Drink.STYLE,
+                    DA + "." + Drink.INGREDIENTS,
+                    PA + "." + ProducerEntry._ID,
+                    PA + "." + Producer.PRODUCER_ID,
+                    PA + "." + Producer.NAME,
+                    PA + "." + Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -219,16 +249,16 @@ public class QueryColumns {
         public static class EditQuery {
 
             public static final String[] COLUMNS = {
-                    DatabaseContract.DrinkEntry.TABLE_NAME + "." + DatabaseContract.DrinkEntry._ID,  // without the CursorAdapter doesn't work
-                    Drink.NAME,
-                    Drink.DRINK_ID,
-                    Drink.TYPE,
-                    Drink.SPECIFICS,
-                    Drink.STYLE,
-                    Drink.INGREDIENTS,
-                    Producer.PRODUCER_ID,
-                    Producer.NAME,
-                    Producer.LOCATION_ID};  //TODO
+                    DA + "." + DrinkEntry._ID,  // without the CursorAdapter doesn't work
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.DRINK_ID,
+                    DA + "." + Drink.TYPE,
+                    DA + "." + Drink.SPECIFICS,
+                    DA + "." + Drink.STYLE,
+                    DA + "." + Drink.INGREDIENTS,
+                    PA + "." + Producer.PRODUCER_ID,
+                    PA + "." + Producer.NAME,
+                    PA + "." + Producer.LOCATION_ID};  //TODO
 
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
@@ -242,16 +272,21 @@ public class QueryColumns {
             public static final int COL_PRODUCER_LOCATION = 9;
         }
 
-        public static final String[] PRODUCER_QUERY_COLUMNS = {
-                DatabaseContract.ProducerEntry.TABLE_NAME + "." +  DatabaseContract.ProducerEntry._ID,
-                Producer.NAME,
-                Producer.LOCATION_ID,   //TODO
-                Producer.PRODUCER_ID};
 
-        public static final int COL_QUERY_PRODUCER__ID = 0;
-        public static final int COL_QUERY_PRODUCER_NAME = 1;
-        public static final int COL_QUERY_PRODUCER_LOCATION = 2;
-        public static final int COL_QUERY_PRODUCER_ID = 3;
+        public static class ProducerCompletionQuery {
+
+            public static final String[] COLUMNS = {
+                    DatabaseContract.ProducerEntry.TABLE_NAME + "." +  DatabaseContract.ProducerEntry._ID,
+                    Producer.NAME,
+                    Producer.LOCATION_ID,   //TODO
+                    Producer.PRODUCER_ID};
+
+            public static final int COL_PRODUCER__ID = 0;
+            public static final int COL_PRODUCER_NAME = 1;
+            public static final int COL_PRODUCER_LOCATION = 2;
+            public static final int COL_PRODUCER_ID = 3;
+        }
+
     }
 
     public static class ProducerFragment {
@@ -286,17 +321,13 @@ public class QueryColumns {
                     Review.RECOMMENDED_SIDES,
                     Review.DRINK_ID
             };
+        }
 
-            public static final int COL_REVIEW_ID = 0;
-            public static final int COL_USER_NAME = 1;
-            public static final int COL_READABLE_DATE = 2;
-            public static final int COL_LOCATION = 3;
-            public static final int COL_RATING = 4;
-            public static final int COL_DESCRIPTION = 5;
-            public static final int COL_RECOMMNEDED_SIDES = 6;
-            public static final int COL_DRINK_ID = 7;
-
-
+        public static class UserColumns {
+            public static final String[] COLUMNS = {
+                    User.USER_ID,
+                    User.NAME
+            };
         }
 
         public static class DrinkColumns {
@@ -309,32 +340,28 @@ public class QueryColumns {
                     Drink.INGREDIENTS,
                     Drink.PRODUCER_ID
             };
-
-            public static final int COL_DRINK_ID = 0;
-            public static final int COL_NAME = 1;
-            public static final int COL_SPECIFICS = 2;
-            public static final int COL_STYLE = 3;
-            public static final int COL_TYPE = 4;
-            public static final int COL_INGREDIENTS = 5;
-            public static final int COL_PRODUCER_ID= 6;
         }
 
         public static class ProducerColumns {
             public static final String[] COLUMNS = {
                     Producer.PRODUCER_ID,
                     Producer.NAME,
-                    Producer.LOCATION_ID,   //TODO
+                    Producer.LOCATION_ID,
                     Producer.DESCRIPTION,
                     Producer.WEBSITE
             };
+        }
 
-            public static final int COL_PRODUCER_ID = 0;
-            public static final int COL_NAME= 1;
-            public static final int COL_LOCATION = 2;
-            public static final int COL_DESCRIPTION = 3;
-            public static final int COL_WEBSITE = 4;
-
-
+        public static class LocationColumns {
+            public static final String[] COLUMNS = {
+                    Location.LOCATION_ID,
+                    Location.INPUT,
+                    Location.LATITUDE,
+                    Location.LONGITUDE,
+                    Location.COUNTRY,
+                    Location.FORMATTED_ADDRESS,
+                    Location.DESCRIPTION
+            };
         }
     }
 
@@ -343,31 +370,37 @@ public class QueryColumns {
         public static class Reviews {
 
             public static final String[] COLUMNS = {
-                    ReviewEntry.ALIAS + "." + ReviewEntry._ID,
-                    Review.USER_ID, //TODO
-                    Review.RATING,
-                    Review.DESCRIPTION,
-                    Review.READABLE_DATE,
-                    Review.LOCATION_ID, //TODO
-                    DrinkEntry.ALIAS + "." + DrinkEntry._ID,
-                    Drink.NAME,
-                    Drink.TYPE,
-                    Drink.STYLE,
-                    ProducerEntry.ALIAS + "." + ProducerEntry._ID,
-                    Producer.NAME,
-                    Producer.LOCATION_ID,   //TODO
+                    RA + "." + ReviewEntry._ID,
+                    RA + "." + Review.RATING,
+                    RA + "." + Review.DESCRIPTION,
+                    RA + "." + Review.READABLE_DATE,
+                    RA + "." + Review.LOCATION_ID, //TODO
+
+                    UA + "." + User.NAME,
+
+                    DA + "." + DrinkEntry._ID,
+                    DA + "." + Drink.NAME,
+                    DA + "." + Drink.TYPE,
+                    DA + "." + Drink.STYLE,
+
+                    PA + "." + ProducerEntry._ID,
+                    PA + "." + Producer.NAME,
+                    PA + "." + Producer.LOCATION_ID,   //TODO
             };
 
             public static final int COL_REVIEW__ID = 0;
-            public static final int COL_REVIEW_USER_NAME = 1;
-            public static final int COL_REVIEW_RATING = 2;
-            public static final int COL_REVIEW_DESCRIPTION = 3;
-            public static final int COL_REVIEW_READABLE_DATE = 4;
-            public static final int COL_REVIEW_LOCATION = 5;
+            public static final int COL_REVIEW_RATING = 1;
+            public static final int COL_REVIEW_DESCRIPTION = 2;
+            public static final int COL_REVIEW_READABLE_DATE = 3;
+            public static final int COL_REVIEW_LOCATION = 4;
+
+            public static final int COL_USER_NAME = 5;
+
             public static final int COL_DRINK__ID = 6;
             public static final int COL_DRINK_NAME = 7;
             public static final int COL_DRINK_TYPE = 8;
             public static final int COL_DRINK_STYLE = 9;
+
             public static final int COL_PRODUCER__ID = 10;
             public static final int COL_PRODUCER_NAME = 11;
             public static final int COL_PRODUCER_LOCATION = 12;
@@ -375,6 +408,12 @@ public class QueryColumns {
     }
 
     public static class Widget {
+
+        public static class LocationQuery {
+            public static final String[] COLUMNS = {
+                    LocationEntry._ID,
+            };
+        }
 
         public static class ProviderQuery {
 
@@ -394,6 +433,12 @@ public class QueryColumns {
             };
             public static final int COL_DRINK__ID = 0;
             public static final int COL_DRINK_NAME = 1;
+        }
+
+        public static class UserQuery {
+            public static final String[] COLUMNS = {
+                    UserEntry._ID
+            };
         }
 
         public static class ReviewQuery {

@@ -9,6 +9,8 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import com.fbartnitzek.tasteemall.R;
+
 import java.util.Arrays;
 
 /**
@@ -34,8 +36,14 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
     private final View mRootView;
     private final String mEntryName;
     private final Uri mContentUri;
+    private final InsertHandler mInsertHandler;
 
-    public InsertEntryTask(Activity mActivity, Uri contentUri, View rootView, String entryName) {
+    public interface InsertHandler {
+        void onInserted(Uri uri, String mEntryName);
+    }
+
+    public InsertEntryTask(Activity mActivity, Uri contentUri, View rootView, String entryName, InsertHandler mInsertHandler) {
+        this.mInsertHandler = mInsertHandler;
         Log.v(LOG_TAG, "InsertEntryTask, hashCode=" + this.hashCode() + ", " + "mActivity = [" + mActivity + "], rootView = [" + rootView + "], entryName = [" + entryName + "]");
         this.mActivity = mActivity;
         this.mRootView = rootView;
@@ -72,13 +80,18 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
             // TODO: still one problem - finish in addReview:
             // no modification of bundle in Fragment/Activity to transitionName with id possible...
 
-            Intent output = new Intent();
-            output.setData(uri);    //always returns single-uri
-            mActivity.setResult(Activity.RESULT_OK, output);
-            mActivity.finish();
+            if (mInsertHandler != null) {
+                mInsertHandler.onInserted(uri, mEntryName);
+            } else {
+                Intent output = new Intent();
+                output.setData(uri);    //always returns single-uri
+                mActivity.setResult(Activity.RESULT_OK, output);
+                mActivity.finish();
+            }
         } else {
-            Snackbar.make(mRootView, "Creating new entry " + mEntryName + " didn't work...",
-                    Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            Snackbar.make(mRootView,
+                    mActivity.getString(R.string.msg_creating_new_entry_did_not_work, mEntryName),
+                    Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
     }
 

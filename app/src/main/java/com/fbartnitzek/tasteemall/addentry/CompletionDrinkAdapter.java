@@ -10,7 +10,7 @@ import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -33,10 +33,8 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
     private final CompletionDrinkAdapterSelectionHandler mSelectHandler;
     private final Activity mActivity;
 
-    private static final String LOG_TAG = CompletionDrinkAdapter.class.getName();
-
     interface CompletionDrinkAdapterSelectionHandler {
-        void onSelectedDrink(int drink_Id, String drinkName, String drinkId, String producerName);
+        void onSelectedDrink(String drinkName, String drinkId, String producerName);
     }
 
     public CompletionDrinkAdapter(Activity activity,
@@ -79,7 +77,7 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
         // uri with name for drink or producer... (currently just drink)
         return mActivity.getContentResolver().query(
                 DatabaseContract.DrinkEntry.buildUriWithName(String.valueOf(constraint)),
-                QueryColumns.ReviewFragment.CompletionQuery.COLUMNS,
+                QueryColumns.ReviewFragment.DrinkCompletionQuery.COLUMNS,
                 null,
                 null,
                 null);
@@ -87,11 +85,10 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        String drinkName = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_NAME);
-        String drinkId = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_ID);
-        int drink_Id = cursor.getInt(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK__ID);
-        String producerName = cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_PRODUCER_NAME);
-        mSelectHandler.onSelectedDrink(drink_Id, drinkName, drinkId, producerName);
+        String drinkName = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_NAME);
+        String drinkId = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_ID);
+        String producerName = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_NAME);
+        mSelectHandler.onSelectedDrink(drinkName, drinkId, producerName);
         return drinkName;
     }
 }

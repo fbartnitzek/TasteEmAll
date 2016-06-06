@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.fbartnitzek.tasteemall.Utils;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 import java.util.Arrays;
 
@@ -52,7 +53,7 @@ public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
         Uri uri = Utils.calcDrinkIncludingProducerUri(params[0]);
 
         Cursor cursor = mActivity.getContentResolver().query(
-                uri, QueryColumns.ReviewFragment.CompletionQuery.COLUMNS, null, null, null);
+                uri, QueryColumns.ReviewFragment.DrinkCompletionQuery.COLUMNS, null, null, null);
 
         Object[] objects;
         if (cursor == null) {
@@ -60,10 +61,10 @@ public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
         }
         if (cursor.moveToFirst()) {
             objects = new Object[]{
-                    cursor.getInt(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK__ID),
-                    cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_NAME),
-                    cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_DRINK_ID),
-                    cursor.getString(QueryColumns.ReviewFragment.CompletionQuery.COL_PRODUCER_NAME)};
+                    cursor.getInt(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK__ID),
+                    cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_NAME),
+                    cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_ID),
+                    cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_NAME)};
         } else {
             objects = null;
         }

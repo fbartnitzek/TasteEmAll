@@ -42,7 +42,6 @@ public class SettingsActivity extends PreferenceActivity {
          * is changed.)
          */
         private void bindPreferenceSummaryToValue(Preference preference) {
-//            Log.v(LOG_TAG, "bindPreferenceSummaryToValue, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "]");
             // Set the listener to watch for value changes.
             preference.setOnPreferenceChangeListener(this);
 
@@ -56,9 +55,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 
         private void setPreferenceSummary(Preference preference, Object value) {
-//            Log.v(LOG_TAG, "setPreferenceSummary, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "], value = [" + value + "]");
             String stringValue = value.toString();
-//            String key = preference.getKey();
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -72,7 +69,6 @@ public class SettingsActivity extends PreferenceActivity {
                 // For other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
             }
-//        SunshineSyncAdapter.syncImmediately(this);
         }
 
         @Override
@@ -93,7 +89,6 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-//            return false;
             Log.v(LOG_TAG, "onPreferenceChange, hashCode=" + this.hashCode() + ", " + "preference = [" + preference + "], newValue = [" + newValue + "]");
             setPreferenceSummary(preference, newValue);
             return true;

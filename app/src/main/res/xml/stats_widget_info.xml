@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/info_widget"
     android:initialLayout="@layout/info_widget"
-    android:minHeight="40dp"
+    android:minHeight="110dp"
     android:minWidth="110dp"
     android:previewImage="@drawable/tasteemall_stats_widget"
     android:resizeMode="horizontal|vertical"

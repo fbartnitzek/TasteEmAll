@@ -66,8 +66,16 @@ public class Utils {
         return producerId + "_;drink_" + drinkName;
     }
 
-    public static String calcReviewId(String userName, String mDrinkId, String date) {
-        return "review_user_" + userName + "_;_date_" + date + "_;_" + mDrinkId;
+    public static String calcReviewId(String userId, String mDrinkId, String date) {
+        return "review_" + userId + "_;_date_" + date + "_;_" + mDrinkId;
+    }
+
+    public static String calcUserId(String userName) {
+        return "user_" + userName;
+    }
+
+    public static String calcLocationId(String locationValue) {
+        return "location_" + locationValue;
     }
 
     public static Uri calcSingleDrinkUri(Uri uri) {    //if called f.e. with drink_with_producer-id...

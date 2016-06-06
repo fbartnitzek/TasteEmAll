@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns.ReviewFragment.ShowQuery;
+import com.fbartnitzek.tasteemall.data.QueryColumns.ReviewFragment.ShowQuery;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -217,7 +217,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             mDrinkSpecificsView.setText(data.getString(ShowQuery.COL_DRINK_SPECIFICS));
             mDrinkIngredientsView.setText(data.getString(ShowQuery.COL_DRINK_INGREDIENTS));
 
-            mReviewUserView.setText(data.getString(ShowQuery.COL_REVIEW_USER_NAME));
+            mReviewUserView.setText(data.getString(ShowQuery.COL_USER_NAME));
             mReviewRatingView.setText(data.getString(ShowQuery.COL_REVIEW_RATING));
             mReviewDescriptionView.setText(data.getString(ShowQuery.COL_REVIEW_DESCRIPTION));
             mReviewReadableDateView.setText(data.getString(ShowQuery.COL_REVIEW_READABLE_DATE));

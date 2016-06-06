@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,6 +25,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -44,9 +46,11 @@ import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.location.GeocodeAddressIntentService;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.tasks.QueryAndInsertUserTask;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.tasks.QueryDrinkTask;
 import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
+import com.fbartnitzek.tasteemall.tasks.ValidateUserTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 import com.fbartnitzek.tasteemall.ui.OnTouchHideKeyboardListener;
 import com.google.android.gms.common.ConnectionResult;
@@ -63,18 +67,19 @@ public class AddReviewFragment extends Fragment implements
         CompletionDrinkAdapter.CompletionDrinkAdapterSelectionHandler,
         View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler,
         LoaderManager.LoaderCallbacks<Cursor>,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        CompletionUserAdapter.CompletionUserAdapterSelectionHandler, QueryAndInsertUserTask.UserCreatedHandler, ValidateUserTask.ValidateUserHandler {
 
     private static final String LOG_TAG = AddReviewFragment.class.getName();
     private static final String STATE_CONTENT_URI = "STATE_ADD_REVIEW_CONTENT_URI";
     private static final String STATE_DRINK_NAME = "STATE_ADD_REVIEW_DRINK_NAME";
     private static final String STATE_PRODUCER_NAME = "STATE_ADD_REVIEW_PRODUCER_NAME";
     private static final String STATE_DRINK_ID = "STATE_ADD_REVIEW_DRINK_ID";
-    private static final String STATE_DRINK__ID = "STATE_ADD_REVIEW_DRINK__ID";
     private static final String STATE_REVIEW_RATING_POSITION = "STATE_ADD_REVIEW_REVIEW_RATING_POSITION";
     private static final String STATE_REVIEW_DESCRIPTION = "STATE_ADD_REVIEW_DESCRIPTION";
     private static final String STATE_REVIEW_RECOMMENDED_SIDES = "STATE_ADD_REVIEW_RECOMMENDED_SIDES";
-    private static final String STATE_REVIEW_USER = "STATE_ADD_REVIEW_USER";
+    private static final String STATE_USER_NAME = "STATE_ADD_REVIEW_USER_NAME";
+    private static final String STATE_USER_ID = "STATE_ADD_REVIEW_USER_ID";
     private static final String STATE_REVIEW_READABLE_DATE = "STATE_ADD_REVIEW_READABLE_DATE";
     private static final String STATE_REVIEW_LOCATION = "STATE_ADD_REVIEW_LOCATION";
     private static final String STATE_GEOCODING_DONE = "STATE_GEOCODING_DONE";
@@ -86,17 +91,18 @@ public class AddReviewFragment extends Fragment implements
     private View mRootView;
 
     private static AutoCompleteTextView mEditCompletionDrinkName;
+    private static AutoCompleteTextView mEditCompletionUserName;
     private static Spinner mSpinnerRating;
     private static EditText mEditReviewDescription;
     private static EditText mEditReviewRecommendedSides;
-    private static EditText mEditReviewUser;
     private static EditText mEditReviewReadableDate;
     private static EditText mEditReviewLocation;
 
     private String mDrinkName;
     private String mProducerName;
-    private int mDrink_Id;
     private String mDrinkId;
+    private String mUserName;
+    private String mUserId;
     private Uri mContentUri = null;
     private String mReviewId = null;
     private ArrayAdapter<String> mRatingAdapter;
@@ -146,6 +152,7 @@ public class AddReviewFragment extends Fragment implements
         mRootView = inflater.inflate(R.layout.fragment_add_review, container, false);
 
         mEditCompletionDrinkName = (AutoCompleteTextView) mRootView.findViewById(R.id.drink_name);
+        mEditCompletionUserName = (AutoCompleteTextView) mRootView.findViewById(R.id.review_user_name);
 
         createToolbar();
 
@@ -156,10 +163,19 @@ public class AddReviewFragment extends Fragment implements
 //                mEditCompletionDrinkName.dismissDropDown();   //TODO: needed?
             }
             if (savedInstanceState.containsKey(STATE_DRINK_ID)) {    //found drink
-                mDrink_Id = savedInstanceState.getInt(STATE_DRINK__ID);
                 mDrinkId = savedInstanceState.getString(STATE_DRINK_ID);
                 mProducerName = savedInstanceState.getString(STATE_PRODUCER_NAME);
                 updateToolbar();
+            }
+
+            if (savedInstanceState.containsKey(STATE_USER_NAME)) {  //just text
+                mUserName = savedInstanceState.getString(STATE_USER_NAME);
+                mUserName = savedInstanceState.getString(STATE_USER_NAME);
+                mEditCompletionUserName.setText(mUserName);
+            }
+
+            if (savedInstanceState.containsKey(STATE_USER_ID)) {    // existing ids
+                mUserId = savedInstanceState.getString(STATE_USER_ID);
             }
         }
 
@@ -170,7 +186,14 @@ public class AddReviewFragment extends Fragment implements
             mEditCompletionDrinkName.setTransitionName(getString(R.string.shared_transition_add_drink_name));
         }
 
+        if (savedInstanceState == null || !savedInstanceState.containsKey(STATE_USER_NAME)) {
+            mEditCompletionUserName.setText(Utils.getUserNameFromSharedPrefs(getActivity()));
+        }
+        CompletionUserAdapter completionUserAdapter = new CompletionUserAdapter(getActivity(), this);
+        mEditCompletionUserName.setAdapter(completionUserAdapter);
+
         mRootView.findViewById(R.id.add_drink_button).setOnClickListener(this);
+        mRootView.findViewById(R.id.add_user_button).setOnClickListener(this);
         mRootView.findViewById(R.id.help_review_rating_button).setOnClickListener(this);
 
         mSpinnerRating = (Spinner) mRootView.findViewById(R.id.review_rating);
@@ -211,14 +234,6 @@ public class AddReviewFragment extends Fragment implements
         if (savedInstanceState != null) {
             mEditReviewDescription.setText(savedInstanceState.getString(STATE_REVIEW_DESCRIPTION));
             mEditReviewRecommendedSides.setText(savedInstanceState.getString(STATE_REVIEW_RECOMMENDED_SIDES));
-        }
-
-        // restore or init fields
-        mEditReviewUser = (EditText) mRootView.findViewById(R.id.review_user_name);
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_USER)) {
-            mEditReviewUser.setText(savedInstanceState.getString(STATE_REVIEW_USER));
-        } else {
-            mEditReviewUser.setText(Utils.getUserNameFromSharedPrefs(getActivity()));
         }
 
         // TODO: onClick some dateAndTime-picker
@@ -272,7 +287,6 @@ public class AddReviewFragment extends Fragment implements
         outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
         outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString().trim());
         outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString().trim());
-        outState.putString(STATE_REVIEW_USER, mEditReviewUser.getText().toString().trim());
         outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
         outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
         outState.putBoolean(STATE_GEOCODING_DONE, mGeocodingDone);
@@ -280,11 +294,17 @@ public class AddReviewFragment extends Fragment implements
 
         if (mDrinkId != null) {
             outState.putString(STATE_DRINK_ID, mDrinkId);
-            outState.putInt(STATE_DRINK__ID, mDrink_Id);
             outState.putString(STATE_DRINK_NAME, mDrinkName);
             outState.putString(STATE_PRODUCER_NAME, mProducerName);
         } else {
             outState.putString(STATE_DRINK_NAME, mEditCompletionDrinkName.getText().toString().trim());
+        }
+
+        if (mUserId != null) {
+            outState.putString(STATE_USER_ID, mUserId);
+            outState.putString(STATE_USER_NAME, mUserName);
+        } else {
+            outState.putString(STATE_USER_NAME, mEditCompletionUserName.getText().toString().trim());
         }
 
         if (mContentUri != null) {
@@ -295,7 +315,6 @@ public class AddReviewFragment extends Fragment implements
     }
 
     private void createToolbar() {
-//        Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -314,11 +333,9 @@ public class AddReviewFragment extends Fragment implements
             String readableDrink = getString(Utils.getReadableDrinkNameId(getActivity(), drinkType));
 
             if (mContentUri != null) {
-//                Log.v(LOG_TAG, "createToolbar with contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_review_activity_preview, readableDrink));
             } else {
-//                Log.v(LOG_TAG, "createToolbar without contentUri, hashCode=" + this.hashCode() + ", " + "");
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_add_review_activity_preview,
                                 readableDrink));
@@ -331,7 +348,6 @@ public class AddReviewFragment extends Fragment implements
 
 
     private void updateToolbar() {
-//        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode());
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
         if (activity.getSupportActionBar() != null) {
@@ -379,16 +395,35 @@ public class AddReviewFragment extends Fragment implements
         } else if (getString(R.string.pre_filled_rating).equals(mSpinnerRating.getSelectedItem().toString())) {
             Snackbar.make(mRootView, R.string.msg_rate_drink, Snackbar.LENGTH_SHORT).show();
             return;
-        } else if ("".equals(mEditReviewUser.getText().toString().trim())) {
-            Snackbar.make(mRootView, R.string.msg_no_username, Snackbar.LENGTH_SHORT).show();
-            return;
         } else if (!Utils.checkTimeFormat(mEditReviewReadableDate.getText().toString().trim())) {
             Snackbar.make(mRootView, R.string.msg_invalid_review_date, Snackbar.LENGTH_SHORT).show();
             return;
         } else if (!validateLocation()) {
             Snackbar.make(mRootView, R.string.msg_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
             return;
+        } else {    //opt. async user check
+            mUserName = mEditCompletionUserName.getText().toString();
+            if (mUserName.length() < 1){
+                Snackbar.make(mRootView, R.string.msg_no_review_without_user, Snackbar.LENGTH_SHORT).show();
+            } else {
+                if (mUserId == null) {
+                    new ValidateUserTask(this, getActivity()).execute(mUserName);
+                } else {
+                    onUserValidated(mUserId);
+                }
+            }
         }
+    }
+
+    @Override
+    public void onUserValidated(String userId) {
+
+        if (userId == null) {
+            Snackbar.make(mRootView, getString(R.string.msg_user_not_found, mUserName),
+                    Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        mUserId = userId;
 
         if (mContentUri != null) {
             updateReview();
@@ -413,24 +448,23 @@ public class AddReviewFragment extends Fragment implements
                         mEditReviewRecommendedSides.getText().toString().trim(),
                         mDrinkId,
                         mEditReviewLocation.getText().toString().trim(),
-                        mEditReviewUser.getText().toString().trim()));
+                        mUserId));
     }
 
     private void insertReview() {
-        String userName = mEditReviewUser.getText().toString().trim();
         String date = mEditReviewReadableDate.getText().toString().trim();
         new InsertEntryTask(
                 getActivity(),
-                DatabaseContract.ReviewEntry.CONTENT_URI, mRootView, "Review for " + mDrinkName)
+                DatabaseContract.ReviewEntry.CONTENT_URI, mRootView, "Review for " + mDrinkName, null)
                 .execute(DatabaseHelper.buildReviewValues(
-                        Utils.calcReviewId(userName, mDrinkId, date),
+                        Utils.calcReviewId(mUserId, mDrinkId, date),
                         mSpinnerRating.getSelectedItem().toString(),
                         mEditReviewDescription.getText().toString().trim(),
                         date,
                         mEditReviewRecommendedSides.getText().toString().trim(),
                         mDrinkId,
                         mEditReviewLocation.getText().toString().trim(),
-                        userName));
+                        mUserId));
 
     }
 
@@ -441,15 +475,68 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-//        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
         switch (v.getId()) {
             case R.id.add_drink_button:
                 createDrink();
+                break;
+            case R.id.add_user_button:
+                validateNewUser();
                 break;
             case R.id.help_review_rating_button:
                 showHelp();
                 break;
         }
+    }
+
+    private void validateNewUser() {
+        Log.v(LOG_TAG, "validateNewUser, hashCode=" + this.hashCode() + ", " + "");
+        String userName = mEditCompletionUserName.getText().toString();
+        if (userName.length() < 1) {
+            Snackbar.make(mRootView, R.string.msg_no_username, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(getString(R.string.msg_add_new_user, userName));
+        builder.setCancelable(true);
+
+        builder.setPositiveButton(
+                R.string.add_user_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        createUser();
+                    }
+                }
+        );
+        builder.setNegativeButton(
+                R.string.do_not_add_button,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity(), getString(R.string.msg_user_not_added,
+                                mEditCompletionUserName.getText().toString()), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void createUser() {
+        Log.v(LOG_TAG, "createUser, hashCode=" + this.hashCode() + ", " + "");
+        new QueryAndInsertUserTask(getActivity(), this)
+                .execute(mEditCompletionUserName.getText().toString());
+    }
+
+    @Override
+    public void onUserCreated(String userId, String userName) {
+        mUserId = userId;
+        mUserName = userName;
+
+        mEditCompletionUserName.setText(mUserName);
+        mEditCompletionUserName.dismissDropDown();
+        Snackbar.make(mRootView, getString(R.string.msg_user_created, mUserName), Snackbar.LENGTH_SHORT).show();
     }
 
     private void createDrink() {
@@ -478,7 +565,6 @@ public class AddReviewFragment extends Fragment implements
     public void onFoundDrink(int drink_Id, String drinkName, String drinkId, String producerName) {
         Log.v(LOG_TAG, "onFoundDrink, hashCode=" + this.hashCode() + ", " + "drink_Id = [" + drink_Id + "], drinkName = [" + drinkName + "], drinkId = [" + drinkId + "], producerName = [" + producerName + "]");
         // NOT for both: (completionView and query after startActivityForResult)!!!
-        mDrink_Id = drink_Id;
         mDrinkId = drinkId;
         mDrinkName = drinkName;
         mProducerName = producerName;
@@ -490,12 +576,17 @@ public class AddReviewFragment extends Fragment implements
     }
 
     @Override
-    public void onSelectedDrink(int drink_Id, String drinkName, String drinkId, String producerName) {
-        mDrink_Id = drink_Id;
+    public void onSelectedDrink(String drinkName, String drinkId, String producerName) {
         mDrinkId = drinkId;
         mDrinkName = drinkName;
         mProducerName = producerName;
         updateToolbar();
+    }
+
+    @Override
+    public void onSelectedUser(String userId, String userName) {
+        mUserId = userId;
+        mUserName = userName;
     }
 
     @Override
@@ -524,12 +615,15 @@ public class AddReviewFragment extends Fragment implements
                 if (data != null && data.moveToFirst()) {
 
                     mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
+                    mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
                     // animation might work with separate textView in toolbar...
                     mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
+
                     mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
                     mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
-                    mDrink_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_DRINK__ID);
-                    mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
+
+                    mUserName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_NAME);
+                    mUserId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_ID);
 
                     // later for a matching icon...
 //                    String drinkType = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_TYPE);
@@ -537,30 +631,30 @@ public class AddReviewFragment extends Fragment implements
                     String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION);
                     String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
                     String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
-                    String userName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_USER_NAME);
+
                     String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
 
                     mEditCompletionDrinkName.setText(mDrinkName);
                     mEditCompletionDrinkName.dismissDropDown();
-
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         mEditCompletionDrinkName.setTransitionName(
                                 getString(R.string.shared_transition_review_drink) + mReview_Id);
                     }
 
+                    mEditCompletionUserName.setText(mUserName);
+                    mEditCompletionUserName.dismissDropDown();
+
                     mRatingPosition = mRatingAdapter.getPosition(rating);
                     setSpinner();
                     mEditReviewDescription.setText(reviewDesc);
                     mEditReviewRecommendedSides.setText(recommendedSides);
-                    mEditReviewUser.setText(userName);
+
                     mEditReviewReadableDate.setText(readableDate);
                     mEditReviewLocation.setText(location);
 
                     updateToolbar();
 
                     resumeActivityEnterTransition();    // from edit
-
-//                    Log.v(LOG_TAG, "onLoadFinished - all updated, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
                 }
                 break;
             default:
@@ -623,7 +717,6 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        Log.v(LOG_TAG, "onRequestPermissionsResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], permissions = [" + Arrays.toString(permissions) + "], grantResults = [" + Arrays.toString(grantResults) + "]");
         if (REQUEST_LOCATION_PERMISSION_CODE == requestCode && permissions.length > 0) {
             if (PackageManager.PERMISSION_GRANTED == grantResults[0] ||
                     PackageManager.PERMISSION_GRANTED == grantResults[grantResults.length - 1]) { // at least one allowed
@@ -765,7 +858,7 @@ public class AddReviewFragment extends Fragment implements
         Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ((AddReviewActivity) getActivity()).scheduleStartPostponedTransition(mEditReviewUser);
+            ((AddReviewActivity) getActivity()).scheduleStartPostponedTransition(mEditReviewReadableDate);
         }
     }
 }

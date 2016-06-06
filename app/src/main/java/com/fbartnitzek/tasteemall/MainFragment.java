@@ -42,7 +42,7 @@ import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.showentry.ShowDrinkActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowProducerActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 
 import java.util.ArrayList;
@@ -327,8 +327,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         switch (id) {
             case PRODUCER_LOADER_ID:
-                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
-                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION_ID;    //TODO
+//                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
+//                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION_ID;    //TODO
+                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME;
                 mCurrentProducersUri = ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern);
                 return new CursorLoader(getActivity(),
                         mCurrentProducersUri,
@@ -336,8 +337,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         null, null,
                         mProducersSortOrder);
             case DRINK_LOADER_ID:
-                String sortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", " +
-                        DrinkEntry.TABLE_NAME + "." + Drink.NAME;
+                String sortOrder = ProducerEntry.ALIAS + "." + Producer.NAME + ", " +
+                        DrinkEntry.ALIAS + "." + Drink.NAME;
                 return new CursorLoader(getActivity(),
                          DrinkEntry.buildUriWithNameAndType(
                                 mSearchPattern == null ? "" : mSearchPattern,
@@ -345,7 +346,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                         QueryColumns.MainFragment.DrinkWithProducerQuery.COLUMNS,
                         null, null,
                         sortOrder);
-            case REVIEW_LOADER_ID:
+            case REVIEW_LOADER_ID:  //TODO: shows just user:name, not the right ids - wrong comp? - still wrong... :-p
                 mReviewsSortOrder = ReviewEntry.ALIAS + "." + Review.READABLE_DATE + " DESC";
                 mCurrentReviewsUri = ReviewEntry.buildUriForShowReviewWithPatternAndType(
                         mSearchPattern == null ? "" : mSearchPattern,

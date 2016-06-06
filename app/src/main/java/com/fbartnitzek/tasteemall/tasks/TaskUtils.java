@@ -2,8 +2,12 @@ package com.fbartnitzek.tasteemall.tasks;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 
 import com.fbartnitzek.tasteemall.MainActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
+import com.fbartnitzek.tasteemall.data.pojo.User;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -25,12 +29,28 @@ public class TaskUtils {
 
     public static final String ACTION_DATA_CHANGED
             = TaskUtils.class.getPackage().getName() + ".ACTION_DATA_CHANGED";
+//    public static final String ACTION_PRODUCER_LOCATION_INSERTED
+//            = TaskUtils.class.getPackage().getName() + ".ACTION_PRODUCER_LOCATION_INSERTED";
 
     public static void updateWidgets(Activity activity) {
         // only TasteEmAll app can receive broadcast
         Intent dataUpdatedIntent = new Intent(TaskUtils.ACTION_DATA_CHANGED).setPackage(
                 MainActivity.class.getPackage().getName());
         activity.sendBroadcast(dataUpdatedIntent);
+    }
+
+//    public static void broadcastProducerLocation(Activity activity, Uri locationUri) {
+//        Intent dataUpdatedIntent = new Intent(TaskUtils.ACTION_PRODUCER_LOCATION_INSERTED).setPackage(
+//                MainActivity.class.getPackage().getName());
+//        activity.sendBroadcast(dataUpdatedIntent);
+//    }
+
+    public static Cursor queryWithExactUserName(Activity activity, String userName) {
+        return activity.getContentResolver().query(
+                DatabaseContract.UserEntry.CONTENT_URI,
+                QueryColumns.ReviewFragment.UserQuery.COLUMNS,
+                User.NAME + " = '" + userName + "'", null ,
+                null);
     }
 
 }

@@ -33,7 +33,7 @@ import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.tasks.QueryProducerTask;
 import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
@@ -324,7 +324,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     private void insertData(String drinkName) {
         new InsertEntryTask(
-                getActivity(), DatabaseContract.DrinkEntry.CONTENT_URI, mRootView, drinkName)
+                getActivity(), DatabaseContract.DrinkEntry.CONTENT_URI, mRootView, drinkName, null)
                     .execute(DatabaseHelper.buildDrinkValues(
                         Utils.calcDrinkId(drinkName, mProducerId),
                         drinkName,

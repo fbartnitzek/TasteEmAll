@@ -10,7 +10,6 @@ import android.test.AndroidTestCase;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -74,6 +73,12 @@ public class TestProvider extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         deleteAllRecordsThroughDb();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        deleteAllRecordsThroughDb();
+        super.tearDown();
     }
 
     public void testProviderRegistry() {

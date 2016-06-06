@@ -47,8 +47,10 @@
     <string name="label_drink">Drink</string>
     <string name="label_review">Review</string>
     <string name="label_producers">Producers</string>
+    <string name="label_locations">Locations</string>
     <string name="label_drinks">Drinks</string>
     <string name="label_reviews">Reviews</string>
+    <string name="label_users">Users</string>
     <string name="label_producer_details">producer details</string>
     <string name="label_drink_details">drink details</string>
     <string name="label_review_details">review details</string>
@@ -97,6 +99,10 @@
     <string name="a11y_no_drink_style">no further style of the drink is given</string>
 
 
+    <!-- user attributes -->
+    <string name="a11y_user_name">name of the drinking and reviewing user is <xliff:g id="name">%1$s</xliff:g></string>
+
+
     <!-- review attributes -->
     <string name="label_review_user_name">User</string>
     <string name="hint_review_user_name">name of the reviewer</string>
@@ -128,6 +134,7 @@
     <string name="text_choose_a_drink">choose a drink</string>
     <string name="a11y_add_a_new_producer">create a new producer</string>
     <string name="a11y_add_a_new_drink">create a new drink</string>
+    <string name="a11y_add_a_new_user">create a new user with this username</string>
     <string name="text_plus" translatable="false">+</string>
     <string name="text_questionmark" translatable="false">\?</string>
     <string name="a11y_choose_export_dir">choose the directory on your phone for exports</string>
@@ -140,8 +147,10 @@
     <string name="a11y_add_review">add a new review</string>
 
     <!-- import / export -->
+    <string name="file_locations" translatable="false">Locations</string>
     <string name="file_producers" translatable="false">Producers</string>
     <string name="file_drinks" translatable="false">Drinks</string>
+    <string name="file_users" translatable="false">Users</string>
     <string name="file_reviews" translatable="false">Reviews</string>
     <string name="file_extension" translatable="false">.csv</string>
 
@@ -164,10 +173,14 @@
 
     <!-- widget -->
     <string name="widget_heading_statistics">TasteEmAll</string>
+    <string name="widget_statistics_locations"><xliff:g id="number">%1$d</xliff:g> Locations</string>
+    <string name="widget_statistics_locations_preview">Locations</string>
     <string name="widget_statistics_producers"><xliff:g id="number">%1$d</xliff:g> Producers</string>
     <string name="widget_statistics_producers_preview">Producers</string>
     <string name="widget_statistics_drinks"><xliff:g id="number">%1$d</xliff:g> Drinks</string>
     <string name="widget_statistics_drinks_preview">Drinks</string>
+    <string name="widget_statistics_users"><xliff:g id="number">%1$d</xliff:g> Users</string>
+    <string name="widget_statistics_users_preview">Users</string>
     <string name="widget_statistics_reviews"><xliff:g id="number">%1$d</xliff:g> Reviews</string>
     <string name="widget_statistics_reviews_preview">Reviews</string>
     <string name="a11y_add_new_review">add a new review for a drink</string>
@@ -180,7 +193,8 @@
     <!-- Toast warnings / messages -->
     <string name="msg_choose_existing_drink">choose an existing drink first</string>
     <string name="msg_rate_drink">rate your drink first</string>
-    <string name="msg_no_username">no rating without username</string>
+    <string name="msg_no_review_without_user">no review-user selected</string>
+    <string name="msg_no_username">enter a username first</string>
     <string name="msg_invalid_review_date">invalid date for the review</string>
     <string name="msg_choose_existing_provider">choose an existing producer first</string>
     <string name="msg_choose_drink_name">choose a name first</string>
@@ -224,8 +238,24 @@
     <string name="msg_map_navigate_to">navigating to first entry <xliff:g id="location">%1$s</xliff:g></string>
     <string name="msg_show_map_no_network">network is not available, so no map can be shown</string>
 
+    <string name="msg_really_delete_entry">Do you really want to CASCADING delete the current entry?</string>
+
+    <string name="msg_add_new_user">Really add a new user <xliff:g id="user">%1$s</xliff:g>?</string>
+    <string name="msg_user_not_added">no user <xliff:g id="user">%1$s</xliff:g> added</string>
+    <string name="msg_user_not_found">no user <xliff:g id="user">%1$s</xliff:g> found</string>
+    <string name="msg_user_already_exists">The user <xliff:g id="user">%1$s</xliff:g> already exists!</string>
+    <string name="msg_user_created">created user <xliff:g id="user">%1$s</xliff:g></string>
+
+    <string name="msg_creating_new_entry_did_not_work">"Creating new entry <xliff:g id="entryName">%1$s</xliff:g> did not work..."</string>
+
     <string name="error_not_bound_to_recycler_view">not bound to RecyclerView</string>
     <string name="error_wrong_loader_in_main_fragment">wrong loader_id in MainFragment...</string>
+
+    <string name="delete_button">delete</string>
+    <string name="keep_button">keep</string>
+    <string name="add_user_button">add</string>
+    <string name="do_not_add_button">don\'t</string>
+
 
 
     <!-- empty views - unused for now... -->
@@ -282,9 +312,7 @@
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen</string>
-    <string name="msg_really_delete_entry">Do you really want to CASCADING delete the current entry?</string>
-    <string name="delete_button">delete</string>
-    <string name="keep_button">keep</string>
+
 
 
 </resources>

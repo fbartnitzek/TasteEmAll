@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fbartnitzek.tasteemall.tasks.PopulateMapTask;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

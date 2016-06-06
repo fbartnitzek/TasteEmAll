@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fbartnitzek.tasteemall.data.QueryColumns;
+
 import java.util.Arrays;
 
 /**
@@ -47,7 +49,7 @@ public class QueryProducerTask extends AsyncTask<Uri, Void, Object[]>{
         }
 
         Cursor cursor = mActivity.getContentResolver().query(
-                params[0], QueryColumns.DrinkFragment.PRODUCER_QUERY_COLUMNS, null, null, null);
+                params[0], QueryColumns.DrinkFragment.ProducerCompletionQuery.COLUMNS, null, null, null);
 
         Object[] objects;
         if (cursor == null) {
@@ -55,9 +57,9 @@ public class QueryProducerTask extends AsyncTask<Uri, Void, Object[]>{
         }
         if (cursor.moveToFirst()) {
             objects = new Object[]{
-                    cursor.getInt(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER__ID),
-                    cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_NAME),
-                    cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_ID)};
+                    cursor.getInt(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER__ID),
+                    cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_NAME),
+                    cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_ID)};
         } else {
             objects = null;
         }

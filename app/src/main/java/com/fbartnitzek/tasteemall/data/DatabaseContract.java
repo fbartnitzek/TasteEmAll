@@ -39,6 +39,7 @@ public class DatabaseContract {
     public static final String PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE = "drink_with_producer_by_name_and_type";
 
     public static final String PATH_USER = "user";
+    public static final String PATH_USER_BY_NAME = "user_by_name";
 
     public static final String PATH_REVIEW = "review";
     public static final String PATH_REVIEW_WITH_ALL = "review_with_all";
@@ -133,6 +134,13 @@ public class DatabaseContract {
                     appendPath(searchString).build();
         }
 
+        public static Uri buildUriWithNameAndType(String searchString, String drinkType) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE)
+                    .appendPath(drinkType)
+                    .appendPath(searchString)
+                    .build();
+        }
+
         public static Uri buildUriDrinkOnlyWithName(String searchString) {
             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_BY_NAME).
                     appendPath(searchString).build();
@@ -164,12 +172,7 @@ public class DatabaseContract {
             }
         }
 
-        public static Uri buildUriWithNameAndType(String searchString, String drinkType) {
-            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE)
-                    .appendPath(drinkType)
-                    .appendPath(searchString)
-                    .build();
-        }
+
     }
 
     public static final class UserEntry implements BaseColumns {
@@ -185,6 +188,20 @@ public class DatabaseContract {
 
         public static Uri buildUri(long id) {
             return CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        }
+
+        public static Uri buildUriWithName(String searchString) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER_BY_NAME).
+                    appendPath(searchString).build();
+        }
+
+        public static String getSearchString(Uri uri) {
+            // may also be empty
+            if (uri.getPathSegments().size()>1){
+                return uri.getPathSegments().get(1);
+            } else {
+                return "";
+            }
         }
 
     }

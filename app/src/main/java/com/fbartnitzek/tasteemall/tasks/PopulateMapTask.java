@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -146,7 +147,7 @@ public class PopulateMapTask extends AsyncTask<Uri, Void, Map<LatLng, PopulateMa
         String drinkName = cursor.getString(QueryColumns.MapFragment.Reviews.COL_DRINK_NAME);
         String producerName = cursor.getString(QueryColumns.MapFragment.Reviews.COL_PRODUCER_NAME);
         String dateString = cursor.getString(QueryColumns.MapFragment.Reviews.COL_REVIEW_READABLE_DATE);
-        String user = cursor.getString(QueryColumns.MapFragment.Reviews.COL_REVIEW_USER_NAME);
+        String user = cursor.getString(QueryColumns.MapFragment.Reviews.COL_USER_NAME);
 
         Date date = Utils.getDate(dateString);
 

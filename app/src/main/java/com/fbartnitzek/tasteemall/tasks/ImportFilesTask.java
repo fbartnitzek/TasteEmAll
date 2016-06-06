@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.csv.CsvFileReader;
 
 import java.io.File;
@@ -53,26 +54,38 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
             return mActivity.getString(R.string.msg_on_import_files_chosen);
         }
 
+        String locations = mActivity.getString(R.string.label_locations);
         String producers = mActivity.getString(R.string.label_producers);
         String drinks = mActivity.getString(R.string.label_drinks);
+        String users = mActivity.getString(R.string.label_users);
         String reviews = mActivity.getString(R.string.label_reviews);
         String extension = mActivity.getString(R.string.file_extension);
 
         // TODO: later multiple files might be allowed - but not for now...
+        List<File> locationFiles = getEntryFile(params,
+                mActivity.getString(R.string.file_locations), extension);
         List<File> producerFiles = getEntryFile(params,
                 mActivity.getString(R.string.file_producers), extension);
         List<File> drinkFiles = getEntryFile(params,
                 mActivity.getString(R.string.file_drinks),extension);
+        List<File> userFiles = getEntryFile(params,
+                mActivity.getString(R.string.file_users), extension);
         List<File> reviewFiles = getEntryFile(params,
                 mActivity.getString(R.string.file_reviews), extension);
 
         String message;
-        if (producerFiles.size() == 1) {
-            message = importEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
-                    QueryColumns.ExportAndImport.ProducerColumns.COLUMNS,
-                    producerFiles.get(0), producers);
+        if (locationFiles.size() == 1) {
+            message = importEntries(DatabaseContract.LocationEntry.CONTENT_URI,
+                    QueryColumns.ExportAndImport.LocationColumns.COLUMNS, locationFiles.get(0), locations);
         } else {
-            message = mActivity.getString(R.string.msg_wrong_number_files, producers, producerFiles.size());
+            message = mActivity.getString(R.string.msg_wrong_number_files, locations, locationFiles.size());
+        }
+
+        if (producerFiles.size() == 1) {
+            message += "\n" + importEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
+                    QueryColumns.ExportAndImport.ProducerColumns.COLUMNS, producerFiles.get(0), producers);
+        } else {
+            message += "\n" + mActivity.getString(R.string.msg_wrong_number_files, producers, producerFiles.size());
         }
 
         if (drinkFiles.size() == 1) {
@@ -83,10 +96,16 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
             message += "\n" + mActivity.getString(R.string.msg_wrong_number_files, drinks, drinkFiles.size());
         }
 
+        if (userFiles.size() == 1) {
+            message += "\n" + importEntries(DatabaseContract.UserEntry.CONTENT_URI,
+                    QueryColumns.ExportAndImport.UserColumns.COLUMNS, userFiles.get(0), users);
+        } else {
+            message += "\n" + mActivity.getString(R.string.msg_wrong_number_files, users, userFiles.size());
+        }
+
         if (reviewFiles.size() == 1) {
             message += "\n" + importEntries(DatabaseContract.ReviewEntry.CONTENT_URI,
-                    QueryColumns.ExportAndImport.ReviewColumns.COLUMNS,
-                    reviewFiles.get(0), reviews);
+                    QueryColumns.ExportAndImport.ReviewColumns.COLUMNS, reviewFiles.get(0), reviews);
         } else {
             message += "\n" + mActivity.getString(R.string.msg_wrong_number_files, reviews, reviewFiles.size());
         }

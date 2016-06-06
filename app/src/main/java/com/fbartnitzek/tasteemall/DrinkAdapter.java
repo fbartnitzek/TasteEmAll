@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 /**
  * Copyright 2016.  Frank Bartnitzek

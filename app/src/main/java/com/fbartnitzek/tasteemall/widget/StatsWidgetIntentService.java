@@ -15,7 +15,7 @@ import com.fbartnitzek.tasteemall.MainActivity;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -51,10 +51,14 @@ public class StatsWidgetIntentService extends IntentService{
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StatsWidgetProvider.class));
 
         // query all entities
+        int numLocations = queryAndGetCount(
+                DatabaseContract.LocationEntry.CONTENT_URI, QueryColumns.Widget.LocationQuery.COLUMNS);
         int numProducers = queryAndGetCount(
                 DatabaseContract.ProducerEntry.CONTENT_URI, QueryColumns.Widget.ProviderQuery.COLUMNS);
         int numDrinks = queryAndGetCount(
                 DatabaseContract.DrinkEntry.CONTENT_URI, QueryColumns.Widget.DrinkQuery.COLUMNS);
+        int numUsers = queryAndGetCount(
+                DatabaseContract.UserEntry.CONTENT_URI, QueryColumns.Widget.UserQuery.COLUMNS);
         int numReviews = queryAndGetCount(
                 DatabaseContract.ReviewEntry.CONTENT_URI, QueryColumns.Widget.ReviewQuery.COLUMNS);
 
@@ -69,11 +73,17 @@ public class StatsWidgetIntentService extends IntentService{
             RemoteViews views = new RemoteViews(getPackageName(), R.layout.info_widget);
 
             // fill stats
+            views.setTextViewText(R.id.stats_locations,
+                    getString(R.string.widget_statistics_locations, numLocations));
+
             views.setTextViewText(R.id.stats_producers,
                     getString(R.string.widget_statistics_producers, numProducers));
 
             views.setTextViewText(R.id.stats_drinks,
                     getString(R.string.widget_statistics_drinks, numDrinks));
+
+            views.setTextViewText(R.id.stats_users,
+                    getString(R.string.widget_statistics_users, numUsers));
 
             views.setTextViewText(R.id.stats_reviews,
                     getString(R.string.widget_statistics_reviews, numReviews));

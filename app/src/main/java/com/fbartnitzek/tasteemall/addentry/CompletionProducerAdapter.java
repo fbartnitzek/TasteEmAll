@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -68,7 +68,7 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
 //        Uri uri = DatabaseContract.ProducerEntry.buildUriWithName(String.valueOf(constraint));
         return mActivity.getContentResolver().query(
                 DatabaseContract.ProducerEntry.CONTENT_URI,
-                QueryColumns.DrinkFragment.PRODUCER_QUERY_COLUMNS,
+                QueryColumns.DrinkFragment.ProducerCompletionQuery.COLUMNS,
                 Producer.NAME + " LIKE ? ",
                 new String[]{ "%" + constraint + "%"},
                 null);
@@ -76,10 +76,9 @@ class CompletionProducerAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-//        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", " + "cursor = [" + cursor + "]");
-        String producerName = cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_NAME);
-        String producerId = cursor.getString(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER_ID);
-        int producer_Id = cursor.getInt(QueryColumns.DrinkFragment.COL_QUERY_PRODUCER__ID);
+        String producerName = cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_NAME);
+        String producerId = cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_ID);
+        int producer_Id = cursor.getInt(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER__ID);
         mSelectHandler.onSelectedProducer(producer_Id, producerName, producerId);
         return producerName;
     }

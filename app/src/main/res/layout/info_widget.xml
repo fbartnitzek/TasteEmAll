@@ -23,6 +23,18 @@
             android:text="@string/widget_heading_statistics"/>
 
         <TextView
+            android:id="@+id/stats_locations"
+            android:fontFamily="sans-serif"
+            android:paddingLeft="@dimen/widget_vertical_tab"
+            android:paddingStart="@dimen/widget_vertical_tab"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@color/secondary_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold|italic"
+            android:text="@string/widget_statistics_locations_preview"/>
+
+        <TextView
             android:id="@+id/stats_producers"
             android:fontFamily="sans-serif"
             android:paddingLeft="@dimen/widget_vertical_tab"
@@ -45,6 +57,20 @@
             android:layout_height="wrap_content"
             android:textStyle="bold|italic"
             android:text="@string/widget_statistics_drinks_preview"/>
+
+        <!-- TODO: just for debugging - quite useless for users -->
+        <TextView
+            android:id="@+id/stats_users"
+            android:focusable="true"
+            android:paddingLeft="@dimen/widget_vertical_tab"
+            android:paddingStart="@dimen/widget_vertical_tab"
+            android:fontFamily="sans-serif"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@color/primary_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold|italic"
+            android:text="@string/widget_statistics_users_preview"/>
 
         <TextView
             android:id="@+id/stats_reviews"

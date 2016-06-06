@@ -22,10 +22,11 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
-import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
-import com.fbartnitzek.tasteemall.tasks.QueryColumns;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 
 
@@ -33,7 +34,7 @@ import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
  * A simple {@link Fragment} subclass.
  * to handle interaction events.
  */
-public class AddProducerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AddProducerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,InsertEntryTask.InsertHandler {
 
     private static final int EDIT_PRODUCER_LOADER_ID = 12345;
     private static final String STATE_PRODUCER_NAME = "STATE_PRODUCER_NAME";
@@ -52,6 +53,7 @@ public class AddProducerFragment extends Fragment implements LoaderManager.Loade
     private static final String LOG_TAG = AddProducerFragment.class.getName();
     private Uri mContentUri = null;
     private String mProducerId = null;
+    private String mLocation;
 
     public AddProducerFragment() {
         // Required empty public constructor
@@ -91,6 +93,9 @@ public class AddProducerFragment extends Fragment implements LoaderManager.Loade
         }
 
         mEditProducerLocation = (EditText) mRootView.findViewById(R.id.producer_location);
+        // TODO: simple solution first: add location just with raw input
+        // later: geocoder, town-picker, current location button, ...
+
         mEditProducerWebsite = (EditText) mRootView.findViewById(R.id.producer_website);
         mEditProducerDescription = (EditText) mRootView.findViewById(R.id.producer_description);
 
@@ -179,59 +184,89 @@ public class AddProducerFragment extends Fragment implements LoaderManager.Loade
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
         if (mContentUri != null) {
-//            Log.v(LOG_TAG, "onActivityCreated with contentUri - edit, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
             getLoaderManager().initLoader(EDIT_PRODUCER_LOADER_ID, null, this);
-//        } else {
-//            Log.v(LOG_TAG, "onActivityCreated without contentUri - add, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
         super.onActivityCreated(savedInstanceState);
     }
 
 
-    private void insertData(String producerName, String location) {
+    private void insertData() {
+        // TODO: needs 2 sequential InsertEntryTasks = a new one?
+        // 1) validate and add location
+        // 1a) onFailure: toast
+        // 1b/2) validate and add producer
+        // 2a) onFailure: toast
+        // 2b) finish
+        // try without handler? - broadcast / event based...
+//        new InsertEntryTask(
+//                getActivity(), ProducerEntry.CONTENT_URI, mRootView, mProducerName)
+//                .execute(DatabaseHelper.buildProducerValues(
+//                        Utils.calcProducerId(producerName, location),
+//                        producerName,
+//                        mEditProducerDescription.getText().toString().trim(),
+//                        mEditProducerWebsite.getText().toString().trim(),
+//                        location));
+
         new InsertEntryTask(
-                getActivity(), ProducerEntry.CONTENT_URI, mRootView, mProducerName)
-                .execute(DatabaseHelper.buildProducerValues(
-                        Utils.calcProducerId(producerName, location),
-                        producerName,
-                        mEditProducerDescription.getText().toString().trim(),
-                        mEditProducerWebsite.getText().toString().trim(),
-                        location));
+                getActivity(), LocationEntry.CONTENT_URI, mRootView,
+                mLocation, this)
+                .execute(DatabaseHelper.buildLocationValues(
+                        Utils.calcLocationId(mLocation),
+                        mLocation,
+                        null, null, null, null, null));
     }
 
-    private void updateData(String producerName, String location) {
+
+    @Override
+    public void onInserted(Uri uri, String locationName) {
+        // inserted location...
+
+        // query producer to get id... workaround recreate id... // TODO
+        String locationId = Utils.calcLocationId(locationName);
+        new InsertEntryTask(
+                getActivity(), DatabaseContract.ProducerEntry.CONTENT_URI, mRootView, mProducerName, null)
+                .execute(DatabaseHelper.buildProducerValues(
+                        Utils.calcProducerId(mProducerName, locationName),
+                        mProducerName,
+                        mEditProducerDescription.getText().toString().trim(),
+                        mEditProducerWebsite.getText().toString().trim(),
+                        locationId));
+    }
+
+
+    private void updateData() {
         Uri singleProducerUri = Utils.calcSingleProducerUri(mContentUri);
         new UpdateEntryTask(getActivity(), singleProducerUri, mProducerName, mRootView)
                 .execute(DatabaseHelper.buildProducerValues(
                         mProducerId,
-                        producerName,
+                        mProducerName,
                         mEditProducerDescription.getText().toString().trim(),
                         mEditProducerWebsite.getText().toString().trim(),
-                        location));
+                        mLocation));
     }
 
     void saveData() {
 
-        String producerName = mEditProducerName.getText().toString().trim();
-        String location = mEditProducerLocation.getText().toString().trim();
+        mProducerName = mEditProducerName.getText().toString().trim();
+        mLocation = mEditProducerLocation.getText().toString().trim();
 
         //validate
-        if (producerName.length() == 0) {
+        if (mProducerName.length() == 0) {
             Snackbar.make(mRootView, R.string.msg_enter_producer_name, Snackbar.LENGTH_SHORT).show();
             return;
-        } else if (location.length() == 0) {
+        } else if (mLocation.length() == 0) {
             Snackbar.make(mRootView, R.string.msg_enter_producer_location, Snackbar.LENGTH_SHORT).show();
             return;
         }
 
         if (mContentUri != null) { //update
 
-            updateData(producerName, location);
+            updateData();
 
         } else { // insert
 
-            insertData(producerName, location);
+            insertData();
         }
 
     }

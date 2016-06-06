@@ -22,6 +22,12 @@ public class Review {
     public static final String REVIEW_ID = "review_id";
     public static final String RATING = "review_rating";
     public static final String DESCRIPTION = "review_description";
+
+    /**
+     * notes on timestamps:
+     * for reviews the readableDate is most important - as it's the time in the timezone when the user created the review on the given location
+     * creation and updateDates are just for internal stuff and should be utc - later
+     */
     public static final String READABLE_DATE = "review_readable_date";
 //    public static final String CREATION_DATE = "review_creation_date";
 //    public static final String UPDATE_DATE = "review_update_date";
@@ -37,105 +43,4 @@ public class Review {
 
     public static final String DRINK_ID = "review_drink_id";
 
-
-
-    private String reviewId;
-    private String rating;
-    private String description;
-//    private String look;
-//    private String smell;
-//    private String taste;
-
-
-    /**
-     * notes on timestamps:
-     * for reviews the readableDate is most important - as it's the time in the timezone when the user created the review on the given location
-     * creation and updateDates are just for internal stuff and should be utc - later
-     */
-    private String readableDate;
-//    private String creationDate;
-//    private String updateDate;
-    private String recommendedSides;
-    private String userName;
-//    private String userId;
-
-    private String drinkId;
-    private String location;
-
-    // currently not used
-    public Review(String description, String drinkId, String location, String rating,
-                  String readableDate, String recommendedSides, String reviewId, String userName) {
-        this.description = description;
-        this.drinkId = drinkId;
-        this.location = location;
-        this.rating = rating;
-        this.readableDate = readableDate;
-        this.recommendedSides = recommendedSides;
-        this.reviewId = reviewId;
-        this.userName = userName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDrinkId() {
-        return drinkId;
-    }
-
-    public void setDrinkId(String drinkId) {
-        this.drinkId = drinkId;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-
-    public String getReadableDate() {
-        return readableDate;
-    }
-
-    public void setReadableDate(String readableDate) {
-        this.readableDate = readableDate;
-    }
-
-    public String getRecommendedSides() {
-        return recommendedSides;
-    }
-
-    public void setRecommendedSides(String recommendedSides) {
-        this.recommendedSides = recommendedSides;
-    }
-
-    public String getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(String reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
 }

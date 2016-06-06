@@ -9,6 +9,7 @@ import android.util.Log;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.csv.CsvFileWriter;
 
 import java.io.File;
@@ -62,13 +63,21 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         }
 
         String message;
-        message = exportEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
+        message = exportEntries(DatabaseContract.LocationEntry.CONTENT_URI,
+                QueryColumns.ExportAndImport.LocationColumns.COLUMNS, dir,
+                mActivity.getString(R.string.file_locations), mActivity.getString(R.string.label_locations));
+
+        message += exportEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
                 QueryColumns.ExportAndImport.ProducerColumns.COLUMNS, dir,
                 mActivity.getString(R.string.file_producers), mActivity.getString(R.string.label_producers));
 
         message += "\n" + exportEntries(DatabaseContract.DrinkEntry.CONTENT_URI,
                 QueryColumns.ExportAndImport.DrinkColumns.COLUMNS, dir,
                 mActivity.getString(R.string.file_drinks), mActivity.getString(R.string.label_drinks));
+
+        message += "\n" + exportEntries(DatabaseContract.UserEntry.CONTENT_URI,
+                QueryColumns.ExportAndImport.UserColumns.COLUMNS, dir,
+                mActivity.getString(R.string.file_users), mActivity.getString(R.string.label_users));
 
         message += "\n" + exportEntries(DatabaseContract.ReviewEntry.CONTENT_URI,
                 QueryColumns.ExportAndImport.ReviewColumns.COLUMNS, dir,
@@ -88,8 +97,6 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         String fileName = EXPORT_PREFIX + Utils.getCurrentLocalTimePrefix() + "_" + fileEntries +  mActivity.getString(R.string.file_extension);
         File file = new File(dir, fileName);
 
-//        Log.v(LOG_TAG, "exportEntries, File: " + file.getAbsolutePath() + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + columns + "], dir = [" + dir + "], entries = [" + entries + "]");
-        
         Cursor cursor = mActivity.getContentResolver().query(
                 contentUri, columns, null, null, null);
         
@@ -111,7 +118,6 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
             if (error == null) {
                 message = mActivity.getString(R.string.msg_entries_exported_success_shorter,
                         msgEntries, cursor.getCount());
-//                        entries, cursor.getCount(), file.getName());
             } else {
                 Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], dir = [" + dir + "], fileEntries = [" + fileEntries+ "]");
                 message = mActivity.getString(R.string.msg_writing_entries_failed, msgEntries);
