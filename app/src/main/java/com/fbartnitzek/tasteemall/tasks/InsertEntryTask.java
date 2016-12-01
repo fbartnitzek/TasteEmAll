@@ -35,20 +35,20 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
     private final Activity mActivity;
     private final View mRootView;
     private final String mEntryName;
-    private final Uri mContentUri;
-    private final InsertHandler mInsertHandler;
+    private final Uri CONTENT_URI ;
+//    private final InsertHandler mInsertHandler;
+//
+//    public interface InsertHandler {
+//        void onInserted(Uri uri, String mEntryName);
+//    }
 
-    public interface InsertHandler {
-        void onInserted(Uri uri, String mEntryName);
-    }
-
-    public InsertEntryTask(Activity mActivity, Uri contentUri, View rootView, String entryName, InsertHandler mInsertHandler) {
-        this.mInsertHandler = mInsertHandler;
+    public InsertEntryTask(Activity mActivity, Uri CONTENT_URI, View rootView, String entryName) {
+//        this.mInsertHandler = mInsertHandler;
         Log.v(LOG_TAG, "InsertEntryTask, hashCode=" + this.hashCode() + ", " + "mActivity = [" + mActivity + "], rootView = [" + rootView + "], entryName = [" + entryName + "]");
         this.mActivity = mActivity;
         this.mRootView = rootView;
         this.mEntryName = entryName;
-        this.mContentUri = contentUri;
+        this.CONTENT_URI = CONTENT_URI;
     }
 
     @Override
@@ -58,10 +58,7 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
             return null;
         }
 
-        return mActivity.getContentResolver().insert(
-                mContentUri,
-                params[0]
-        );
+        return mActivity.getContentResolver().insert(CONTENT_URI, params[0]);
     }
 
     @Override
@@ -80,14 +77,10 @@ public class InsertEntryTask extends AsyncTask<ContentValues, Void, Uri> {
             // TODO: still one problem - finish in addReview:
             // no modification of bundle in Fragment/Activity to transitionName with id possible...
 
-            if (mInsertHandler != null) {
-                mInsertHandler.onInserted(uri, mEntryName);
-            } else {
-                Intent output = new Intent();
-                output.setData(uri);    //always returns single-uri
-                mActivity.setResult(Activity.RESULT_OK, output);
-                mActivity.finish();
-            }
+            Intent output = new Intent();
+            output.setData(uri);    //always returns single-uri
+            mActivity.setResult(Activity.RESULT_OK, output);
+            mActivity.finish();
         } else {
             Snackbar.make(mRootView,
                     mActivity.getString(R.string.msg_creating_new_entry_did_not_work, mEntryName),

@@ -58,4 +58,5 @@ dependencies {
     compile 'org.apache.commons:commons-csv:1.0'
     compile 'com.android.support:multidex:1.0.1'
     //enable multidex on v4.3 devices - part 2
+
 }

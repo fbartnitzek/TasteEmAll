@@ -23,71 +23,11 @@ public class Producer {
     public static final String DESCRIPTION = "producer_description";
     //wikipedia-style for absolute age of a brewery => separate...?
     public static final String WEBSITE = "producer_website";
-    public static final String LOCATION_ID = "producer_location_id";
+//    public static final String LOCATION_ID = "producer_location_id";
+    public static final String LATITUDE = "producer_latitude";
+    public static final String LONGITUDE = "producer_longitude";
+    public static final String COUNTRY = "producer_country";
+    public static final String INPUT = "producer_input";
+    public static final String FORMATTED_ADDRESS= "producer_formatted_address";
 
-    private String producerId;
-    private String name;
-    private String description;
-    private String website;
-    private String location;
-
-    // currently not used
-    public Producer(String producerId, String description, String location, String name, String website) {
-        this.producerId = producerId;
-        this.description= description;
-        this.location = location;
-        this.name = name;
-        this.website = website;
-    }
-
-    @Override
-    public String toString() {
-        return "Producer{" +
-                "description='" + description + '\'' +
-                ", producerId='" + producerId + '\'' +
-                ", name='" + name + '\'' +
-                ", website='" + website + '\'' +
-                ", location='" + location + '\'' +
-                '}';
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getProducerId() {
-        return producerId;
-    }
-
-    public void setProducerId(String producerId) {
-        this.producerId = producerId;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
 }

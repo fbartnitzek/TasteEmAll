@@ -62,6 +62,22 @@
             android:layout_height="@dimen/height_main_recyclerviews">
         </android.support.v7.widget.RecyclerView>
 
+
+        <TextView
+            android:id="@+id/heading_locations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/margin_main_fragment_headings"
+            android:text="@string/label_list_of_locations_preview"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_location"
+            android:layout_width="match_parent"
+            android:scrollbars="vertical"
+            android:layout_height="@dimen/height_main_recyclerviews">
+        </android.support.v7.widget.RecyclerView>
+
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

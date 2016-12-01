@@ -16,6 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="32dp"
             android:orientation="horizontal">
 
             <TextView
@@ -23,7 +24,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingBottom="8dp"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
                 android:text="@string/label_producer"/>
@@ -33,9 +33,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingBottom="8dp"
+
                 android:transitionName="@string/shared_transition_producer_producer"
                 android:text="@string/example_brewery"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/label_producer_location_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="40dp"
+                android:paddingRight="40dp"
+                android:text="@string/producer_location_country"/>
+
+            <TextView
+                android:id="@+id/producer_location_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/example_country"/>
         </LinearLayout>
 
         <LinearLayout
@@ -45,19 +66,26 @@
             android:paddingBottom="32dp">
 
             <TextView
-                android:id="@+id/label_producer_location"
+                android:id="@+id/label_producer_location_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="40dp"
                 android:paddingRight="40dp"
-                android:text="@string/producer_location"/>
+                android:text="@string/producer_location_address"/>
 
             <TextView
-                android:id="@+id/producer_location"
+                android:id="@+id/producer_location_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/example_location"/>
+                android:text="@string/example_producer_location"/>
         </LinearLayout>
+
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_marginBottom="12dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"

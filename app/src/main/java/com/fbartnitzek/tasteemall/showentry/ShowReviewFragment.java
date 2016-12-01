@@ -68,6 +68,8 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     private TextView mReviewRecommendedSidesView;
     private int mDrink_Id;
     private int mProducer_Id;
+    private int mLocation_Id;
+    private TextView mReviewLocationDescriptionView;
 
 
     public ShowReviewFragment() {
@@ -116,6 +118,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
         mReviewDescriptionView = (TextView) mRootView.findViewById(R.id.review_description);
         mReviewReadableDateView = (TextView) mRootView.findViewById(R.id.review_readable_date);
         mReviewLocationView = (TextView) mRootView.findViewById(R.id.review_location);
+        mReviewLocationDescriptionView = (TextView) mRootView.findViewById(R.id.review_location_description);
         mReviewRecommendedSidesView = (TextView) mRootView.findViewById(R.id.review_recommended_sides);
 
         FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab_share);
@@ -145,7 +148,8 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     @Override
     public void onResume() {
         Log.v(LOG_TAG, "onResume, hashCode=" + this.hashCode() + ", " + "");
-        getLoaderManager().initLoader(SHOW_REVIEW_LOADER_ID, null, this);
+//        getLoaderManager().initLoader(SHOW_REVIEW_LOADER_ID, null, this);
+        getLoaderManager().restartLoader(SHOW_REVIEW_LOADER_ID, null, this);    //overkill, but init wont change the views... TODO
         super.onResume();
     }
 
@@ -175,6 +179,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
+            Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
             // each value has its label before - a11y should work that way...
             String drinkType = data.getString(ShowQuery.COL_DRINK_TYPE);
@@ -195,6 +200,8 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
             mDrink_Id = data.getInt(ShowQuery.COL_DRINK__ID);
             mProducer_Id = data.getInt(ShowQuery.COL_PRODUCER__ID);
+            mLocation_Id = data.getInt(ShowQuery.COL_REVIEW_LOCATION__ID);
+            Log.v(LOG_TAG, "onLoadFinished, mLocation_Id=" + mLocation_Id);
 
             int reviewId = DatabaseContract.getIdFromUri(mUri);
 
@@ -208,6 +215,10 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
             mProducerNameView.setText(producerName);
             mProducerNameView.setOnClickListener(this);
+            // why were values not updated...? - TODO: maybe restored through state...? - later
+//            String prodLoc = data.getString(ShowQuery.COL_PRODUCER_LOCATION);
+//            Log.v(LOG_TAG, "onLoadFinished, getActivity()==null? " + (getActivity()==null) + ", prodLoc=" + prodLoc );  // updated result, but won't be displayed...?
+//            mProducerLocationView.setText(prodLoc);
             mProducerLocationView.setText(data.getString(ShowQuery.COL_PRODUCER_LOCATION));
 
             mDrinkNameView.setText(drinkName);
@@ -221,8 +232,11 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             mReviewRatingView.setText(data.getString(ShowQuery.COL_REVIEW_RATING));
             mReviewDescriptionView.setText(data.getString(ShowQuery.COL_REVIEW_DESCRIPTION));
             mReviewReadableDateView.setText(data.getString(ShowQuery.COL_REVIEW_READABLE_DATE));
-            mReviewLocationView.setText(data.getString(ShowQuery.COL_REVIEW_LOCATION));
+            mReviewLocationView.setText(data.getString(ShowQuery.COL_REVIEW_LOCATION_FORMATTED));
+            mReviewLocationDescriptionView.setText(data.getString(ShowQuery.COL_REVIEW_LOCATION_DESCRIPTION));
             mReviewRecommendedSidesView.setText(data.getString(ShowQuery.COL_REVIEW_RECOMMENDED_SIDES));
+
+            mReviewLocationView.setOnClickListener(this);
 
             updateToolbar();
 
@@ -246,6 +260,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
     @Override
     public void onClick(View v) {
+//        Log.v(LOG_TAG, "onClick, mProducer_Id=" + mProducer_Id + ", mDrink_Id=" + mDrink_Id + ", mLocation_Id=" + mLocation_Id);
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
             Bundle bundle = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -271,7 +286,11 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             }
             startActivity(
                     new Intent(getActivity(), ShowDrinkActivity.class)
-                        .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)), bundle);
+                            .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)), bundle);
+        } else if (v.getId() == R.id.review_location && mLocation_Id > -1) {
+            startActivity(
+                    new Intent(getActivity(), ShowLocationActivity.class)
+                            .setData(DatabaseContract.LocationEntry.buildUri(mLocation_Id)));
         } else if (v.getId() == R.id.fab_share && mProducer_Id > -1) {  // all loaded
             shareReview();
         }

@@ -6,8 +6,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.os.ResultReceiver;
+import android.util.Log;
 
 import com.fbartnitzek.tasteemall.R;
 
@@ -31,31 +31,35 @@ import java.util.Locale;
  * limitations under the License.
  */
 
-public class GeocodeAddressIntentService extends IntentService {
+public class GeocodeIntentService extends IntentService {
 
     public static final int SUCCESS_RESULT = 0;
-    public static final int FAILURE_NO_LOCATION_DATA_PROVIDED = 1;
+    public static final int FAILURE_NO_LOCATION_DATA_PROVIDED = 1;  // TODO: other msg?
     public static final int FAILURE_SERVICE_NOT_AVAILABLE = 2;
     public static final int FAILURE_INVALID_LAT_LONG_USED = 3;
     public static final int FAILURE_NO_RESULT_FOUND = 4;
 
-    private static final String PACKAGE_NAME = GeocodeAddressIntentService.class.getPackage().getName();
+    private static final String PACKAGE_NAME = GeocodeIntentService.class.getPackage().getName();
 
     public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
 
     public static final String RESULT_ADDRESS_KEY = PACKAGE_NAME + ".RESULT_ADDRESS_KEY";
+    public static final String RESULT_ADDRESSES_KEY = PACKAGE_NAME + ".RESULT_ADDRESSES_KEY";
+    public static final String RESULT_ADDRESSES_INPUT = PACKAGE_NAME + ".RESULT_ADDRESSES_INPUT";
     public static final String RESULT_MSG_KEY = PACKAGE_NAME + ".RESULT_MSG_KEY";
 
-    public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
+    public static final String EXTRA_LOCATION_LATLNG = PACKAGE_NAME + ".EXTRA_LOCATION_LATLNG";
+    public static final String EXTRA_LOCATION_TEXT = PACKAGE_NAME + ".EXTRA_LOCATION_TEXT";
+
 
     private ResultReceiver mReceiver = null;
-    private static final String LOG_TAG = GeocodeAddressIntentService.class.getName();
+    private static final String LOG_TAG = GeocodeIntentService.class.getName();
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
      */
-    public GeocodeAddressIntentService() {
+    public GeocodeIntentService() {
         super(LOG_TAG);
     }
 
@@ -73,43 +77,42 @@ public class GeocodeAddressIntentService extends IntentService {
             return;
         }
 
-        // Get the location passed to this service through an extra.
-        Location location = intent.getParcelableExtra(LOCATION_DATA_EXTRA);
+        // geocoding: formattedAddress => LatLng
+        // reverse geocoding: LatLng => formattedAddress
+        boolean reverseGeocoding = intent.hasExtra(EXTRA_LOCATION_LATLNG);
 
-        // Make sure that the location data was really sent over through an extra. If it wasn't,
-        // send an error error message and return.
-        if (location == null) {
+        if (!reverseGeocoding && !intent.hasExtra(EXTRA_LOCATION_TEXT)) {
             errorMessage = getString(R.string.msg_no_location_provided);
             Log.wtf(LOG_TAG, errorMessage);
             deliverResultToReceiver(FAILURE_NO_LOCATION_DATA_PROVIDED, errorMessage);
             return;
         }
 
-        // Errors could still arise from using the Geocoder (for example, if there is no
-        // connectivity, or if the Geocoder is given illegal location data). Or, the Geocoder may
-        // simply not have an address for a location. In all these cases, we communicate with the
-        // receiver using a resultCode indicating the failure. If an address is found, it is returned
-
-        // The Geocoder used in this sample. The Geocoder's responses are localized for the given
-        // Locale, which represents a specific geographical or linguistic region. Locales are used
-        // to alter the presentation of information such as numbers or dates to suit the conventions
-        // in the region they describe.
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
-        // Address found using the Geocoder.
+        // Addresses found using the Geocoder.
         List<Address> addresses;
 
+        Location location = null;
+        String locationName = null;
         try {
-            // Using getFromLocation() returns an array of Addresses for the area immediately
-            // surrounding the given latitude and longitude. The results are a best guess and are
-            // not guaranteed to be accurate.
-            Log.v(LOG_TAG, "onHandleIntent - lat: " + location.getLatitude() + ", long: " + location.getLongitude() + ", hashCode=" + this.hashCode() + ", " + "intent = [" + intent + "]");
-            addresses = geocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    1); // for LatLong, we want just the single address.
+            if (reverseGeocoding) {
+                // Using getFromLocation() returns an array of Addresses for the area immediately
+                // surrounding the given latitude and longitude. The results are a best guess and are
+                // not guaranteed to be accurate.
+                location = intent.getParcelableExtra(EXTRA_LOCATION_LATLNG);
+                Log.v(LOG_TAG, "onHandleIntent reverseGeocoding - lat: " + location.getLatitude() + ", long: " + location.getLongitude() + ", hashCode=" + this.hashCode() + ", " + "intent = [" + intent + "]");
+                addresses = geocoder.getFromLocation(
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        1); // for LatLong, we want just the single address.
+            } else {
+                locationName = intent.getStringExtra(EXTRA_LOCATION_TEXT);
+                Log.v(LOG_TAG, "onHandleIntent geocoding - locationName: " + locationName + ", hashCode=" + this.hashCode() + ", " + "intent = [" + intent + "]");
+                addresses = geocoder.getFromLocationName(locationName, 10); //without borders, anywhere
+            }
+
         } catch (IOException ioException) {
-            // Catch network or other I/O problems.
             errorMessage = getString(R.string.service_not_available);
             Log.w(LOG_TAG, errorMessage, ioException);
             deliverResultToReceiver(FAILURE_SERVICE_NOT_AVAILABLE, errorMessage);
@@ -117,9 +120,8 @@ public class GeocodeAddressIntentService extends IntentService {
         } catch (IllegalArgumentException illegalArgumentException) {
             // Catch invalid latitude or longitude values.
             errorMessage = getString(R.string.invalid_lat_long_used);
-            Log.w(LOG_TAG, errorMessage + ". " +
-                    "Latitude = " + location.getLatitude() +
-                    ", Longitude = " + location.getLongitude(), illegalArgumentException);
+            Log.w(LOG_TAG, errorMessage + ". " + printLocationInput(location, locationName),
+                    illegalArgumentException);
             deliverResultToReceiver(FAILURE_INVALID_LAT_LONG_USED, errorMessage);
             return;
         }
@@ -130,9 +132,22 @@ public class GeocodeAddressIntentService extends IntentService {
             Log.w(LOG_TAG, errorMessage);
             deliverResultToReceiver(FAILURE_NO_RESULT_FOUND, errorMessage);
         } else {
-            Address address = addresses.get(0);
-//            Log.i(LOG_TAG, getString(R.string.address_found));
-            deliverResultToReceiver(SUCCESS_RESULT, address);
+            Log.v(LOG_TAG, "onHandleIntent with " + addresses.size() + " results");
+            if (reverseGeocoding) { // just 1
+                deliverResultToReceiver(SUCCESS_RESULT, addresses.get(0));
+            } else {    // all
+                Address[] addressesArray = addresses.toArray(new Address[addresses.size()]);
+                deliverResultsToReceiver(SUCCESS_RESULT, addressesArray, locationName);
+            }
+
+        }
+    }
+
+    private String printLocationInput(Location location, String locationName) {
+        if (location != null) {
+            return "Latitude = " + location.getLatitude() + ", Longitude = " + location.getLongitude();
+        } else {
+            return "LocationName = " + locationName;
         }
     }
 
@@ -142,10 +157,16 @@ public class GeocodeAddressIntentService extends IntentService {
         mReceiver.send(resultCode, bundle);
     }
 
-    // TODO: for Geocoding by name: return multiple addresses and show LocationPicker...
     private void deliverResultToReceiver(int resultCode, Address address) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(RESULT_ADDRESS_KEY, address);
+        mReceiver.send(resultCode, bundle);
+    }
+
+    private void deliverResultsToReceiver(int resultCode, Address[] addresses, String input) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArray(RESULT_ADDRESSES_KEY, addresses);
+        bundle.putString(RESULT_ADDRESSES_INPUT, input);
         mReceiver.send(resultCode, bundle);
     }
 }

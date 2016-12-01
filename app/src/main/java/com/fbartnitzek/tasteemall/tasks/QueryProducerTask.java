@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 import java.util.Arrays;
@@ -48,8 +49,10 @@ public class QueryProducerTask extends AsyncTask<Uri, Void, Object[]>{
             return null;
         }
 
+        Uri uri = Utils.calcProducerUriIncludingDrink(params[0]);
+
         Cursor cursor = mActivity.getContentResolver().query(
-                params[0], QueryColumns.DrinkFragment.ProducerCompletionQuery.COLUMNS, null, null, null);
+                uri, QueryColumns.DrinkFragment.ProducerCompletionQuery.COLUMNS, null, null, null);
 
         Object[] objects;
         if (cursor == null) {

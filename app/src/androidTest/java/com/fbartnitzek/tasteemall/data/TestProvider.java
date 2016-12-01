@@ -8,8 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
-import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.UserEntry;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -120,7 +125,6 @@ public class TestProvider extends AndroidTestCase {
         Cursor cursor = mContext.getContentResolver().query(LocationEntry.CONTENT_URI,
                 null, null, null, null);
         assertTrue("missing location after insert", cursor.getCount() == 1);
-//        TestUtils.printAllCursorEntries(cursor, " 1 location should be inserted");
         cursor.close();
 
 
@@ -138,29 +142,15 @@ public class TestProvider extends AndroidTestCase {
         cursor = mContext.getContentResolver().query(ProducerEntry.CONTENT_URI,
                 null, null, null, null);
         assertTrue("missing brewery after insert", cursor.getCount() > 0);
-//        TestUtils.printAllCursorEntries(cursor, "1 brewery should be inserted");
         cursor.close();
-
-        // TODO: search by location
-//        cursor = mContext.getContentResolver().query(
-////                ProducerEntry.buildBreweryLocationWithName(""),
-//                ProducerEntry.buildBreweryLocationWithName("Bay"),
-//                null,
-//                null,
-//                null,
-//                null);
-//        assertTrue("joined brewery-location-query did not work as expected... ",
-//                cursor.getCount() > 0);
-//        TestUtils.printAllCursorEntries(cursor, "joined brewery-location-query");
-//        cursor.close();
 
         // drink
         tco = TestUtils.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(DrinkEntry.CONTENT_URI, true, tco);
 
-        insertUri = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
+        Uri uriGose = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
                 TestUtils.createBeerGose());
-        assertTrue(insertUri != null);
+        assertTrue(uriGose != null);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
@@ -169,7 +159,6 @@ public class TestProvider extends AndroidTestCase {
                 null, null, null, null);
 
         assertTrue("missing beer after insert", cursor.getCount() > 0);
-//        TestUtils.printAllCursorEntries(cursor, "1 beer should be inserted");
         cursor.close();
 
 
@@ -179,26 +168,35 @@ public class TestProvider extends AndroidTestCase {
         assertTrue("joined drink query failed", cursor.getCount() > 0
                 && cursor.getColumnCount() == TestUtils.createBeerGose().size()
                 + TestUtils.createBreweryBayrischerBahnhof().size() + 2);   //all attributes + id each
-
         cursor.close();
 
-        // other beer and distillery and whisky
+        // other beer
         tco = TestUtils.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(DrinkEntry.CONTENT_URI, true, tco);
         insertUri = mContext.getContentResolver().insert(DrinkEntry.CONTENT_URI,
                 TestUtils.createBeerSchwarzbier());
         assertTrue(insertUri != null);
         mContext.getContentResolver().unregisterContentObserver(tco);
+        cursor = mContext.getContentResolver().query(insertUri, null, null, null, null);
+        assertTrue("missing beer after second insert - by id", cursor.getCount() == 1);
+        cursor.close();
 
-        cursor = mContext.getContentResolver().query(DrinkEntry.CONTENT_URI,
-                null, null, null, null);
-        assertTrue("missing beer after second insert", cursor.getCount() > 1);
+
+        // and location, distillery and whisky
+        tco = TestUtils.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(LocationEntry.CONTENT_URI, true, tco);
+        insertUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI,
+                TestUtils.createLocationIslay());
+        assertTrue("location islay not inserted", insertUri != null);
+        mContext.getContentResolver().unregisterContentObserver(tco);
+        cursor = mContext.getContentResolver().query(insertUri, null, null, null, null);
+        assertTrue("query of location failed...", cursor.getCount() == 1);
         cursor.close();
 
         // distillery
-        insertUri = mContext.getContentResolver().insert(ProducerEntry.CONTENT_URI,
+        Uri uriLaphroaig = mContext.getContentResolver().insert(ProducerEntry.CONTENT_URI,
                 TestUtils.createDistilleryLaphroaig());
-        assertTrue(insertUri != null);
+        assertTrue(uriLaphroaig != null);
 
         cursor = mContext.getContentResolver().query(ProducerEntry.CONTENT_URI,
                 null, null, null, null);
@@ -221,21 +219,33 @@ public class TestProvider extends AndroidTestCase {
         assertTrue("query with type failed", cursor.getCount() > 0);
         cursor.close();
 
+//        // validate location of producer
+//        cursor = mContext.getContentResolver().query(uriLaphroaig, QueryColumns.ProducerFragment.ShowQuery.COLUMNS, null, null, null);
+//        assertTrue("query of producer failed...", cursor.getCount() == 1);
+//        cursor.moveToFirst();
+////        int location_Id = cursor.getInt(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_LOCATION__ID);
+////        assertTrue("no location_id found for producer", location_Id > 0);
+//        cursor.close();
+
+//        cursor = mContext.getContentResolver().query(DatabaseContract.LocationEntry.buildUri(location_Id),
+//                null, null, null, null);
+//        assertTrue("query for location of producer by location_id failed", cursor.getCount() == 1);
+//        cursor.close();
 
         // update distillery
-        int rows = mContext.getContentResolver().update(ProducerEntry.buildUri(2),
+        int rows = mContext.getContentResolver().update(uriLaphroaig,
                 TestUtils.updateDistilleryLaphroaig(), null, null);
         assertTrue("update of distillery failed", rows == 1);
-        cursor = mContext.getContentResolver().query(ProducerEntry.buildUri(2),
-                QueryColumns.ProducerFragment.DETAIL_COLUMNS, null, null, null);
+        cursor = mContext.getContentResolver().query(uriLaphroaig,
+                QueryColumns.ProducerFragment.ShowQuery.COLUMNS, null, null, null);
         assertTrue("query after update of distillery failed", cursor.getCount() == 1);
         cursor.moveToFirst();
-        String prodDescription = cursor.getString(QueryColumns.ProducerFragment.COL_PRODUCER_DESCRIPTION);
+        String prodDescription = cursor.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_DESCRIPTION);
         assertTrue("update of distillery-description failed", TestUtils.NEW_PRODUCER_LAPHROAIG_DESCRIPTION.equals(prodDescription));
         cursor.close();
 
         // update beer
-        rows = mContext.getContentResolver().update(DrinkEntry.buildUri(1),
+        rows = mContext.getContentResolver().update(uriGose,
                 TestUtils.updateBeerGose(), null, null);
         assertTrue("update of beer failed", rows == 1);
         final String[] DETAIL_COLUMNS = {
@@ -243,7 +253,7 @@ public class TestProvider extends AndroidTestCase {
                 Drink.NAME,
                 Drink.DRINK_ID,
                 Drink.INGREDIENTS};
-        cursor = mContext.getContentResolver().query(DrinkEntry.buildUri(1),
+        cursor = mContext.getContentResolver().query(uriGose,
                 DETAIL_COLUMNS, null, null, null);
         assertTrue("query after update of distillery failed", cursor.getCount() == 1);
         cursor.moveToFirst();
@@ -283,16 +293,10 @@ public class TestProvider extends AndroidTestCase {
 
         cursor = mContext.getContentResolver().query(ReviewEntry.CONTENT_URI,
                 null, null, null, null);
-        assertTrue("missing review after insert", cursor.getCount() > 0);
-//        TestUtils.printAllCursorEntries(cursor, "1 review should be inserted");
+        assertTrue("missing review after insert", cursor.getCount() == 1);
         cursor.close();
 
-        //query provider with all...
-//        cursor = mContext.getContentResolver().query(DrinkEntry.buildUriWithName(""),
-//                null, null, null, null);
-//        assertTrue("joined drink query failed", cursor.getCount() > 0
-//                && cursor.getColumnCount() == TestUtils.createBeerGose().size()
-//                + TestUtils.createBreweryBayrischerBahnhof().size() + 2);   //all attributes + id each
+        //query review with all...
         cursor = mContext.getContentResolver().query(ReviewEntry.buildUriForShowReview(1),
                 null, null, null, null);
         assertTrue("joined query on review did not work", cursor.getCount() > 0);
@@ -317,12 +321,12 @@ public class TestProvider extends AndroidTestCase {
         cursor = mContext.getContentResolver().query(
                 ReviewEntry.buildUriForShowReviewWithPatternAndType("hof", "wine"),
                 null, null, null, null);
-        assertTrue("joined query on review Wine containing ig", cursor.getCount() == 0);
+        assertTrue("joined query on review Wine containing hof", cursor.getCount() == 0);
         cursor.close();
         cursor = mContext.getContentResolver().query(
                 ReviewEntry.buildUriForShowReviewWithPatternAndType("hof", "beer"),
                 null, null, null, null);
-        assertTrue("joined query on review Beer containing ig", cursor.getCount() > 0);
+        assertTrue("joined query on review Beer containing hof", cursor.getCount() > 0);
         cursor.close();
 
         // bulk insert reviews
@@ -349,8 +353,24 @@ public class TestProvider extends AndroidTestCase {
         assertTrue("missing reviews after bulk insert", cursor.getCount() > 9);
         cursor.close();
 
+        // insert review without location
+        tco = TestUtils.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ReviewEntry.CONTENT_URI, true, tco);
+
+        insertUri = mContext.getContentResolver().insert(ReviewEntry.CONTENT_URI,
+                TestUtils.createReview2());
+        assertTrue(insertUri != null);
+
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        //query review with all...
+        cursor = mContext.getContentResolver().query(insertUri, null, null, null, null);
+        assertTrue("joined query on review did not work", cursor.getCount() == 1);
+        cursor.moveToFirst();
+        String noLocation = cursor.getString(cursor.getColumnIndex(Review.LOCATION_ID));
+        assertTrue("location not null: " + noLocation, noLocation == null);
+        cursor.close();
     }
-
-
 
 }

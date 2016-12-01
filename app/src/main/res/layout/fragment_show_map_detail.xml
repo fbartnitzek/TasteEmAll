@@ -10,21 +10,43 @@
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
               app:layout_behavior="@string/appbar_scrolling_view_behavior"
-              tools:context="com.fbartnitzek.tasteemall.ShowMapActivity"
+              tools:context=".location.ShowMapActivity"
               tools:showIn="@layout/fragment_show_map">
 
     <TextView
-        android:id="@+id/map_info"
-        android:text="@string/loading_map_entries"
-        android:layout_width="match_parent"
+        android:id="@+id/heading_map_locations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_main_fragment_headings"
+        android:text="@string/label_list_map_locations_preview"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_map_locations"
         android:scrollbars="vertical"
-        android:maxLines="50"
+        android:layout_width="match_parent"
         android:layout_height="120dp"/>
 
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="240dp"
         android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+    <TextView
+        android:id="@+id/heading_map_sub_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_main_fragment_headings"
+        android:text="@string/label_list_map_sub_list"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview_map_sub_list"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"/>
+
+    <!-- Details maybe through intent from sub-list -->
 
 </LinearLayout>

@@ -16,24 +16,35 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ShowProducerFragment extends ShowBaseFragment {
+public class ShowProducerFragment extends ShowBaseFragment implements OnMapReadyCallback {
 
     private static final String LOG_TAG = ShowProducerFragment.class.getName();
 
     private static final int SHOW_PRODUCER_LOADER_ID = 42;
 
     private TextView mProducerNameView;
-    private TextView mProducerLocationView;
+    private TextView mProducerLocationCountryView;
+    private TextView mProducerLocationAddressView;
     private TextView mProducerDescriptionView;
     private TextView mProducerWebsiteView;
+    private static GoogleMap mMap;
+    private SupportMapFragment mMapFragment;
     private Uri mUri;
     private View mRootView;
+    private LatLng mLatLng;
     // --Commented out by Inspection (07.05.16 22:47):private int mDrinkTypeIndex;
 
     public ShowProducerFragment() {
@@ -42,6 +53,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
 
     @Override
     void calcCompleteUri() {    //if called with producer-only-id...
+        mUri = DatabaseContract.ProducerEntry.buildUriIncLocation(DatabaseContract.getIdFromUri(mUri));
         // still the same for now...
     }
 
@@ -71,7 +83,13 @@ public class ShowProducerFragment extends ShowBaseFragment {
         }
 
         mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
-        mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
+        mProducerLocationCountryView = (TextView) mRootView.findViewById(R.id.producer_location_country);
+        mProducerLocationAddressView = (TextView) mRootView.findViewById(R.id.producer_location_address);
+
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mMapFragment.getMapAsync(this);
+
+
         mProducerDescriptionView = (TextView) mRootView.findViewById(R.id.producer_description);
         mProducerWebsiteView = (TextView) mRootView.findViewById(R.id.producer_website);
         mProducerWebsiteView.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +118,7 @@ public class ShowProducerFragment extends ShowBaseFragment {
             return new CursorLoader(
                     getActivity(),
                     mUri,
-                    QueryColumns.ProducerFragment.DETAIL_COLUMNS,
+                    QueryColumns.ProducerFragment.ShowQuery.COLUMNS,
                     null,
                     null,
                     null);
@@ -132,20 +150,27 @@ public class ShowProducerFragment extends ShowBaseFragment {
 
         if (data != null && data.moveToFirst()) {
             // variables not really needed - optimize later...
-            String name = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_NAME);
+            String name = data.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_NAME);
             mProducerNameView.setText(name);
-            String location = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_LOCATION);
-            mProducerLocationView.setText(location);
-            String website = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_WEBSITE);
+            String country = data.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_COUNTRY);
+            String address = data.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_FORMATTED_ADDRESS);
+            mProducerLocationCountryView.setText(country);
+            mProducerLocationAddressView.setText(address);
+            String website = data.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_WEBSITE);
             mProducerWebsiteView.setText(website);
-            String description = data.getString(QueryColumns.ProducerFragment.COL_PRODUCER_DESCRIPTION);
+            String description = data.getString(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_DESCRIPTION);
             mProducerDescriptionView.setText(description);
 
+            mLatLng = new LatLng(
+                    data.getDouble(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_LATITUDE),
+                    data.getDouble(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_LONGITUDE));
             updateToolbar();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 ((ShowProducerActivity) getActivity()).scheduleStartPostponedTransition(mProducerNameView);
             }
+
+            updateAndMoveToMarker();
 
 //            Log.v(LOG_TAG, "onLoadFinished, name=" + name + ", location=" + location + ", " + "website= [" + website+ "], description= [" + description+ "]");
         }
@@ -154,5 +179,28 @@ public class ShowProducerFragment extends ShowBaseFragment {
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+    }
+
+
+    // map
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        updateAndMoveToMarker();
+    }
+
+    private void updateAndMoveToMarker() {
+        Log.v(LOG_TAG, "updateAndMoveToMarker, mMap=" + mMap + ", mLatLng=" + mLatLng);
+        if (mMap != null && mLatLng != null) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(mLatLng)
+                    .title(mProducerNameView.getText().toString())
+                    .snippet(mProducerLocationAddressView.getText().toString())
+                    .draggable(false));
+            mMap.moveCamera(
+                    CameraUpdateFactory.newLatLng(mLatLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+        }
     }
 }

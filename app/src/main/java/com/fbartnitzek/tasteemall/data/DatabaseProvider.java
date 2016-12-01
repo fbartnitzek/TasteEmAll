@@ -13,18 +13,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.UserEntry;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 
 import java.util.Arrays;
+
+import static com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry.getPathString;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -44,22 +46,39 @@ import java.util.Arrays;
 
 public class DatabaseProvider extends ContentProvider {
 
+    private static final String RA = ReviewEntry.ALIAS;   //ReviewAlias
+    private static final String UA = UserEntry.ALIAS;   //UserAlias
+    private static final String DA = DrinkEntry.ALIAS;   //DrinkAlias
+    private static final String PA = ProducerEntry.ALIAS;   //ProducerAlias
+    private static final String LAR = LocationEntry.ALIAS_REVIEW;   //LocationAlias
+
+    private static final String LOCATION_NOT_NULL = " AND " + LAR + "." + Location.LOCATION_ID
+            + " IS NOT NULL AND " + LAR + "." + Location.LOCATION_ID + " != ''";;
     private static DatabaseHelper mHelper;
     private static final String LOG_TAG = DatabaseProvider.class.getName();
 
     private static final int LOCATIONS = 100;
+    private static final int LOCATIONS_BY_PATTERN = 101;
     private static final int LOCATION_BY_ID = 102;
+    private static final int LOCATIONS_BY_LATLNG = 103;
+    private static final int LOCATIONS_BY_DESCRIPTION_PATTERN = 104;
+    private static final int LOCATIONS_BY_BOTH_PATTERNS = 106;
+    private static final int GEOCODE_VALID_LATLNG_LOCATIONS = 110;
+    private static final int GEOCODE_TEXT_LATLNG_LOCATIONS = 111;
 
     private static final int PRODUCERS = 200;
-    private static final int PRODUCERS_BY_NAME = 201;
     private static final int PRODUCER_BY_ID = 202;
-    private static final int PRODUCERS_BY_PATTERN = 203;
+    private static final int PRODUCERS_WITH_LOCATION_BY_ID = 203;
+    private static final int PRODUCERS_WITH_LOCATION_BY_PATTERN = 204;
+    private static final int GEOCODE_VALID_LATLNG_PRODUCER_LOCATIONS = 210;
+    private static final int GEOCODE_TEXT_PRODUCER_LOCATIONS = 211;
 
     private static final int DRINKS = 300;
     private static final int DRINKS_BY_NAME = 301;
     private static final int DRINK_BY_ID = 302;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME = 310;
     private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
+    private static final int DRINKS_WITH_PRODUCER_AND_LOCATION_BY_ID = 312;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE = 320;
 
     private static final int USERS = 400;
@@ -70,46 +89,70 @@ public class DatabaseProvider extends ContentProvider {
     private static final int REVIEW_BY_ID = 503;
     private static final int REVIEW_WITH_ALL_BY_ID = 510;
     private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
+    private static final int REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE = 5201;
+    private static final int REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE = 5202;
     private static final int REVIEWS_GEOCODE = 530;
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 
-    private static final String RA = ReviewEntry.ALIAS;   //ReviewAlias
-    private static final String UA = UserEntry.ALIAS;   //UserAlias
-    private static final String DA = DrinkEntry.ALIAS;   //DrinkAlias
-    private static final String PA = ProducerEntry.ALIAS;   //ProducerAlias
-    private static final String LAP = LocationEntry.ALIAS_PRODUCER;   //LocationAlias
-    private static final String LAR = LocationEntry.ALIAS_REVIEW;   //LocationAlias
 
-    private static final String PRODUCERS_BY_NAME_SELECTION = //both seem to work
-//            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ?";
-            ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE '%' || ? || '%'";
+    private static final String LOCATIONS_GEOCODE_VALID_LATLNG =
+            Location.FORMATTED_ADDRESS + " LIKE '" + LocationEntry.GEOCODE_ME + "' AND "
+                    + Location.LATITUDE + " <= 90.0 AND " + Location.LATITUDE + " >= -90.0 AND "
+                    + Location.LONGITUDE+ " <= 180.0 AND " + Location.LONGITUDE + " >= -180.0";
 
-    // TODO: adapt
+//    private static final String REVIEW_LOCATIONS_VALID_LATLNG =
+//            LAR + "." + Location.LATITUDE + " <= 90.0 AND " + LAR + "." + Location.LATITUDE + " >= -90.0 AND " +
+//            LAR + "." + Location.LONGITUDE + " <= 180.0 AND " + LAR + "." + Location.LONGITUDE + " >= -180.0";
+
+    public static final String PRODUCERS_GEOCODE_VALID_LATLNG =
+            Producer.FORMATTED_ADDRESS + " LIKE '" + LocationEntry.GEOCODE_ME + "' AND "
+                    + Producer.LATITUDE + " <= 90.0 AND " + Producer.LATITUDE + " >= -90.0 AND "
+                    + Producer.LONGITUDE+ " <= 180.0 AND " + Producer.LONGITUDE + " >= -180.0";
+
+    public static final String LOCATIONS_GEOCODE_TEXT =
+            Location.FORMATTED_ADDRESS + " LIKE '" + LocationEntry.GEOCODE_ME + "' AND ("
+                    + Location.LATITUDE + " > 90.0 OR " + Location.LATITUDE + " < -90.0 OR "
+                    + Location.LONGITUDE+ " > 180.0 OR " + Location.LONGITUDE + " < -180.0)";
+
+    public static final String PRODUCERS_GEOCODE_TEXT =
+            Producer.FORMATTED_ADDRESS + " LIKE '" + LocationEntry.GEOCODE_ME + "' AND ("
+                    + Producer.LATITUDE + " > 90.0 OR " + Producer.LATITUDE + " < -90.0 OR "
+                    + Producer.LONGITUDE+ " > 180.0 OR " + Producer.LONGITUDE + " < -180.0)";
+
+
+
+
+//    private static final String PRODUCERS_BY_NAME_OR_LOCATION_SELECTION =
+//                PA + "." + Producer.NAME + " LIKE ? OR "
+//                    + LAP + "." + Location.FORMATTED_ADDRESS + " LIKE ? OR "
+//                    + LAP + "." + Location.COUNTRY + " LIKE ?";
     private static final String PRODUCERS_BY_NAME_OR_LOCATION_SELECTION =
-                ProducerEntry.TABLE_NAME + "." + Producer.NAME + " LIKE ? OR "
-                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION_ID + " LIKE ?";
+        Producer.NAME + " LIKE ? OR "
+                + Producer.FORMATTED_ADDRESS + " LIKE ? OR "
+                + Producer.COUNTRY + " LIKE ?";
 
     private static final String DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
             DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?";
-
-    private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
-            DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?";
-
-//    private static final String DRINKS_BY_NAME_AND_TYPE_SELECTION =
-//            DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE ? AND "
-//                    + DrinkEntry.TABLE_NAME + "." + Drink.TYPE + " = ?";
 
     private static final String DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
             "(" + DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?)" +
                     " AND " + DA + "." + Drink.TYPE + " = ?";
 
+    private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
+            DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?";
+
     private static final String REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
             "(" + DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?)" +
                     " AND " + DA + "." + Drink.TYPE + " = ?";
 
-//    private static final String PRODUCER_BY_ID_SELECTION =
-//            ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = ?";
+    private static final String REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION =
+            "(" + DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?) AND "
+            + LAR + "." + LocationEntry._ID + " = ?" ;
+
+    private static final String REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION =
+            "(" + DA + "." + Drink.NAME + " LIKE ? OR " + PA + "." + Producer.NAME + " LIKE ?)" +
+                    " AND " + DA + "." + Drink.TYPE + " = ? AND " + LAR + "." + LocationEntry._ID + " = ?";
 
     private UriMatcher buildUriMatcher() {
         Log.v(LOG_TAG, "buildUriMatcher, " + "");
@@ -119,16 +162,30 @@ public class DatabaseProvider extends ContentProvider {
         // all locations
         matcher.addURI(authority, DatabaseContract.PATH_LOCATION, LOCATIONS);
         matcher.addURI(authority, DatabaseContract.PATH_LOCATION + "/#", LOCATION_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_PATTERN + "/", LOCATIONS_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_PATTERN + "/*", LOCATIONS_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_DESCRIPTION_PATTERN + "/", LOCATIONS_BY_DESCRIPTION_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_DESCRIPTION_PATTERN + "/*", LOCATIONS_BY_DESCRIPTION_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_PATTERN_OR_DESCRIPTION + "/", LOCATIONS_BY_BOTH_PATTERNS);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_PATTERN_OR_DESCRIPTION + "/*", LOCATIONS_BY_BOTH_PATTERNS);
+
+        // all variations if double is without dot
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_LATLNG + "/#/#", LOCATIONS_BY_LATLNG);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_LATLNG + "/*/#", LOCATIONS_BY_LATLNG);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_LATLNG + "/#/*", LOCATIONS_BY_LATLNG);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_BY_LATLNG + "/*/*", LOCATIONS_BY_LATLNG);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_LATLNG_GEOCODE, GEOCODE_VALID_LATLNG_LOCATIONS);
+        matcher.addURI(authority, DatabaseContract.PATH_LOCATION_TEXT_GEOCODE, GEOCODE_TEXT_LATLNG_LOCATIONS);
 
         // all producers
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER, PRODUCERS);
         matcher.addURI(authority, DatabaseContract.PATH_PRODUCER + "/#", PRODUCER_BY_ID);
-        // needed for empty string ...
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/", PRODUCERS_BY_NAME);
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_NAME + "/*", PRODUCERS_BY_NAME);
-        // producer.name and producer.location
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/", PRODUCERS_BY_PATTERN);
-        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_BY_PATTERN + "/*", PRODUCERS_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_WITH_LOCATION + "/#", PRODUCERS_WITH_LOCATION_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_WITH_LOCATION_BY_PATTERN + "/", PRODUCERS_WITH_LOCATION_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCER_WITH_LOCATION_BY_PATTERN + "/*", PRODUCERS_WITH_LOCATION_BY_PATTERN);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCERS_LATLNG_GEOCODE, GEOCODE_VALID_LATLNG_PRODUCER_LOCATIONS);
+        matcher.addURI(authority, DatabaseContract.PATH_PRODUCERS_TEXT_GEOCODE, GEOCODE_TEXT_PRODUCER_LOCATIONS);
+
         //TODO: all breweries in certain location - even better in area (center, radius)
 
         // all drinks
@@ -141,6 +198,7 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/*", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK + "/#", DRINK_BY_ID);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER + "/#", DRINKS_WITH_PRODUCER_BY_ID);
+        matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_AND_LOCATION + "/#", DRINKS_WITH_PRODUCER_AND_LOCATION_BY_ID);
 
         // TODO: all beers of certain brewery, of breweries in certain location / area
 
@@ -159,9 +217,28 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL + "/#", REVIEW_WITH_ALL_BY_ID);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEWS_WITH_ALL_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/", REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/#/", REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE);
+        matcher.addURI(authority, DatabaseContract.PATH_REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/*/#", REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_GEOCODE_LOCATION, REVIEWS_GEOCODE);
 
         return matcher;
+    }
+
+
+    private static final String LAT = Location.LATITUDE;
+    private static final String LNG = Location.LONGITUDE;
+
+    private static String filterLatLng(double lat, double lng, double filter) {
+        // manhattan distance
+        return LAT + " >= " + (lat - filter) + " AND " + LAT + " <= " + (lat + filter)
+                + " AND " + LNG + " >= " + (lng - filter) + " AND " + LNG + " <= " + (lng + filter)
+                // 2d euclidean distance - good enough
+                + " AND "
+                + "(" + LAT + " - " + lat + ") * (" + LAT + " - " + lat + ") + "
+                + "(" + LNG + " - " + lng + ") * (" + LNG + " - " + lng + ") "
+                + " <= " + LocationEntry.DISTANCE_SQUARE_THRESHOLD;
     }
 
     @Override
@@ -188,33 +265,96 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(LocationEntry.TABLE_NAME, projection, selection,
                         selectionArgs, null, null, sortOrder);
                 break;
+            case LOCATIONS_BY_PATTERN:
+                pattern = LocationEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", "%" + pattern + "%"};
+                cursor = db.query(LocationEntry.TABLE_NAME, projection,
+                        Location.FORMATTED_ADDRESS + " LIKE ? OR " + Location.INPUT + " LIKE ? OR " + Location.COUNTRY + " LIKE ?",
+                        mySelectionArgs,
+                        null, null, sortOrder);
+                break;
+            case LOCATIONS_BY_DESCRIPTION_PATTERN:
+                pattern = LocationEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{"%" + pattern + "%"};
+                cursor = db.query(LocationEntry.TABLE_NAME, projection,
+                        Location.DESCRIPTION+ " LIKE ?",
+                        mySelectionArgs,
+                        null, null, sortOrder);
+
+                break;
+            case LOCATIONS_BY_BOTH_PATTERNS:
+                pattern = LocationEntry.getSearchString(uri);
+                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", "%" + pattern + "%", "%" + pattern + "%"};
+                cursor = db.query(LocationEntry.TABLE_NAME, projection,
+                        Location.FORMATTED_ADDRESS + " LIKE ? OR " + Location.INPUT + " LIKE ? OR " + Location.COUNTRY + " LIKE ? OR " + Location.DESCRIPTION + " LIKE ?",
+                        mySelectionArgs,
+                        null, null, sortOrder);
+                break;
             case LOCATION_BY_ID:
                 cursor = db.query(LocationEntry.TABLE_NAME, projection,
                         LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
                 break;
+            case LOCATIONS_BY_LATLNG:
+                double latitude = LocationEntry.getLatitude(uri);
+                double longitude = LocationEntry.getLongitude(uri);
+                cursor = db.query(LocationEntry.TABLE_NAME, projection,
+                        filterLatLng(latitude, longitude, LocationEntry.DISTANCE_PRE_FILTER_LAT_LNG),
+                        null,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case GEOCODE_VALID_LATLNG_LOCATIONS:
+                cursor = db.query(LocationEntry.TABLE_NAME, projection, LOCATIONS_GEOCODE_VALID_LATLNG,
+                        selectionArgs, null, null, sortOrder);
+                break;
+            case GEOCODE_TEXT_LATLNG_LOCATIONS:
+                cursor = db.query(LocationEntry.TABLE_NAME, projection, LOCATIONS_GEOCODE_TEXT,
+                        selectionArgs, null, null, sortOrder);
+                break;
+
             case PRODUCERS:
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-            case PRODUCERS_BY_NAME:
-                pattern = ProducerEntry.getSearchString(uri);
-                mySelectionArgs = new String[]{"%" + pattern + "%"};
-                cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_BY_NAME_SELECTION,
-                        mySelectionArgs, null, null, sortOrder);
-                break;
+
             case PRODUCER_BY_ID:
+//                cursor = sProducersWithLocationQueryBuilder.query(db, projection,
+//                        PA + "." + ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+//                        selectionArgs, null, null, sortOrder);
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection,
                         ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
                 break;
-            case PRODUCERS_BY_PATTERN:
+
+            case PRODUCERS_WITH_LOCATION_BY_ID:
+//                cursor = sProducersWithLocationQueryBuilder.query(db, projection,
+//                PA + "." + ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection,
+                        ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
+
+            case PRODUCERS_WITH_LOCATION_BY_PATTERN:
                 pattern = ProducerEntry.getSearchString(uri);
-                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
+                mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", "%" + pattern + "%"};
+                Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], pattern= [" + pattern+ "]");
+//                cursor = sProducersWithLocationQueryBuilder.query(db, projection,
                 cursor = db.query(ProducerEntry.TABLE_NAME, projection,
                         PRODUCERS_BY_NAME_OR_LOCATION_SELECTION,
                         mySelectionArgs, null, null, sortOrder);
                 break;
+
+            case GEOCODE_VALID_LATLNG_PRODUCER_LOCATIONS:
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_GEOCODE_VALID_LATLNG,
+                        selectionArgs, null, null, sortOrder);
+                break;
+            case GEOCODE_TEXT_PRODUCER_LOCATIONS:
+                cursor = db.query(ProducerEntry.TABLE_NAME, projection, PRODUCERS_GEOCODE_TEXT,
+                        selectionArgs, null, null, sortOrder);
+                break;
+
             case DRINKS:
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
@@ -251,6 +391,11 @@ public class DatabaseProvider extends ContentProvider {
                 }
 
                 break;
+            case DRINKS_WITH_PRODUCER_AND_LOCATION_BY_ID:
+                cursor = sDrinksWithProducersAndLocationQueryBuilder.query(db,
+                        projection, DA + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        selectionArgs, null, null, sortOrder);
+                break;
             case DRINKS_WITH_PRODUCER_BY_ID:
                 cursor = sDrinksWithProducersQueryBuilder.query(db,
                         projection, DA + "." + DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
@@ -286,23 +431,78 @@ public class DatabaseProvider extends ContentProvider {
                         RA + "." + ReviewEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs, null, null, sortOrder);
                 break;
-            case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE: //TODO
+            case REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE:
+
+                String locationId;
+                drinkType = ReviewEntry.getPathString(uri, 1);
+                if (uri.getPathSegments().size() > 3) {
+                    pattern = getPathString(uri, 2);
+                    locationId = ReviewEntry.getPathString(uri, 3);
+
+                } else {
+                    pattern = "";
+                    locationId = ReviewEntry.getPathString(uri, 2);
+                }
+
+                String mySortOrder = ReviewEntry.ALIAS + "." + Review.READABLE_DATE + " DESC";
+                if (Drink.TYPE_ALL.equals(drinkType)) {
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", locationId};
+
+                    cursor = sReviewWithAllQueryBuilder.query(db,
+                            projection, REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION,
+                            mySelectionArgs, null, null, mySortOrder);
+
+                    Log.v(LOG_TAG, "query, ReviewsOfLocations without type, selection = [" + REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION + "], selectionArgs = [" + Arrays.toString(mySelectionArgs) + "], sortOrder = [" + mySortOrder+ "]");
+                } else {
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", drinkType, locationId};
+
+                    cursor = sReviewWithAllQueryBuilder.query(db,
+                            projection, REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION,
+                            mySelectionArgs, null, null, mySortOrder);
+                    Log.v(LOG_TAG, "query, ReviewsOfLocations with type, selection = [" + REVIEWS_OF_LOCATION_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION + "], selectionArgs = [" + Arrays.toString(mySelectionArgs) + "], sortOrder = [" + mySortOrder + "]");
+                }
+
+                break;
+            case REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE:
+                // all other patterns all also needed...
+
+                pattern = ReviewEntry.getSearchString(uri, true);
+                drinkType = ReviewEntry.getDrinkType(uri);
+                mySortOrder = LocationEntry.ALIAS_REVIEW + "." + Location.FORMATTED_ADDRESS + " ASC";
+
+                if (Drink.TYPE_ALL.equals(drinkType)) {
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
+//                    sReviewWithAllQueryBuilder.setDistinct(true);
+                    cursor = sReviewWithAllQueryBuilder.query(db,
+                            projection, "(" + REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION + ")" + LOCATION_NOT_NULL,
+                            mySelectionArgs, null, null, mySortOrder);
+                    Log.v(LOG_TAG, "query, Reviews without type, selection = [" + "(" + REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION + ")" + LOCATION_NOT_NULL + "], selectionArgs = [" + Arrays.toString(mySelectionArgs) + "], sortOrder = [" + mySortOrder+ "]");
+                } else {
+                    mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", drinkType};
+                    cursor = sReviewWithAllQueryBuilder.query(db,
+                            projection, "(" + REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION + ")" + LOCATION_NOT_NULL,
+                            mySelectionArgs, null, null, mySortOrder);
+                    Log.v(LOG_TAG, "query, Reviews with type, selection = [" + "(" + REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION + ")" + LOCATION_NOT_NULL + "], selectionArgs = [" + Arrays.toString(mySelectionArgs) + "], sortOrder = [" + mySortOrder + "]");
+                }
+
+                break;
+            case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
                 pattern = ReviewEntry.getSearchString(uri, true);
                 drinkType = ReviewEntry.getDrinkType(uri);
                 if (Drink.TYPE_ALL.equals(drinkType)) {
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%"};
-                    cursor = sReviewWithAllQueryBuilder.query(db,
+                    cursor = sReviewWithMostQueryBuilder.query(db,
                             projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_SELECTION, mySelectionArgs, null, null, sortOrder);
                 } else {
                     mySelectionArgs = new String[]{"%" + pattern + "%", "%" + pattern + "%", drinkType};
-                    cursor = sReviewWithAllQueryBuilder.query(db,
+                    cursor = sReviewWithMostQueryBuilder.query(db,
                             projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
                 }
                 break;
             case REVIEWS_GEOCODE:
                 cursor = db.query(ReviewEntry.TABLE_NAME, projection,
                         //TODO!!!
-                        Review.LOCATION_ID + " LIKE '" + Utils.GEOCODE_ME + "%'",
+                        Review.LOCATION_ID + " LIKE '" + LocationEntry.GEOCODE_ME + "%'",
                         selectionArgs, null, null, sortOrder);
                 break;
             // TODO: special review-searches    - advanced search Fragment...
@@ -331,6 +531,17 @@ public class DatabaseProvider extends ContentProvider {
                         + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID);
     }
 
+    public static final SQLiteQueryBuilder sDrinksWithProducersAndLocationQueryBuilder;
+    static {
+        sDrinksWithProducersAndLocationQueryBuilder = new SQLiteQueryBuilder();
+        sDrinksWithProducersAndLocationQueryBuilder.setTables(
+                DrinkEntry.TABLE_NAME + " " + DA
+                        + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
+                        + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID);
+//                        + " INNER JOIN " + LocationEntry.TABLE_NAME + " " + LAP + " ON "
+//                        + PA + "." + Producer.LOCATION_ID + " = " + LAP + "." + Location.LOCATION_ID);
+    }
+
     private static final SQLiteQueryBuilder sReviewWithAllQueryBuilder;
     static {
         sReviewWithAllQueryBuilder = new SQLiteQueryBuilder();
@@ -339,12 +550,28 @@ public class DatabaseProvider extends ContentProvider {
                 ReviewEntry.TABLE_NAME + " " + RA
                         + " INNER JOIN " + UserEntry.TABLE_NAME + " " + UA + " ON "
                         + RA + "." + Review.USER_ID + " = " + UA + "." + User.USER_ID
+                        + " LEFT JOIN " + LocationEntry.TABLE_NAME + " " + LAR + " ON "
+                        + RA + "." + Review.LOCATION_ID + " = " + LAR + "." + Location.LOCATION_ID
                         + " INNER JOIN " + DrinkEntry.TABLE_NAME + " " + DA + " ON "
                         + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
                         + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
                         + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID
 //                        + " INNER JOIN " + LocationEntry.TABLE_NAME + " " + LAP + " ON "
 //                        + PA + "." + Producer.LOCATION_ID + " = " + LAP + "." + Location.LOCATION_ID
+        );
+    }
+
+    private static final SQLiteQueryBuilder sReviewWithMostQueryBuilder;
+    static {
+        sReviewWithMostQueryBuilder= new SQLiteQueryBuilder();
+        sReviewWithMostQueryBuilder.setTables(
+                ReviewEntry.TABLE_NAME + " " + RA
+                        + " INNER JOIN " + UserEntry.TABLE_NAME + " " + UA + " ON "
+                        + RA + "." + Review.USER_ID + " = " + UA + "." + User.USER_ID
+                        + " INNER JOIN " + DrinkEntry.TABLE_NAME + " " + DA + " ON "
+                        + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
+                        + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
+                        + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID
         );
     }
 
@@ -583,7 +810,7 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             case PRODUCER_BY_ID:
                 impactedRows = db.update(ProducerEntry.TABLE_NAME, values,
-                        ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        ProducerEntry.TABLE_NAME + "." + ProducerEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
                         selectionArgs);
                 break;
             case DRINKS:
@@ -629,11 +856,11 @@ public class DatabaseProvider extends ContentProvider {
                 return LocationEntry.CONTENT_TYPE;
             case LOCATION_BY_ID:
                 return LocationEntry.CONTENT_ITEM_TYPE;
+            case GEOCODE_VALID_LATLNG_LOCATIONS:
+                return LocationEntry.CONTENT_TYPE;
             case PRODUCERS:
                 return ProducerEntry.CONTENT_TYPE;
-            case PRODUCERS_BY_NAME:
-                return ProducerEntry.CONTENT_TYPE;
-            case PRODUCERS_BY_PATTERN:
+            case PRODUCERS_WITH_LOCATION_BY_PATTERN:
                 return ProducerEntry.CONTENT_TYPE;
             case PRODUCER_BY_ID:
                 return ProducerEntry.CONTENT_ITEM_TYPE;
@@ -645,6 +872,8 @@ public class DatabaseProvider extends ContentProvider {
                 return DrinkEntry.CONTENT_ITEM_TYPE;
             case DRINKS_WITH_PRODUCER_BY_NAME:
                 return DrinkEntry.CONTENT_TYPE;
+            case DRINKS_WITH_PRODUCER_AND_LOCATION_BY_ID:
+                return DrinkEntry.CONTENT_ITEM_TYPE;
             case DRINKS_WITH_PRODUCER_BY_ID:
                 return DrinkEntry.CONTENT_ITEM_TYPE;
             case DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE:

@@ -30,15 +30,9 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
-    private final CompletionDrinkAdapterSelectionHandler mSelectHandler;
     private final Activity mActivity;
 
-    interface CompletionDrinkAdapterSelectionHandler {
-        void onSelectedDrink(String drinkName, String drinkId, String producerName);
-    }
-
-    public CompletionDrinkAdapter(Activity activity,
-                                  CompletionDrinkAdapterSelectionHandler selectHandler) {
+    public CompletionDrinkAdapter(Activity activity) {
         super(activity,
                 R.layout.list_item_drink_completion,
                 null,
@@ -47,7 +41,6 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
                         R.id.list_item_producer_name},  //quite useless now...
                 0);
         mActivity = activity;
-        mSelectHandler = selectHandler;
     }
 
     @Override
@@ -74,7 +67,6 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-        // uri with name for drink or producer... (currently just drink)
         return mActivity.getContentResolver().query(
                 DatabaseContract.DrinkEntry.buildUriWithName(String.valueOf(constraint)),
                 QueryColumns.ReviewFragment.DrinkCompletionQuery.COLUMNS,
@@ -85,10 +77,6 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        String drinkName = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_NAME);
-        String drinkId = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_ID);
-        String producerName = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_NAME);
-        mSelectHandler.onSelectedDrink(drinkName, drinkId, producerName);
-        return drinkName;
+        return cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_NAME);
     }
 }

@@ -1,4 +1,4 @@
-package com.fbartnitzek.tasteemall;
+package com.fbartnitzek.tasteemall.location;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.fbartnitzek.tasteemall.R;
 import com.google.android.gms.maps.GoogleMap;
 
 /**
@@ -57,19 +58,22 @@ public class ShowMapActivity extends AppCompatActivity {
 
             if (getIntent() != null) {
                 Bundle args = new Bundle();
+                Log.v(LOG_TAG, "onCreate with args: " + args);
                 if (getIntent().hasExtra(EXTRA_REVIEWS_URI)) {
                     args.putParcelable(EXTRA_REVIEWS_URI, getIntent().getParcelableExtra(EXTRA_REVIEWS_URI));
-                }
-                if (getIntent().hasExtra(EXTRA_PRODUCERS_URI)) {
-                    args.putParcelable(EXTRA_PRODUCERS_URI, getIntent().getParcelableExtra(EXTRA_PRODUCERS_URI));
                 }
                 if (getIntent().hasExtra(EXTRA_REVIEWS_SORT_ORDER)) {
                     args.putString(EXTRA_REVIEWS_SORT_ORDER, getIntent().getStringExtra(EXTRA_REVIEWS_SORT_ORDER));
                 }
-                if (getIntent().hasExtra(EXTRA_PRODUCERS_SORT_ORDER)) {
-                    args.putString(EXTRA_PRODUCERS_SORT_ORDER, getIntent().getStringExtra(EXTRA_PRODUCERS_SORT_ORDER));
-                }
+//                if (getIntent().hasExtra(EXTRA_PRODUCERS_URI)) {
+//                    args.putParcelable(EXTRA_PRODUCERS_URI, getIntent().getParcelableExtra(EXTRA_PRODUCERS_URI));
+//                }
+//                if (getIntent().hasExtra(EXTRA_PRODUCERS_SORT_ORDER)) {
+//                    args.putString(EXTRA_PRODUCERS_SORT_ORDER, getIntent().getStringExtra(EXTRA_PRODUCERS_SORT_ORDER));
+//                }
                 fragment.setArguments(args);
+            } else {
+                Log.e(LOG_TAG, "onCreate without intent...?");
             }
 
             getSupportFragmentManager().beginTransaction()

@@ -55,6 +55,8 @@
     <string name="label_drink_details">drink details</string>
     <string name="label_review_details">review details</string>
     <string name="label_numberAppendix"> (<xliff:g id="number">%1$d</xliff:g>)</string>
+    <string name="label_list_of_locations_preview">list of locations</string>
+    <string name="label_list_of_locations">list of locations<xliff:g id="numberAppendix">%1$s</xliff:g></string>
     <string name="label_list_of_producers_preview">list of producers</string>
     <string name="label_list_of_producers">list of producers<xliff:g id="numberAppendix">%1$s</xliff:g></string>
     <string name="label_list_of_drinks_preview">list of drinks</string>
@@ -68,6 +70,8 @@
     <string name="label_producer_name">Name</string>
     <string name="hint_producer_name">name of the producer</string>
     <string name="producer_location">Location</string>
+    <string name="producer_location_country">Country</string>
+    <string name="producer_location_address">Address</string>
     <string name="hint_producer_location">location of the producer</string>
     <string name="label_producer_website">Website</string>
     <string name="hint_producer_website">website of the producer</string>
@@ -136,6 +140,8 @@
     <string name="a11y_add_a_new_drink">create a new drink</string>
     <string name="a11y_add_a_new_user">create a new user with this username</string>
     <string name="text_plus" translatable="false">+</string>
+    <string name="text_location_here_button">here</string>
+    <string name="a11y_location_here_button">here</string>
     <string name="text_questionmark" translatable="false">\?</string>
     <string name="a11y_choose_export_dir">choose the directory on your phone for exports</string>
     <string name="hint_choose_export_dir">choose export directory</string>
@@ -163,6 +169,7 @@
     <string name="action_map_type_normal">normal</string>
     <string name="action_map_type_none">none</string>
     <string name="title_show_map">Show Map</string>
+    <string name="title_show_map_location">Show <xliff:g id="location">%1$s</xliff:g></string>
     <!--<string name="marker_review_title">Review <xliff:g id="number">%3$s</xliff:g> for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g></string>-->
     <!-- TODO: lint - special plural handling ...? - later -->
     <string name="marker_title"><xliff:g id="number">%1$d</xliff:g> Reviews for <xliff:g id="location">%2$s</xliff:g></string>
@@ -201,6 +208,7 @@
 
     <string name="msg_enter_producer_name">enter a producer name first</string>
     <string name="msg_enter_producer_location">enter the location first</string>
+    <string name="msg_enter_location">enter the location first</string>
 
     <string name="help_show_review_rating_help" tools:ignore="TypographyDashes"><![CDATA[++ really good\n+ buy again\n0 neither good nor bad\n- don\'t buy again\n-- spit & spill it out\n(the remaining for the uncertain ones)]]></string>
 
@@ -209,12 +217,23 @@
     <string name="msg_no_location_provided">no location data provided, please enter the location manually</string>
     <string name="msg_no_location_access">no location access provided, please enter the location manually</string>
     <string name="msg_service_not_available">Geocoder unreachable - geocoder can be called later from menu</string>
+    <string name="msg_geocoder_already_running">Geocoder already running...</string>
     <string name="msg_service_network_not_available">no network is available - geocoder can be called later from menu</string>
     <string name="msg_no_location_generic">no location found, please enter the location manually</string>
+    <string name="msg_no_producer_location_given">no location given, either enter manually or use here-button</string>
     <string name="msg_invalid_geocode_location">the geocode pattern in review location was modified, please enter the location manually</string>
     <string name="msg_mass_geocoder_no_network">network is not available, so geocoder is unreachable</string>
-    <string name="msg_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="failedNumber">%1$d</xliff:g> Reviews failed)</string>
+    <string name="msg_mass_geocoder_unreachable">Geocoder unreachable, try again later and check your network settings (<xliff:g id="all">%1$d</xliff:g> <xliff:g id="LocationType">%2$s</xliff:g>, converted: <xliff:g id="converted">%3$d</xliff:g>, failed: <xliff:g id="failed">%4$d</xliff:g>)</string>
     <string name="msg_mass_geocoder_result">Geocoding complete, <xliff:g id="converted">%1$s</xliff:g> Reviews converted, <xliff:g id="converted">%2$d</xliff:g> Reviews failed)</string>
+    <string name="msg_mass_geocoder_valid_latlng_result_producer">Producer locations: <xliff:g id="converted">%1$d</xliff:g> converted, <xliff:g id="failed">%2$d</xliff:g> failed</string>
+    <string name="msg_mass_geocoder_no_latlng_result_producer">no Producer locations found (GPS)</string>
+    <string name="msg_mass_geocoder_valid_latlng_result_review">Review locations: <xliff:g id="converted">%1$d</xliff:g> converted, <xliff:g id="failed">%2$d</xliff:g> failed</string>
+    <string name="msg_mass_geocoder_no_latlng_result_review">no Review locations found (GPS)</string>
+
+    <string name="geocode_entries_by_text">Geocode <xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> by text?</string>
+    <string name="geocode_continue_entries_by_text">continue geocoding by text? (<xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> remaining)</string>
+    <string name="geocode_button">geocode now</string>
+    <string name="cancel_button">cancel</string>
 
     <string name="msg_no_export_directory">no export directory chosen</string>
     <string name="msg_wrong_export_directory">the export directory does not exist or it cannot be written to (<xliff:g id="path">%1$s</xliff:g>)</string>
@@ -256,7 +275,7 @@
     <string name="add_user_button">add</string>
     <string name="do_not_add_button">don\'t</string>
 
-
+    <string name="location_of_producer_description">location of <xliff:g id="producerName">%1$s</xliff:g></string>
 
     <!-- empty views - unused for now... -->
     <string name="empty_no_reviews_found">no reviews found</string>
@@ -286,24 +305,24 @@
 
 
     <!-- examples-->
-    <string name="example_review_date">20160509</string>
+    <string name="example_review_date">example 20160509</string>
     <string name="example_review_user_name">example_user</string>
-    <string name="example_review_location">somewhere</string>
-    <string name="example_review_recommended_sides">Kartoffelbrot</string>
-    <string name="example_review_description">great taste and smell</string>
-    <string name="example_drink_specifics">some specifics</string>
-    <string name="example_drink_ingredients">some ingredients</string>
+    <string name="example_review_location">example somewhere</string>
+    <string name="example_review_recommended_sides">example Kartoffelbrot</string>
+    <string name="example_review_description">example great taste and smell</string>
+    <string name="example_drink_specifics">example some specifics</string>
+    <string name="example_drink_ingredients">example some ingredients</string>
     <string name="example_review_rating">++</string>
-    <string name="example_drink_type">beer</string>
-    <string name="example_country">some country</string>
-    <string name="example_drink_style">IPA</string>
-    <string name="example_producer_location">some town</string>
-    <string name="example_website">NO website</string>
-    <string name="example_brewery">THE Brewery</string>
-    <string name="example_producer_description">since 1666</string>
-    <string name="example_drink_name">some drink</string>
-    <string name="example_location">TestLocation</string>
-    <string name="example_review_count">5 Reviews</string>
+    <string name="example_drink_type">example beer</string>
+    <string name="example_country">example some country</string>
+    <string name="example_drink_style">example IPA</string>
+    <string name="example_producer_location">example some town</string>
+    <string name="example_website">example NO website</string>
+    <string name="example_brewery">example THE Brewery</string>
+    <string name="example_producer_description">example since 1666</string>
+    <string name="example_drink_name">example some drink</string>
+    <string name="example_location">example TestLocation</string>
+    <string name="example_review_count">example 5 Reviews</string>
 
     <!-- logging -->
     <string name="service_not_available">service not available</string>
@@ -312,7 +331,33 @@
     <string name="address_found">address found</string>
     <string name="no_geocode_reviews">no reviews found to geocode</string>
     <string name="no_geocode_cursor_reivews">no cursor found - that should not happen</string>
-
+    <string name="call_geocoder_later">call geocoder later</string>
+    <string name="label_location_input">location</string>
+    <string name="title_choose_location">choose the location</string>
+    <string name="a11y_search_review_location">explicitly search the location, you are </string>
+    <string name="hint_search_review_location">search the review location</string>
+    <string name="label_review_location_description">description</string>
+    <string name="hint_review_location_description">optional description for the review location</string>
+    <string name="label_location_formatted_address">address</string>
+    <string name="label_location_description">description</string>
+    <string name="label_location_country">country</string>
+    <string name="label_location_latitude">latitude</string>
+    <string name="example_latitude">12.345</string>
+    <string name="label_location_longitude">longitude</string>
+    <string name="example_longitude">23.456</string>
+    <string name="label_location">location</string>
+    <string name="hint_location_input">enter the location</string>
+    <string name="hint_location_location">enter the location</string>
+    <string name="title_search_location">search location</string>
+    <string name="label_location_id">locationId</string>
+    <string name="label_producer_locations">producer-locations</string>
+    <string name="msg_title_gps_geocoding">GPS geocoding</string>
+    <string name="msg_title_choose_map_src">which locations?</string>
+    <string name="label_list_map_locations_preview">reviews-locations</string>
+    <string name="label_list_map_locations"><xliff:g id="numberAppendix">%1$d</xliff:g> reviews-locations</string>
+    <string name="label_list_map_sub_list">reviews</string>
+    <string name="label_list_map_reviews_of_location_preview">reviews</string>
+    <string name="label_list_map_reviews_of_location"><xliff:g id="numberAppendix">%1$d</xliff:g> reviews</string>
 
 
 </resources>

@@ -74,7 +74,7 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         viewHolder.nameView.setText(producerName);
         viewHolder.nameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
 
-        //TODO later with flag :-)
+        //TODO later with flag: https://github.com/hjnilsson/country-flags
         String producerLocation = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_LOCATION);
         viewHolder.locationView.setText(producerLocation);
         viewHolder.locationView.setContentDescription(mContext.getString(R.string.a11y_producer_location, producerLocation));

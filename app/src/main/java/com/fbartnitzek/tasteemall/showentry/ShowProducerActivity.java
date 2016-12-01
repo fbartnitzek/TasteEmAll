@@ -103,7 +103,7 @@ public class ShowProducerActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);
+                        Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);   //TODO: joined error
                         // TODO: check for foreign keys ... generic seems unlikely...?
 //                        int id = DatabaseContract.getIdFromUri(deleteUri);
 //                        Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);

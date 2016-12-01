@@ -85,11 +85,16 @@
                 android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
-            android:name=".ShowMapActivity"
+            android:name=".location.ShowMapActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fbartnitzek.tasteemall.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".location.ChooseLocationActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
             android:name=".SettingsActivity"
@@ -112,20 +117,28 @@
         </activity>
 
         <service
-            android:name=".location.GeocodeAddressIntentService"
+            android:name=".location.GeocodeIntentService"
             android:exported="false"/>
 
-        <receiver android:name=".widget.StatsWidgetProvider"
+        <receiver
+            android:name=".widget.StatsWidgetProvider"
             android:label="@string/widget_heading_statistics">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="com.fbartnitzek.tasteemall.tasks.ACTION_DATA_CHANGED"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stats_widget_info"/>
         </receiver>
+
         <service android:name=".widget.StatsWidgetIntentService"/>
+
+        <activity android:name=".showentry.ShowLocationActivity">
+        </activity>
+        <activity android:name=".addentry.AddLocationActivity">
+        </activity>
     </application>
 
 </manifest>

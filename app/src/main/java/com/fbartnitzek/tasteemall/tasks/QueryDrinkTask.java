@@ -6,8 +6,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 
 import java.util.Arrays;
 
@@ -34,7 +36,8 @@ public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
     private static final String LOG_TAG = QueryDrinkTask.class.getName();
 
     public interface QueryDrinkFoundHandler {
-        void onFoundDrink(int drink_Id, String drinkName, String drinkId, String producerName);
+        void onFoundDrink(int drink_Id, String drinkName, String drinkId, String producerName,
+                          LocationParcelable locationParcelable);
     }
 
     public QueryDrinkTask(Activity mActivity, QueryDrinkFoundHandler mFoundHandler) {
@@ -60,11 +63,26 @@ public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
             return null;
         }
         if (cursor.moveToFirst()) {
+
+            double latitude = cursor.getDouble(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_LOCATION_LATITUDE);
+            double longitude = cursor.getDouble(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_LOCATION_LONGITUDE);
+            String locationInput = Utils.getLocationInput(latitude, longitude); // TODO: special handling for no latLng...
+            String producerName = cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_NAME);
             objects = new Object[]{
                     cursor.getInt(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK__ID),
                     cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_NAME),
                     cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_DRINK_ID),
-                    cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_NAME)};
+                    producerName,
+                    new LocationParcelable(
+                            LocationParcelable.INVALID_ID,
+                            cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_COUNTRY),
+                            Utils.calcLocationId(locationInput),
+                            latitude,
+                            longitude,
+                            locationInput,
+                            cursor.getString(QueryColumns.ReviewFragment.DrinkCompletionQuery.COL_PRODUCER_LOCATION_FORMATTED),
+                            mActivity.getString(R.string.location_of_producer_description, producerName))
+                    };
         } else {
             objects = null;
         }
@@ -77,7 +95,7 @@ public class QueryDrinkTask extends AsyncTask<Uri, Void, Object[]>{
     protected void onPostExecute(Object[] objects) {
         if (objects != null) {
             mFoundHandler.onFoundDrink((int) objects[0], (String) objects[1],
-                    (String) objects[2], (String) objects[3]);
+                    (String) objects[2], (String) objects[3], (LocationParcelable) objects[4]);
         }
     }
 }

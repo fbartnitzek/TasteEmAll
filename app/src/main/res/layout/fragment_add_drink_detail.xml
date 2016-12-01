@@ -53,7 +53,7 @@
 
             <Button
                 android:id="@+id/add_producer_button"
-                style="@style/AddButtonSmall"
+                style="@style/ButtonSmall"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

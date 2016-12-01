@@ -2,12 +2,14 @@ package com.fbartnitzek.tasteemall;
 
 import android.app.ActivityOptions;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -15,8 +17,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.fbartnitzek.tasteemall.addentry.AddLocationActivity;
+import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.location.ShowMapActivity;
 import com.fbartnitzek.tasteemall.tasks.ExportToDirTask;
-import com.fbartnitzek.tasteemall.tasks.GeocodeReviewsTask;
+import com.fbartnitzek.tasteemall.tasks.GeocodeAllLocationsTask;
+import com.fbartnitzek.tasteemall.tasks.ImportFilesOldFormatTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -24,12 +31,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ExportToDirTask.ExportHandler, ImportFilesTask.ImportHandler {
+public class MainActivity extends AppCompatActivity implements ExportToDirTask.ExportHandler, ImportFilesTask.ImportHandler, GeocodeAllLocationsTask.GeocodeProducersUpdateHandler, ImportFilesOldFormatTask.ImportHandler {
 
     private static final String LOG_TAG = MainActivity.class.getName();
     private static final String MAIN_FRAGMENT_TAG = "MAIN_FRAGMENT_TAG";
     private static final int REQUEST_EXPORT_DIR_CODE = 1233;
     private static final int REQUEST_IMPORT_FILES_CODE = 1234;
+    private static final String STATE_PRODUCERS_TO_GEOCODE = "STATE_PRODUCERS_TO_GEOCODE";
+    private static final int REQUEST_EDIT_PRODUCER_GEOCODE = 1235;
+    private static final String STATE_REVIEW_LOCATIONS_TO_GEOCODE = "STATE_REVIEW_LOCATIONS_TO_GEOCODE";
+    private static final int REQUEST_EDIT_REVIEW_LOCATION_GEOCODE = 32421;
+    private ArrayList<Uri> mProducerLocationUris;
+    private ArrayList<Uri> mReviewLocationUris;
+    private ArrayList<Integer> mSelectedItems;
+    private List<File> mFiles;
 
 
     @Override
@@ -62,7 +77,23 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
 
+        if (savedInstanceState != null){
+            if (savedInstanceState.containsKey(STATE_PRODUCERS_TO_GEOCODE)) {
+                mProducerLocationUris = savedInstanceState.getParcelableArrayList(STATE_PRODUCERS_TO_GEOCODE);
+            }
+            if (savedInstanceState.containsKey(STATE_REVIEW_LOCATIONS_TO_GEOCODE)) {
+                mReviewLocationUris = savedInstanceState.getParcelableArrayList(STATE_REVIEW_LOCATIONS_TO_GEOCODE);
+            }
+        }
+
         // add toolbar from fragment (when view is initialized)
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_PRODUCERS_TO_GEOCODE, mProducerLocationUris);
+        outState.putParcelableArrayList(STATE_REVIEW_LOCATIONS_TO_GEOCODE, mReviewLocationUris);
     }
 
     private MainFragment getFragment() {
@@ -95,15 +126,15 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                 startImport();
                 return true;
             case R.id.action_show_map:
-                startShowMap();
+                startShowMapDialog();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
     }
 
-    private void startShowMap() {
-        Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "");
+    private void startShowMapDialog() {
+        Log.v(LOG_TAG, "startShowMapDialog, hashCode=" + this.hashCode() + ", " + "");
         if (Utils.isNetworkUnavailable(this)) {
             View view = findViewById(R.id.fragment_detail_layout);
             if (view != null) {
@@ -111,20 +142,74 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
             }
             return;
         }
+
+        // build dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        mSelectedItems = new ArrayList<>();
+        builder.setTitle(R.string.msg_title_choose_map_src)
+                .setMultiChoiceItems(R.array.map_src, null, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            mSelectedItems.add(which);
+                        } else if (mSelectedItems.contains(which)) {
+                            mSelectedItems.remove(Integer.valueOf(which));
+                        }
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startShowMap();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSelectedItems.clear();
+                    }
+                });
+        builder.show();
+    }
+
+    private void startShowMap() {
+        Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "mSelectedItems: " + mSelectedItems);
+        if (mSelectedItems.isEmpty()) {
+            Log.w(LOG_TAG, "startShowMap without something to show... - ignoring");
+            return;
+        }
         MainFragment fragment = getFragment();
         Intent intent = new Intent(this, ShowMapActivity.class);
 
         if (fragment != null) {
-//            Log.v(LOG_TAG, "startShowMap, currentReviewsUri=" + fragment.getmCurrentReviewsUri() + ", currentProducersUri=" + fragment.getmCurrentProducersUri());
-            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI, fragment.getmCurrentReviewsUri());
-            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
-            intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
-            intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
+            //  [] ReviewsOld      - review locations
+            //  [] Drinks       - review locations of drinks or drinks.producers.locations...
+            //  [] Producers    - self explaining
+
+            if (mSelectedItems.contains(0)) {   // review
+                intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI,
+                        DatabaseContract.ReviewEntry.getReviewLocationsUriFromMainFragmentReviewsUri(
+                                fragment.getmCurrentReviewsUri()));
+//                        fragment.getmCurrentReviewsUri());
+                intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
+            }
+
+            if (mSelectedItems.contains(1)) { // drink
+                Log.w(LOG_TAG, "startShowMap, Drinks currently not supported");
+            }
+
+            if (mSelectedItems.contains(2)) { // producer
+                Log.w(LOG_TAG, "startShowMap, Producers currently not supported");
+                // intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
+                // intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
+            }
+
         }
 
 //        item.expandActionView();
 //        View menuView = item.getActionView();   // is null - no shared element transition...
-//        Log.v(LOG_TAG, "startShowMap, menuView=" + menuView);
+//        Log.v(LOG_TAG, "startShowMapDialog, menuView=" + menuView);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
@@ -141,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         } else {
             startActivity(intent);
         }
+
     }
 
     private void startExport() {
@@ -168,7 +254,8 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         startActivityForResult(intent, REQUEST_IMPORT_FILES_CODE);
     }
 
-    private void startGeocoding() {
+
+    private void startGeocoding() { //all geocoding seems to work :-)
         if (Utils.isNetworkUnavailable(this)) {
             View view = findViewById(R.id.fragment_detail_layout);
             if (view != null) {
@@ -176,15 +263,51 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
             }
             return;
         }
-//        Log.v(LOG_TAG, "startGeocoding, hashCode=" + this.hashCode() + ", " + "");
-        new GeocodeReviewsTask(this, new GeocodeReviewsTask.GeocodeReviewsUpdatedHandler() {
-            @Override
-            public void onUpdatedReviews(String msg) {
-                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-            }
-        }).execute();
+
+        new GeocodeAllLocationsTask(this, this).execute();
     }
 
+    @Override
+    public void onUpdatedLatLngLocations(String errorMsg, String producerMsg, String reviewLocationMsg,
+                                         final ArrayList<Uri> producerUris, final ArrayList<Uri> reviewUris) {
+
+        Log.v(LOG_TAG, "onUpdatedLatLngLocations, hashCode=" + this.hashCode() + ", " + "errorMsg = [" + errorMsg + "], producerMsg = [" + producerMsg + "], reviewLocationMsg = [" + reviewLocationMsg + "], producerUris = [" + producerUris + "], reviewUris = [" + reviewUris + "]");
+
+        if (producerUris != null) {
+            mProducerLocationUris = producerUris;
+        }
+        if (reviewUris != null) {
+            mReviewLocationUris = reviewUris;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String msg = (errorMsg == null ? "" : "Error: " + errorMsg + "\n")
+                + (producerMsg == null ? "" : producerMsg + "\n")
+                + (reviewLocationMsg == null ? "" : reviewLocationMsg + "\n");
+        builder.setTitle(R.string.msg_title_gps_geocoding)
+            .setMessage(msg)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (producerUris != null && !producerUris.isEmpty()){
+                            showProducerGeocodeDialog(false);
+                        } else if (reviewUris != null && !reviewUris.isEmpty()) {
+                            showReviewLocationGeocodeDialog(false);
+                        }
+                    }
+                });
+        builder.show();
+
+//        if (producerUris != null) {
+//            // if yes: store uris in mProducerLocationUris
+//            // call AddProducer with mUri = mProducerLocationUris.first
+//            // on finish: remove first entry, ask if next
+//            // until list is empty - async usage (state-handling needed... or also in db - query everytime...)
+//            mProducerLocationUris = producerUris;
+//            showProducerGeocodeDialog(false);
+//        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -223,8 +346,31 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
                 }
 
                 if (!files.isEmpty() && requestCode == REQUEST_IMPORT_FILES_CODE) {
-                    new ImportFilesTask(this, this).execute(files.toArray(new File[files.size()]));
 
+                    // TODO: refactor afterwards without mFiles
+                    // new ImportFilesTask(MainActivity.this, MainActivity.this).execute(files.toArray(new File[files.size()]));
+
+                    mFiles = files;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("which import shall be used?")
+                            .setPositiveButton("new", new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new ImportFilesTask(MainActivity.this, MainActivity.this)
+                                            .execute(mFiles.toArray(new File[mFiles.size()]));
+                                    mFiles = null;
+                                }
+                            })
+                            .setNegativeButton("old", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new ImportFilesOldFormatTask(MainActivity.this, MainActivity.this)
+                                            .execute(mFiles.toArray(new File[mFiles.size()]));
+                                    mFiles = null;
+                                }
+                            });
+                    builder.show();
                 }
 
             } else {
@@ -238,12 +384,121 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
 
             }
 
+        } else if (requestCode == REQUEST_EDIT_PRODUCER_GEOCODE && resultCode == AppCompatActivity.RESULT_OK) {
+
+            if (mProducerLocationUris == null) {
+                Log.e(LOG_TAG, "onActivityResult mProducerLocationUris == null! - should never happen...");
+                return;
+            }
+
+            if (mProducerLocationUris.isEmpty()) {
+                if (mReviewLocationUris != null && !mReviewLocationUris.isEmpty()) {
+                    showReviewLocationGeocodeDialog(true);
+                } else {
+                    Toast.makeText(MainActivity.this, "all geocoding done", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                showProducerGeocodeDialog(true);
+            }
+
+        } else if (requestCode == REQUEST_EDIT_REVIEW_LOCATION_GEOCODE && resultCode == AppCompatActivity.RESULT_OK) {
+            if (mReviewLocationUris == null) {
+                Log.e(LOG_TAG, "onActivityResult mReviewLocationUris == null! - should never happen");
+                return;
+            }
+
+            if (mReviewLocationUris.isEmpty()) {
+                Toast.makeText(MainActivity.this, "all geocoding done", Toast.LENGTH_SHORT).show();
+            } else {
+                showReviewLocationGeocodeDialog(true);
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void showProducerGeocodeDialog(boolean cont) {
+        Log.v(LOG_TAG, "showProducerGeocodeDialog, hashCode=" + this.hashCode() + ", " + "cont = [" + cont + "], mProducerLocationUris=" + mProducerLocationUris);
+        if (mProducerLocationUris == null || mProducerLocationUris.isEmpty()) {
+            return;
+        }
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(cont ?
+                    getString(R.string.geocode_continue_entries_by_text, mProducerLocationUris.size(),
+                            getString(R.string.label_producers)) :
+                    getString(R.string.geocode_entries_by_text, mProducerLocationUris.size(),
+                            getString(R.string.label_producers)))
+                .setPositiveButton(R.string.geocode_button, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "dialog = [" + dialog + "], which = [" + which + "]");
+                        Uri lastUri = mProducerLocationUris.get(mProducerLocationUris.size() - 1);
+                        mProducerLocationUris.remove(mProducerLocationUris.size() - 1);
+                        Intent intent = new Intent(MainActivity.this, AddProducerActivity.class);
+                        intent.setData(lastUri);
+                        // geocoding implicitly or explicitly? - implicit seems better:
+                        //  resolve "geocode me" whenever possible on the fly - less non-geocoded-entries
+
+                        // TODO: bundle for transition
+                        MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_PRODUCER_GEOCODE);
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mProducerLocationUris = null;
+                    }
+                });
+        builder.show();
+    }
+
+    private void showReviewLocationGeocodeDialog(boolean cont) {
+        Log.v(LOG_TAG, "showReviewLocationGeocodeDialog, hashCode=" + this.hashCode() + ", " + "cont = [" + cont + "]");
+        if (mReviewLocationUris == null || mReviewLocationUris.isEmpty()) {
+            return;
+        }
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(cont ?
+                getString(R.string.geocode_continue_entries_by_text, mReviewLocationUris.size(),
+                        getString(R.string.label_locations)) :
+                getString(R.string.geocode_entries_by_text, mReviewLocationUris.size(),
+                        getString(R.string.label_locations)))
+                .setPositiveButton(R.string.geocode_button, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "dialog = [" + dialog + "], which = [" + which + "]");
+                        Uri lastUri = mReviewLocationUris.get(mReviewLocationUris.size() - 1);
+                        mReviewLocationUris.remove(mReviewLocationUris.size() - 1);
+
+
+                        Intent intent = new Intent(MainActivity.this, AddLocationActivity.class);
+                        intent.setData(lastUri);
+                        // geocoding implicitly or explicitly? - implicit seems better:
+                        //  resolve "geocode me" whenever possible on the fly - less non-geocoded-entries
+
+                        // TODO: bundle for transition
+                        MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_REVIEW_LOCATION_GEOCODE);
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mReviewLocationUris = null;
+                    }
+                });
+        builder.show();
+
+    }
+
     // TODO: show Msg Activity/Dialog/Fragment (LONG is to short ...) with ok button OR Notification
+
+    // import / export seems to be generic enough to keep working "out of the box" :-D
 
     @Override
     public void onExportFinished(String message) {
@@ -264,4 +519,5 @@ public class MainActivity extends AppCompatActivity implements ExportToDirTask.E
         }
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
+
 }

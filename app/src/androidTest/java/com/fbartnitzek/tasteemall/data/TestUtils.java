@@ -29,23 +29,52 @@ class TestUtils {
     private static final String LOG_TAG = TestUtils.class.getName();
 
     public static ContentValues createLocationLeipzig() {
-        return DatabaseHelper.buildLocationValues("1", "Leipzig, Bayr. Bhf 1", "51.3257686", "12.3861969",
+        return DatabaseHelper.buildLocationValues("1", "Leipzig, Bayr. Bhf 1", 51.3257686, 12.3861969,
                 "Germany", "Leipzig, Bayrischer Bahnhof", "");
     }
 
     public static ContentValues createLocationIslay() {
-        return DatabaseHelper.buildLocationValues("2", "Islay, Port Ellen", "55.7586424", "-6.4126686",
+        return DatabaseHelper.buildLocationValues("2", "Islay, Port Ellen", 55.7586424, -6.4126686,
                 "UK", "Port Ellen, Isle of Islay", "");
     }
 
+
+    public static ContentValues createMainAddress() {
+        return DatabaseHelper.buildLocationValues("3", "Gartenstr. 102", 49.992236,8.660902,
+                null, "Langen, Gartenstr. 102", "");
+    }
+
+    public static ContentValues createLocationOther() {
+        return DatabaseHelper.buildLocationValues("4", "Bahnhofskneipe", 49.9934195,  8.6557552,
+                null, "Langen, Bahnhofsanlage 9", "");
+    }
+
+//    public static ContentValues createNearbyAddress1() {
+//        // 49.9922541,8.6597822
+//        return DatabaseHelper.buildLocationValues("3a", "Marienstr. 9", 49.9922541,8.6597822,
+//                null, "Langen, Marienstr. 9", "");
+//    }
+//
+//    public static ContentValues createNearbyAddress2() {
+//        return DatabaseHelper.buildLocationValues("3b", "Sandweg 6", 49.9903763,8.6589285,
+//                null, "Langen, Sandweg 6", "");
+//    }
+//
+//    public static ContentValues createNearbyAddress3() {
+//        return DatabaseHelper.buildLocationValues("3c", "Odenwaldstraße 32", 49.990729, 8.660845,
+//                null, "Langen, Odenwaldstraße 32", "");
+//    }
+
     public static ContentValues createBreweryBayrischerBahnhof() {
         return DatabaseHelper.buildProducerValues("1", "Bayerischer Bahnhof", "Brauerei im ehemaligen Bahnhof",
-                "http://www.bayerischer-bahnhof.de", "1");
+                "http://www.bayerischer-bahnhof.de", "Leipzig, Bayr. Bhf 1", 51.3257686, 12.3861969,
+                "Germany", "Leipzig, Bayrischer Bahnhof" );
     }
 
     public static ContentValues createDistilleryLaphroaig() {
         return DatabaseHelper.buildProducerValues("2", "Laphroaig", "The most richly flavoured of all Scotch whiskies",
-                "http://www.laphroaig.com", "2");
+                "http://www.laphroaig.com", "Islay, Port Ellen", 55.7586424, -6.4126686,
+                "UK", "Port Ellen, Isle of Islay");
     }
 
     public static ContentValues createBeerGose() {
@@ -66,7 +95,11 @@ class TestUtils {
 
     public static ContentValues createReview1() {
         return DatabaseHelper.buildReviewValues("1", "++", "lecker", "2015-12-11 16:00:00",
-                "Kartoffelbrot", "1", "Leipzig, Bayrischer Platz 1", "1");
+                "Kartoffelbrot", "1", "1", "1");
+    }
+    public static ContentValues createReview2() {
+        return DatabaseHelper.buildReviewValues("1", "+", "ziemlich gut", "2016-09-05 22:33:00",
+                "", "1", null, "1");
     }
 
     public static ContentValues[] createBulkUsers(int n) {
@@ -105,7 +138,8 @@ class TestUtils {
 
     public static ContentValues updateDistilleryLaphroaig() {
         return DatabaseHelper.buildProducerValues("2", "Laphroaig", NEW_PRODUCER_LAPHROAIG_DESCRIPTION,
-                "http://www.laphroaig.com", "2");
+                "http://www.laphroaig.com", "Islay, Port Ellen", 55.7586424, -6.4126686,
+                "UK", "Port Ellen, Isle of Islay");
     }
 
     private static final String OLD_BEER_GOSE_INGREDIENTS = "usual + salt + coriander";
@@ -116,7 +150,6 @@ class TestUtils {
     public static ContentValues updateBeerGose() {
         return DatabaseHelper.buildDrinkValues("1", "Gose", "ABV 4.5%", "Gose", "beer", NEW_BEER_GOSE_INGREDIENTS, "1");
     }
-
 
     static class TestContentObserver extends ContentObserver {
         final HandlerThread mHT;

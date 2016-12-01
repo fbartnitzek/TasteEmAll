@@ -43,7 +43,6 @@ import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 public class AddDrinkFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemSelectedListener,
         LoaderManager.LoaderCallbacks<Cursor>,
-        CompletionProducerAdapter.CompletionProducerAdapterSelectHandler,
         QueryProducerTask.QueryProducerFoundHandler {
 
     private static final int PRODUCER_ACTIVITY_REQUEST_CODE = 666;
@@ -108,9 +107,22 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
         createToolbar();
 
-        CompletionProducerAdapter completionAdapter = new CompletionProducerAdapter(getActivity(), this);
+        CompletionProducerAdapter completionAdapter = new CompletionProducerAdapter(getActivity());
 
         mEditCompletionProducerName.setAdapter(completionAdapter);
+        mEditCompletionProducerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Cursor c = (Cursor) parent.getItemAtPosition(position);
+
+                mProducer_Id = c.getInt(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER__ID);
+                mProducerId = c.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_ID);
+                mProducerName = c.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_NAME);
+
+                Log.v(LOG_TAG, "onSelectedProducer, hashCode=" + this.hashCode() + ", " + "producer_Id = [" + mProducer_Id + "]");
+            }
+        });
 
         mRootView.findViewById(R.id.add_producer_button).setOnClickListener(this);
 
@@ -324,7 +336,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     private void insertData(String drinkName) {
         new InsertEntryTask(
-                getActivity(), DatabaseContract.DrinkEntry.CONTENT_URI, mRootView, drinkName, null)
+                getActivity(), DatabaseContract.DrinkEntry.CONTENT_URI, mRootView, drinkName)
                     .execute(DatabaseHelper.buildDrinkValues(
                         Utils.calcDrinkId(drinkName, mProducerId),
                         drinkName,
@@ -365,7 +377,7 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        Log.v(LOG_TAG, "onItemSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
         if (mDrinkTypeAdapter == parent.getAdapter()) {
             // resets all to generic - but there is no better way...
             String drinkType = mSpinnerDrinkType.getItemAtPosition(position).toString();
@@ -386,11 +398,11 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-//        Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
+        Log.v(LOG_TAG, "onNothingSelected, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "]");
     }
 
     private void updateProvider(Uri producerUri) {
-//        Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
+        Log.v(LOG_TAG, "updateProvider, hashCode=" + this.hashCode() + ", " + "producerUri = [" + producerUri + "]");
 
         new QueryProducerTask(getActivity(), this).execute(producerUri);
     }
@@ -487,13 +499,6 @@ public class AddDrinkFragment extends Fragment implements View.OnClickListener,
 
     public void setmPreFilledPattern(String mPreFilledPattern) {
         this.mPreFilledPattern = mPreFilledPattern;
-    }
-
-    @Override
-    public void onSelectedProducer(int producer_Id, String producerName, String producerId) {
-        mProducer_Id = producer_Id;
-        mProducerId = producerId;
-        mProducerName = producerName;
     }
 
     private void resumeActivityEnterTransition() {

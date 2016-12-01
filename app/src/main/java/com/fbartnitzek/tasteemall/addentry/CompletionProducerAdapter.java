@@ -3,12 +3,13 @@ package com.fbartnitzek.tasteemall.addentry;
 import android.app.Activity;
 import android.database.Cursor;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+import com.fbartnitzek.tasteemall.data.pojo.Producer;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -28,58 +29,54 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 class CompletionProducerAdapter extends SimpleCursorAdapter {
 
-    private final CompletionProducerAdapterSelectHandler mSelectHandler;
     private final Activity mActivity;
     private static final String LOG_TAG = CompletionProducerAdapter.class.getName();
 
-    interface CompletionProducerAdapterSelectHandler {
-        void onSelectedProducer(int producer_Id, String producerName, String producerId);
-    }
+    public CompletionProducerAdapter(Activity activity) {
 
-    public CompletionProducerAdapter(Activity activity,
-                                     CompletionProducerAdapterSelectHandler updateHandler) {
         super(activity,
                 R.layout.list_item_producer_completion,
                 null,
-                new String[]{Producer.NAME, Producer.LOCATION_ID},  //TODO
+                new String[] {Producer.NAME, Producer.FORMATTED_ADDRESS},
                 new int[]{R.id.list_item_producer_name, R.id.list_item_location_name},
                 0);
+//        Log.v(LOG_TAG, "CompletionProducerAdapter, hashCode=" + this.hashCode() + ", " + "activity = [" + activity + "], updateHandler = [" + updateHandler + "]");
+        Log.v(LOG_TAG, "CompletionProducerAdapter, hashCode=" + this.hashCode() + ", " + "activity = [" + activity + "]");
         mActivity = activity;
-        mSelectHandler = updateHandler;
     }
 
     @Override
     public void setViewText(TextView v, String text) {
+        Log.v(LOG_TAG, "setViewText, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], text = [" + text + "]");
         if (v.getId() == R.id.list_item_location_name) {
             v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
             v.setContentDescription(mActivity.getString(R.string.a11y_producer_location, text));
         } else if (v.getId() == R.id.list_item_producer_name) {
             v.setText(text);
             v.setContentDescription(mActivity.getString(R.string.a11y_producer_name, text));
-        } else {
-            super.setViewText(v, text);
         }
     }
 
+    // no override possible for getColumnIndex: // Hack according to bug 903852
+    // BUT cause of the exception was a missing column - confusing ...
+
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-//        Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
+        Log.v(LOG_TAG, "runQueryOnBackgroundThread, hashCode=" + this.hashCode() + ", " + "constraint = [" + constraint + "]");
 
-//        Uri uri = DatabaseContract.ProducerEntry.buildUriWithName(String.valueOf(constraint));
+        if (constraint == null) {
+            return null;
+        }
+
         return mActivity.getContentResolver().query(
-                DatabaseContract.ProducerEntry.CONTENT_URI,
+                DatabaseContract.ProducerEntry.buildUriIncLocationWithPattern(String.valueOf(constraint)),
                 QueryColumns.DrinkFragment.ProducerCompletionQuery.COLUMNS,
-                Producer.NAME + " LIKE ? ",
-                new String[]{ "%" + constraint + "%"},
-                null);
+                null, null, null);
+
     }
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        String producerName = cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_NAME);
-        String producerId = cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_ID);
-        int producer_Id = cursor.getInt(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER__ID);
-        mSelectHandler.onSelectedProducer(producer_Id, producerName, producerId);
-        return producerName;
+        return cursor.getString(QueryColumns.DrinkFragment.ProducerCompletionQuery.COL_PRODUCER_NAME);
     }
 }

@@ -69,6 +69,7 @@ public class AddReviewActivity extends AppCompatActivity {
     // TODO: might be better directly in fragment...
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+//        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         switch (item.getItemId()) {
             case android.R.id.home:
                 supportFinishAfterTransition();

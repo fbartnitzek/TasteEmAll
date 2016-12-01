@@ -6,8 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.fbartnitzek.tasteemall.data.DatabaseContract.*;
-import com.fbartnitzek.tasteemall.data.pojo.*;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.fbartnitzek.tasteemall.data.DatabaseContract.UserEntry;
+import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Location;
+import com.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
+import com.fbartnitzek.tasteemall.data.pojo.User;
+import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -45,8 +54,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + LocationEntry._ID + " INTEGER PRIMARY KEY,"
                 + Location.LOCATION_ID + " TEXT NOT NULL,"
                 + Location.INPUT + " TEXT NOT NULL,"
-                + Location.LATITUDE + " TEXT,"
-                + Location.LONGITUDE + " TEXT,"
+                + Location.LATITUDE + " REAL,"
+                + Location.LONGITUDE + " REAL,"
                 + Location.COUNTRY + " TEXT,"
                 + Location.FORMATTED_ADDRESS + " TEXT,"
                 + Location.DESCRIPTION + " TEXT,"
@@ -62,10 +71,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Producer.NAME + " TEXT NOT NULL, "
                 + Producer.DESCRIPTION + " TEXT,"
                 + Producer.WEBSITE + " TEXT,"
-                + Producer.LOCATION_ID + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
+//                + Producer.LOCATION_ID + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
+                + Producer.INPUT + " TEXT NOT NULL,"
+                + Producer.LATITUDE + " REAL,"
+                + Producer.LONGITUDE + " REAL,"
+                + Producer.COUNTRY + " TEXT,"
+                + Producer.FORMATTED_ADDRESS + " TEXT,"
 
-                + "FOREIGN KEY (" + Producer.LOCATION_ID + ") REFERENCES "
-                + LocationEntry.TABLE_NAME + " (" + Location.LOCATION_ID + "),"
+//                + "FOREIGN KEY (" + Producer.LOCATION_ID + ") REFERENCES "
+//                + LocationEntry.TABLE_NAME + " (" + Location.LOCATION_ID + "),"
 
                 + "UNIQUE (" + Producer.PRODUCER_ID + ") ON CONFLICT REPLACE"
                 + " );";
@@ -132,7 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public static ContentValues buildLocationValues(String locationId, String input,
-                                                    String latitude, String longitude,
+                                                    double latitude, double longitude,
                                                     String country, String formattedAddress,
                                                     String description) {
         ContentValues cv = new ContentValues();
@@ -146,16 +160,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cv;
     }
 
+//    public static ContentValues buildLocationStub(String locationInput) {
+//        return buildLocationValues(mParcelable.getLocationId(), locationInput,
+//                mParcelable.getLatitude(), mParcelable.getLongitude(),
+//                mParcelable.getCountry(), mParcelable.getFormattedAddress(),
+//                mParcelable.getDescription());
+//    }
+
+    public static ContentValues buildLocationValues(LocationParcelable mParcelable) {
+        return buildLocationValues(mParcelable.getLocationId(), mParcelable.getInput(),
+                mParcelable.getLatitude(), mParcelable.getLongitude(),
+                mParcelable.getCountry(), mParcelable.getFormattedAddress(),
+                mParcelable.getDescription());
+    }
+
+    // TODO: other update values
+
+    public static ContentValues buildLocationUpdateValues(double latitude, double longitude,
+                                                          String country, String formattedAddress,
+                                                          String description) {
+        ContentValues cv = new ContentValues();
+        cv.put(Location.LATITUDE, latitude);
+        cv.put(Location.LONGITUDE, longitude);
+        cv.put(Location.COUNTRY, country);
+        cv.put(Location.FORMATTED_ADDRESS, formattedAddress);
+        cv.put(Location.DESCRIPTION, description);
+        return cv;
+    }
+
     public static ContentValues buildProducerValues(String producerId, String name,
                                                     String description, String website,
-                                                    String locationId) {
-        ContentValues cv = new ContentValues();
+                                                    String input, double latitude, double longitude,
+                                                    String country, String formattedAddress) {
+        // updates shall not change the used id!
+        ContentValues cv = buildProducerUpdateValues(
+                name, description, website, input, latitude, longitude, country, formattedAddress);
         cv.put(Producer.PRODUCER_ID, producerId);
+        return cv;
+    }
+
+    public static ContentValues buildProducerUpdateValues(String name,
+                                                    String description, String website,
+                                                    String input, double latitude, double longitude,
+                                                    String country, String formattedAddress) {
+        ContentValues cv = new ContentValues();
         cv.put(Producer.NAME, name);
         cv.put(Producer.DESCRIPTION, description);
         cv.put(Producer.WEBSITE, website);
-//        cv.put(Producer.LOCATION, location);
-        cv.put(Producer.LOCATION_ID, locationId);
+        cv.put(Producer.INPUT, input);
+        cv.put(Producer.LATITUDE, latitude);
+        cv.put(Producer.LONGITUDE, longitude);
+        cv.put(Producer.COUNTRY, country);
+        cv.put(Producer.FORMATTED_ADDRESS, formattedAddress);
         return cv;
     }
 
@@ -183,6 +239,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static ContentValues buildReviewValues(String reviewId, String rating, String description,
                                                   String readableDate, String recommendedSides,
                                                   String drinkId, String locationId, String userId) {
+//        Log.v(LOG_TAG, "buildReviewValues, reviewId = [" + reviewId + "], rating = [" + rating + "], description = [" + description + "], readableDate = [" + readableDate + "], recommendedSides = [" + recommendedSides + "], drinkId = [" + drinkId + "], locationId = [" + locationId + "], userId = [" + userId + "]");
         ContentValues cv = new ContentValues();
         cv.put(Review.REVIEW_ID, reviewId);
         cv.put(Review.RATING, rating);
@@ -192,8 +249,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Review.DRINK_ID, drinkId);
         cv.put(Review.LOCATION_ID, locationId);
         cv.put(Review.USER_ID, userId);
-//        cv.put(Review.LOCATION, location);
-//        cv.put(Review.USER_NAME, userName);
         return cv;
     }
+
+
 }

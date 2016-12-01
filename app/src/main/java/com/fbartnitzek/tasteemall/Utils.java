@@ -9,11 +9,14 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,7 +55,7 @@ public class Utils {
 
     private static final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat filePrefixFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-    public static final String GEOCODE_ME = "geocode_me";
+//    public static final String GEOCODE_ME = "geocode_me";
     private static final String LAT_PREFIX = "_lat_";
     private static final String LONG_PREFIX = "_long_";
     private static final String D_DOT_D = "\\d+\\.\\d+";
@@ -75,13 +78,21 @@ public class Utils {
     }
 
     public static String calcLocationId(String locationValue) {
-        return "location_" + locationValue;
+        String s = locationValue.replace(" ", "");
+        s = s.replace(",", "");
+        if (s.length() > 50) {
+            s = s.substring(0, 49);
+        }
+        return "location_" + s;
+    }
+
+    public static String getLocationInput(double latitude, double longitude) {
+        return latitude + "_" + longitude;
     }
 
     public static Uri calcSingleDrinkUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
         if (uri != null) {
-            int id = DatabaseContract.getIdFromUri(uri);
-            return DatabaseContract.DrinkEntry.buildUri(id);
+            return DatabaseContract.DrinkEntry.buildUri(DatabaseContract.getIdFromUri(uri));
         } else {
             return null;
         }
@@ -89,8 +100,15 @@ public class Utils {
 
     public static Uri calcDrinkIncludingProducerUri(Uri uri) {    //if called with drink-id...
         if (uri != null) {
-            int id = DatabaseContract.getIdFromUri(uri);
-            return DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
+            return DatabaseContract.DrinkEntry.buildUriIncludingProducer(DatabaseContract.getIdFromUri(uri));
+        } else {
+            return null;
+        }
+    }
+
+    public static Uri calcProducerUriIncludingDrink(Uri uri) {
+        if (uri != null) {
+            return DatabaseContract.ProducerEntry.buildUriIncLocation(DatabaseContract.getIdFromUri(uri));
         } else {
             return null;
         }
@@ -98,8 +116,7 @@ public class Utils {
 
     public static Uri calcJoinedReviewUri(Uri uri) {
         if (uri != null) {
-            int id = DatabaseContract.getIdFromUri(uri);
-            return DatabaseContract.ReviewEntry.buildUriForShowReview(id);
+            return DatabaseContract.ReviewEntry.buildUriForShowReview(DatabaseContract.getIdFromUri(uri));
         } else {
             return null;
         }
@@ -107,8 +124,7 @@ public class Utils {
 
     public static Uri calcSingleReviewUri(Uri uri) {
         if (uri != null) {
-            int id = DatabaseContract.getIdFromUri(uri);
-            return DatabaseContract.ReviewEntry.buildUri(id);
+            return DatabaseContract.ReviewEntry.buildUri(DatabaseContract.getIdFromUri(uri));
         } else {
             return null;
         }
@@ -116,8 +132,15 @@ public class Utils {
 
     public static Uri calcSingleProducerUri(Uri uri) {    //if called f.e. with drink_with_producer-id...
         if (uri != null) {
-            int id = DatabaseContract.getIdFromUri(uri);
-            return DatabaseContract.ProducerEntry.buildUri(id);
+            return DatabaseContract.ProducerEntry.buildUri(DatabaseContract.getIdFromUri(uri));
+        } else {
+            return null;
+        }
+    }
+
+    public static Uri calcSingleLocationUri(Uri mContentUri) {
+        if (mContentUri!= null) {
+            return DatabaseContract.LocationEntry.buildUri(DatabaseContract.getIdFromUri(mContentUri));
         } else {
             return null;
         }
@@ -294,26 +317,32 @@ public class Utils {
         return R.string.producer_show_generic;
     }
 
-    public static String formatLocationForGeocoder(Location currentLocation) {
-        return GEOCODE_ME + LAT_PREFIX + String.valueOf(currentLocation.getLatitude())
-                + LONG_PREFIX + String.valueOf(currentLocation.getLongitude());
-    }
+//    public static String formatLocationForGeocoder(Location currentLocation) {
+//        return DatabaseContract.LocationEntry.GEOCODE_ME + LAT_PREFIX + String.valueOf(currentLocation.getLatitude())
+//                + LONG_PREFIX + String.valueOf(currentLocation.getLongitude());
+//    }
 
     public static String formatAddress(Address address) {
-        // Fetch the address lines using getAddressLine,
-        // join them, and send them to the thread.
-        String currentAddress = "";
+        StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = address.getMaxAddressLineIndex() -1 ; i >= 0; --i) {
-            currentAddress += address.getAddressLine(i) + ", ";  //seems to be quite good
+            stringBuilder.append(address.getAddressLine(i)).append(", ");  //seems to be quite good
         }
-        currentAddress = currentAddress.substring(0, currentAddress.length() - 2); //65432 FFM, some street nr
-        return currentAddress;
+        if (stringBuilder.length() > 2) {
+            stringBuilder.setLength(stringBuilder.length() -2);
+        }
+//        currentAddress = currentAddress.substring(0, currentAddress.length() - 2); //65432 FFM, some street nr
+        if (stringBuilder.length() > 0) {
+            return stringBuilder.toString();
+        } else {    //bugfix for Sri Lanka :-p
+            return address.getCountryName();
+        }
+
     }
 
     public static boolean checkGeocodeAddressFormat(String formattedAddress) {
         return formattedAddress != null
-                && formattedAddress.matches(GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
+                && formattedAddress.matches(DatabaseContract.LocationEntry.GEOCODE_ME + LAT_PREFIX + D_DOT_D + LONG_PREFIX + D_DOT_D);
     }
 
     public static boolean checkTimeFormat(String timeFormat) {
@@ -329,10 +358,62 @@ public class Utils {
         return false;
     }
 
+    public static LocationParcelable getLocationFromAddress(Address address, String locationInput, String description) {
+        return new LocationParcelable(
+                LocationParcelable.INVALID_ID,
+                address.getCountryName(),
+                calcLocationId(locationInput),
+                address.getLatitude(),
+                address.getLongitude(),
+                locationInput,
+                formatAddress(address),
+                description);
+    }
+
+    public static LocationParcelable getLocationStubFromLastLocation(Location mLastLocation, String description) {
+        String locationInput = getLocationInput(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        return new LocationParcelable(
+                LocationParcelable.INVALID_ID,
+                null,
+                calcLocationId(locationInput),
+                mLastLocation.getLatitude(),
+                mLastLocation.getLongitude(),
+                locationInput,
+                DatabaseContract.LocationEntry.GEOCODE_ME,
+                description
+        );
+    }
+
+    public static LocationParcelable createLocationStubFromInput(String inputString, String description) {
+
+        return new LocationParcelable(
+                LocationParcelable.INVALID_ID,
+                null,
+                calcLocationId(inputString),
+                DatabaseContract.LocationEntry.INVALID_LAT_LNG,
+                DatabaseContract.LocationEntry.INVALID_LAT_LNG,
+                inputString,
+                DatabaseContract.LocationEntry.GEOCODE_ME,
+                description
+        );
+    }
+
+    public static boolean isValidLatLong(double lat, double lon) {
+        return lat >= -90.0 && lat <= 90.0 && lon >= -180.0 && lon <= 180.0;
+    }
+
+    public static boolean isValidLocation(LocationParcelable location) {
+//        private static final String LOCATIONS_GEOCODE_VALID_LATLNG =
+//                com.fbartnitzek.tasteemall.data.pojo.Location.FORMATTED_ADDRESS + " LIKE '" + DatabaseContract.LocationEntry.GEOCODE_ME + "' AND "
+//                        + com.fbartnitzek.tasteemall.data.pojo.Location.LATITUDE + " <= 90.0 AND " + com.fbartnitzek.tasteemall.data.pojo.Location.LATITUDE + " >= -90.0 AND "
+//                        + com.fbartnitzek.tasteemall.data.pojo.Location.LONGITUDE+ " <= 180.0 AND " + com.fbartnitzek.tasteemall.data.pojo.Location.LONGITUDE + " >= -180.0";
+        return location != null && isValidLatLong(location.getLatitude(), location.getLongitude());
+    }
+
     public static double getLatitude(String location) throws NumberFormatException {
         if (location != null && location.contains(LAT_PREFIX) && location.contains(LONG_PREFIX)) {
             String lat = location.substring(
-                    GEOCODE_ME.length() + LAT_PREFIX.length(), location.indexOf(LONG_PREFIX));
+                    DatabaseContract.LocationEntry.GEOCODE_ME.length() + LAT_PREFIX.length(), location.indexOf(LONG_PREFIX));
             return Double.parseDouble(lat);
         }
         throw new NumberFormatException();
@@ -360,4 +441,27 @@ public class Utils {
             activity.startActivity(intent);
         }
     }
+
+    public static double calcDistance(Double[] mainAddress, Double[] otherAddress) {
+        double dx = mainAddress[0] - otherAddress[0];
+        double dy = mainAddress[1] - otherAddress[1];
+        return dx * dx + dy * dy;
+    }
+
+    public static double calcManhattenDistance(Double[] mainAddress, Double[] otherAddress) {
+        double dx = mainAddress[0] - otherAddress[0];
+        double dy = mainAddress[1] - otherAddress[1];
+        return Math.abs(dx) + Math.abs(dy);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Parcelable> T[] castParcelableArray(Class<T> clazz, Parcelable[] parcelables) {
+        final int length = parcelables.length;
+        final T[] customClasses = (T[]) Array.newInstance(clazz, length);
+        for (int i = 0; i < length; i++) {
+            customClasses[i] = (T) parcelables[i];
+        }
+        return customClasses;
+    }
+
 }

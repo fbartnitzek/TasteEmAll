@@ -37,6 +37,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     private TextView mProducerNameView;
     private TextView mProducerNameLabelView;
     private TextView mProducerLocationView;
+    private TextView mProducerLocationCountryView;
 
     private TextView mDrinkLabelView;
     private TextView mDrinkNameView;
@@ -58,7 +59,8 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     void calcCompleteUri() {    //if called with drink-only-id...
         if (mUri != null) {
             int id = DatabaseContract.getIdFromUri(mUri);
-            mUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
+//            mUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(id);
+            mUri = DatabaseContract.DrinkEntry.buildUriIncludingProducerAndLocation(id);
         }
     }
 
@@ -85,6 +87,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
         mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
         mProducerNameLabelView = (TextView) mRootView.findViewById(R.id.label_producer_name);
         mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
+        mProducerLocationCountryView = (TextView) mRootView.findViewById(R.id.producer_location_country);
 
         mDrinkLabelView = (TextView) mRootView.findViewById(R.id.label_drink);
         mDrinkNameView = (TextView) mRootView.findViewById(R.id.drink_name);
@@ -140,6 +143,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
+            Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
             String drinkType = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_TYPE);
             mDrinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
@@ -170,6 +174,7 @@ public class ShowDrinkFragment extends ShowBaseFragment implements View.OnClickL
             mProducerNameView.setText(producerName);
             mProducerNameView.setOnClickListener(this);
             mProducerLocationView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_LOCATION));
+            mProducerLocationCountryView.setText(data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_PRODUCER_COUNTRY));
 
             String drinkName = data.getString(QueryColumns.DrinkFragment.ShowQuery.COL_DRINK_NAME);
             mDrinkNameView.setText(drinkName);

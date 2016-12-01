@@ -29,15 +29,8 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 public class CompletionUserAdapter extends SimpleCursorAdapter {
 
     private final Activity mActivity;
-    private final CompletionUserAdapterSelectionHandler mSelectionHandler;
 
-
-    interface CompletionUserAdapterSelectionHandler {
-        void onSelectedUser(String userId, String userName);
-    }
-
-    public CompletionUserAdapter(Activity activity,
-                                 CompletionUserAdapterSelectionHandler selectionHandler) {
+    public CompletionUserAdapter(Activity activity) {
         super(activity,
                 R.layout.list_item_user_completion,
                 null,
@@ -45,7 +38,6 @@ public class CompletionUserAdapter extends SimpleCursorAdapter {
                 new int[]{R.id.list_item_user_name},
                 0);
         this.mActivity = activity;
-        this.mSelectionHandler = selectionHandler;
     }
 
     @Override
@@ -72,9 +64,6 @@ public class CompletionUserAdapter extends SimpleCursorAdapter {
 
     @Override
     public CharSequence convertToString(Cursor cursor) {
-        String userName = cursor.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_NAME);
-        String userId = cursor.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_ID);
-        mSelectionHandler.onSelectedUser(userId, userName);
-        return userName;
+        return cursor.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_NAME);
     }
 }

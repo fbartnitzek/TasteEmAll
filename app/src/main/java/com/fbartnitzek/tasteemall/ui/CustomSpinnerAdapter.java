@@ -34,10 +34,11 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private final int spinnerLayout;
     private final int a11yStringId;
     private final LayoutInflater inflater;
-
+//    private static final String LOG_TAG = CustomSpinnerAdapter.class.getName();
 
     public CustomSpinnerAdapter(Context context, ArrayList<String> objects, int spinnerLayout, int a11yStringId) {
         super(context, spinnerLayout, objects);
+//        Log.v(LOG_TAG, "CustomSpinnerAdapter, hashCode=" + this.hashCode() + ", " + "context = [" + context + "], objects = [" + objects + "], spinnerLayout = [" + spinnerLayout + "], a11yStringId = [" + a11yStringId + "]");
         this.spinnerLayout = spinnerLayout;
         this.context = context;
         data = objects;
@@ -53,6 +54,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+//        Log.v(LOG_TAG, "getView, hashCode=" + this.hashCode() + ", " + "position = [" + position + "], convertView = [" + convertView + "], parent = [" + parent + "]");
         return getCustomView(position, convertView, parent);
     }
 

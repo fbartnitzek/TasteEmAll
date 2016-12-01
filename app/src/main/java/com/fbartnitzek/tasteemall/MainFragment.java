@@ -33,16 +33,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.ProducerEntry;
 import com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry;
+import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.showentry.ShowDrinkActivity;
+import com.fbartnitzek.tasteemall.showentry.ShowLocationActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowProducerActivity;
 import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
-import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 
 import java.util.ArrayList;
@@ -51,18 +54,22 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener,
+//        AdapterView.OnItemSelectedListener,
+        View.OnClickListener {
 
     private static final String LOG_TAG = MainFragment.class.getName();
     private static final int PRODUCER_LOADER_ID = 100;
     private static final int DRINK_LOADER_ID = 200;
     private static final int REVIEW_LOADER_ID = 300;
+    private static final int LOCATION_LOADER_ID = 400;
 
     private static final int ADD_DRINK_REQUEST = 555;
     private static final String STATE_SEARCH_PATTERN = "STATE_SEARCH_PATTERN";
     private static final int ADD_REVIEW_REQUEST = 546;
 
 
+    private LocationAdapter mLocationAdapter;
     private ProducerAdapter mProducerAdapter;
     private DrinkAdapter mDrinkAdapter;
     private ReviewAdapter mReviewAdapter;
@@ -73,6 +80,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private String mSearchPattern;
     private Spinner mSpinnerType;
 
+    private TextView mLocationHeading;
     private TextView mProducersHeading;
     private TextView mDrinksHeading;
     private TextView mReviewsHeading;
@@ -105,6 +113,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
         getLoaderManager().initLoader(DRINK_LOADER_ID, null, this);
         getLoaderManager().initLoader(PRODUCER_LOADER_ID, null, this);
+        getLoaderManager().initLoader(LOCATION_LOADER_ID, null, this);
     }
 
     @Override
@@ -121,7 +130,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         createToolbar();
-        createSpinner();
+        // TODO: additional maybe remove adapter... http://stackoverflow.com/questions/26646509/spinners-android-getting-senduseractionevent-mview-null-in-a-fragment
+//        createSpinner();
 
         mReviewAdapter = new ReviewAdapter(new ReviewAdapter.ReviewAdapterClickHandler() {
 
@@ -175,19 +185,31 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             }
         }, getActivity());
 
-        mProducersHeading = (TextView) mRootView.findViewById(R.id.heading_producers);
-        mDrinksHeading = (TextView) mRootView.findViewById(R.id.heading_drinks);
-        mReviewsHeading = (TextView) mRootView.findViewById(R.id.heading_reviews);
+        mLocationAdapter = new LocationAdapter(new LocationAdapter.LocationAdapterClickHandler() {
+            @Override
+            public void onClick(String formatted, Uri contentUri, LocationAdapter.ViewHolder viewHolder) {
+                Intent intent = new Intent(getActivity(), ShowLocationActivity.class)
+                        .setData(contentUri);
+                startActivity(intent);
+            }
+        }, getActivity());
 
+        mLocationHeading = (TextView) mRootView.findViewById(R.id.heading_locations);
+        RecyclerView locationRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_location);
+        locationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        locationRecyclerView.setAdapter(mLocationAdapter);
+
+        mProducersHeading = (TextView) mRootView.findViewById(R.id.heading_producers);
         RecyclerView producerRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_producer);
         producerRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         producerRecyclerView.setAdapter(mProducerAdapter);
 
+        mDrinksHeading = (TextView) mRootView.findViewById(R.id.heading_drinks);
         RecyclerView drinkRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_drink);
         drinkRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         drinkRecyclerView.setAdapter(mDrinkAdapter);
 
+        mReviewsHeading = (TextView) mRootView.findViewById(R.id.heading_reviews);
         RecyclerView reviewRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_reviews);
         reviewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         reviewRecyclerView.setAdapter(mReviewAdapter);
@@ -265,6 +287,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 //        Log.v(LOG_TAG, "createSpinner, hashCode=" + this.hashCode() + ", " + "");
 
         mSpinnerType = (Spinner) mRootView.findViewById(R.id.spinner_type);
+
         String[] typesArray = getResources().getStringArray(R.array.pref_type_filter_values);
         ArrayList<String> typesList = new ArrayList<>(Arrays.asList(typesArray));
 
@@ -274,7 +297,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         updateSpinnerType();
 
-        mSpinnerType.setOnItemSelectedListener(this);
+        mSpinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mDrinkType = parent.getItemAtPosition(position).toString();
+                Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
+                mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
+                restartLoaders();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void updateDrinkTypeFromPrefs() {
@@ -303,12 +339,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getLoaderManager().restartLoader(REVIEW_LOADER_ID, null, this);
         getLoaderManager().restartLoader(DRINK_LOADER_ID, null, this);
         getLoaderManager().restartLoader(PRODUCER_LOADER_ID, null, this);
+        getLoaderManager().restartLoader(LOCATION_LOADER_ID, null, this);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onActivityCreated, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onActivityCreated(savedInstanceState);
+        createSpinner();
     }
 
     @Override
@@ -326,11 +364,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // TODO: get latest entries ... - first sort by insertDate?, max 50 entries?
 
         switch (id) {
+            case LOCATION_LOADER_ID:
+                return new CursorLoader(getActivity(),
+                        DatabaseContract.LocationEntry.buildUriWithPatternOrDescription(mSearchPattern == null ? "" : mSearchPattern),
+                        QueryColumns.MainFragment.LocationQuery.COLUMNS,
+                        null, null,
+                        Location.COUNTRY + ", " + Location.FORMATTED_ADDRESS);
             case PRODUCER_LOADER_ID:
-//                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME + ", "
-//                    + ProducerEntry.TABLE_NAME + "." + Producer.LOCATION_ID;    //TODO
-                mProducersSortOrder = ProducerEntry.TABLE_NAME + "." + Producer.NAME;
-                mCurrentProducersUri = ProducerEntry.buildUriWithPattern(mSearchPattern == null ? "" : mSearchPattern);
+                mProducersSortOrder = Producer.NAME;
+                mCurrentProducersUri = ProducerEntry.buildUriIncLocationWithPattern(mSearchPattern == null ? "" : mSearchPattern);
                 return new CursorLoader(getActivity(),
                         mCurrentProducersUri,
                         QueryColumns.MainFragment.ProducerQuery.COLUMNS,
@@ -367,6 +409,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         String numberAppendix = data == null ? "" : getString(R.string.label_numberAppendix, data.getCount());
         switch (loader.getId()) {
+            case LOCATION_LOADER_ID:
+                mLocationAdapter.swapCursor(data);
+                mLocationHeading.setText(getString(R.string.label_list_of_locations, numberAppendix));
+                break;
             case PRODUCER_LOADER_ID:
                 mProducerAdapter.swapCursor(data);
                 mProducersHeading.setText(getString(R.string.label_list_of_producers, numberAppendix));
@@ -390,6 +436,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, " + "loader = [" + loader + "]");
         switch (loader.getId()) {
+            case LOCATION_LOADER_ID:
+                mLocationAdapter.swapCursor(null);
+                break;
             case PRODUCER_LOADER_ID:
                 mProducerAdapter.swapCursor(null);
                 break;
@@ -416,23 +465,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return false;
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-        if (mSpinnerAdapter == parent.getAdapter()) {
-//            Log.v(LOG_TAG, "onItemSelected in spinnerType, hashCode=" + this.hashCode() + ", " + "parent = [" + parent + "], view = [" + view + "], position = [" + position + "], id = [" + id + "]");
-            mDrinkType = parent.getItemAtPosition(position).toString();
-            Utils.setSharedPrefsDrinkType(MainFragment.this.getActivity(), mDrinkType);
-            mSpinnerType.setContentDescription(getString(R.string.a11y_chosen_drinkType, mDrinkType));
-            restartLoaders();
-        }
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // nothing
-    }
 
     @Override
     public void onClick(View v) {

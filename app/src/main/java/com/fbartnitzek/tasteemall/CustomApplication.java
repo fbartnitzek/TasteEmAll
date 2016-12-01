@@ -2,7 +2,15 @@ package com.fbartnitzek.tasteemall;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
+import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -20,11 +28,68 @@ import android.support.multidex.MultiDex;
  * limitations under the License.
  */
 
-public class CustomApplication extends Application {
+public class CustomApplication extends Application implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private static GoogleApiClient mGoogleApiClient;
+    private static final String LOG_TAG = CustomApplication.class.getName();
+
 
     @Override
     protected void attachBaseContext(Context base) {
         MultiDex.install(base); //enable multidex on v4.3 devices - part 3
         super.attachBaseContext(base);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        buildGoogleApiClient();
+        connectGoogleApiClient();
+    }
+
+    private synchronized void buildGoogleApiClient() {
+        Log.v(LOG_TAG, "buildGoogleApiClient, hashCode=" + this.hashCode() + ", " + "");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private void connectGoogleApiClient() {
+        Log.v(LOG_TAG, "connectGoogleApiClient, hashCode=" + this.hashCode() + ", " + "");
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    public static boolean isGoogleApiClientConnected() {
+        if (mGoogleApiClient != null) {
+            return mGoogleApiClient.isConnected();
+        } else {
+            return false;
+        }
+    }
+
+    public static synchronized GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.v(LOG_TAG, "onConnected, hashCode=" + this.hashCode() + ", " + "bundle = [" + bundle + "]");
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.v(LOG_TAG, "onConnectionSuspended, hashCode=" + this.hashCode() + ", " + "i = [" + i + "]");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.v(LOG_TAG, "onConnectionFailed, hashCode=" + this.hashCode() + ", " + "connectionResult = [" + connectionResult + "]");
     }
 }
