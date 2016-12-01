@@ -228,20 +228,20 @@ public class QueryColumns {
                     RA + "." + Review.READABLE_DATE,
                     RA + "." + Review.RECOMMENDED_SIDES,
 
-                    LAR + "." + LocationEntry.ALIAS_REVIEW + "." + LocationEntry._ID, //TODO
+                    LAR + "." + LocationEntry._ID,
                     LAR + "." + Location.FORMATTED_ADDRESS,
                     LAR + "." + Location.DESCRIPTION,
 
                     UA + "." + User.NAME,
 
-                    DA + "." + DrinkEntry.ALIAS + "." + DrinkEntry._ID,
+                    DA + "." + DrinkEntry._ID,
                     DA + "." + Drink.NAME,
                     DA + "." + Drink.TYPE,
                     DA + "." + Drink.STYLE,
                     DA + "." + Drink.SPECIFICS,
                     DA + "." + Drink.INGREDIENTS,
 
-                    PA + "." + ProducerEntry.ALIAS + "." + ProducerEntry._ID,
+                    PA + "." + ProducerEntry._ID,
                     PA + "." + Producer.NAME,
                     PA + "." + Producer.FORMATTED_ADDRESS
             };
