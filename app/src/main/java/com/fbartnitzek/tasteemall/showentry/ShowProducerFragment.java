@@ -190,6 +190,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
         updateAndMoveToMarker();
     }
 
+    // TODO: not centered on Galaxy S6...
     private void updateAndMoveToMarker() {
         Log.v(LOG_TAG, "updateAndMoveToMarker, mMap=" + mMap + ", mLatLng=" + mLatLng);
         if (mMap != null && mLatLng != null) {

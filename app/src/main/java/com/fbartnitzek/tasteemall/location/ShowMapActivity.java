@@ -48,7 +48,7 @@ public class ShowMapActivity extends AppCompatActivity {
 
         if (findViewById(R.id.container_show_map_fragment) != null) {
             if (savedInstanceState != null) {
-//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
@@ -92,6 +92,7 @@ public class ShowMapActivity extends AppCompatActivity {
     }
 
     private ShowMapFragment getFragment() {
+        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "");
         return (ShowMapFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 
     }

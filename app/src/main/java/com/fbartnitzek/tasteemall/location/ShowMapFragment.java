@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -57,7 +58,7 @@ public class ShowMapFragment extends Fragment implements LoaderManager.LoaderCal
     private static final String LOG_TAG = ShowMapFragment.class.getName();
     private static final int REVIEW_LOCATIONS_LOADER_ID = 23452;
     private static final int REVIEWS_OF_LOCATION_LOADER_ID = 34563;
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
 //    private boolean mMapReady = false;
     private Uri mReviewsUri;
     private String mReviewsSortOrder;
@@ -138,6 +139,8 @@ public class ShowMapFragment extends Fragment implements LoaderManager.LoaderCal
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         reviewsRecyclerView.setAdapter(mReviewOfLocationAdapter);
 
+        Log.v(LOG_TAG, "onCreateView before MapFragment, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+
         //src: http://stackoverflow.com/questions/15525111/getsupportfragmentmanager-findfragmentbyid-returns-null
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -145,6 +148,7 @@ public class ShowMapFragment extends Fragment implements LoaderManager.LoaderCal
         if (mapFragment == null) {
             Log.e(LOG_TAG, "onCreateView, MapFragment not found...");
         } else {
+            Log.v(LOG_TAG, "onCreateView - calling getMapAsync, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
             mapFragment.getMapAsync(this);
         }
 
@@ -217,6 +221,9 @@ public class ShowMapFragment extends Fragment implements LoaderManager.LoaderCal
                 Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " ReviewLocation");
                 mReviewLocationAdapter.swapCursor(data);
                 mHeadingLocations.setText(getString(R.string.label_list_map_locations, count));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ((ShowMapActivity)getActivity()).scheduleStartPostponedTransition(mHeadingLocations);
+                }
                 break;
             case REVIEWS_OF_LOCATION_LOADER_ID:
                 Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Location");
