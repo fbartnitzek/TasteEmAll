@@ -979,11 +979,15 @@ public class AddReviewFragment extends Fragment implements
 //        }
 
         if (Utils.isNetworkUnavailable(getActivity())) {
-            Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-
+            // TODO: should be the matching bugfix 1
             if (mLastLocation != null) {
                 Log.v(LOG_TAG, "startGeocodeServiceByPosition - TODO: call geocoder later..., hashCode=" + this.hashCode() + ", " + "");
+                mLocationParcelable = Utils.getLocationStubFromLastLocation(
+                        mLastLocation, mEditReviewLocationDescription.getText().toString());
+                editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
             }
+
+            Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
             return;
         }
 

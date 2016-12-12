@@ -364,6 +364,7 @@ public class AddLocationFragment extends Fragment implements
 
         if (mLocationParcelable == null) {
             if (mLastLocation != null) {    // latLng without geocoded address: use latLng with GEOCODE_ME
+                // TODO: needed? already with locationParcelable
                 mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation,
                         mEditLocationDescription.getText().toString());
                 Log.v(LOG_TAG, "insertData with latLng, latLng=" + mLocationParcelable.getInput());
@@ -550,7 +551,7 @@ public class AddLocationFragment extends Fragment implements
 
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(CustomApplication.getGoogleApiClient());
             if (mLastLocation != null) {
-                Log.v(LOG_TAG, "getCurrentLocation - startGeocodeServiceByLatLng");
+                Log.v(LOG_TAG, "getCurrentLocation - startGeocodeServiceByLatLng, mLastLocation=" + mLastLocation);
 
                 startGeocodeService(null);
                 return;
@@ -572,6 +573,9 @@ public class AddLocationFragment extends Fragment implements
             }
 
             if (address == null && mLastLocation != null) {
+                // bugfix 2
+                mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation,
+                        mEditLocationDescription.getText().toString());
                 updateLocationText(); // now might use mLastLocation
             }
             return;
