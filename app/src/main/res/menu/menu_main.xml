@@ -29,4 +29,11 @@
         android:orderInCategory="20"
         android:title="@string/action_show_map"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/search_all"
+        android:orderInCategory="10"
+        android:title="@string/search_title"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
 </menu>

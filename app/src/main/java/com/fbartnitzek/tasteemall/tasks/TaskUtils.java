@@ -29,8 +29,6 @@ public class TaskUtils {
 
     public static final String ACTION_DATA_CHANGED
             = TaskUtils.class.getPackage().getName() + ".ACTION_DATA_CHANGED";
-//    public static final String ACTION_PRODUCER_LOCATION_INSERTED
-//            = TaskUtils.class.getPackage().getName() + ".ACTION_PRODUCER_LOCATION_INSERTED";
 
     public static void updateWidgets(Activity activity) {
         // only TasteEmAll app can receive broadcast
@@ -38,12 +36,6 @@ public class TaskUtils {
                 MainActivity.class.getPackage().getName());
         activity.sendBroadcast(dataUpdatedIntent);
     }
-
-//    public static void broadcastProducerLocation(Activity activity, Uri locationUri) {
-//        Intent dataUpdatedIntent = new Intent(TaskUtils.ACTION_PRODUCER_LOCATION_INSERTED).setPackage(
-//                MainActivity.class.getPackage().getName());
-//        activity.sendBroadcast(dataUpdatedIntent);
-//    }
 
     public static Cursor queryWithExactUserName(Activity activity, String userName) {
         return activity.getContentResolver().query(

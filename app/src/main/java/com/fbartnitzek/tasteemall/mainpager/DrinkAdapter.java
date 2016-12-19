@@ -1,4 +1,4 @@
-package com.fbartnitzek.tasteemall;
+package com.fbartnitzek.tasteemall.mainpager;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fbartnitzek.tasteemall.R;
+import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 
@@ -29,26 +31,29 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
  * limitations under the License.
  */
 
-public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder>{
-
+public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> {
     private final Context mContext;
     private Cursor mCursor;
-    private final ReviewAdapterClickHandler mClickHandler;
 
-    public interface ReviewAdapterClickHandler {
-        void onClick(Uri contentUri, ViewHolder viewHolder);
+//    private static final String LOG_TAG = DrinkAdapter.class.getName();
+
+    public interface DrinkAdapterClickHandler {
+        void onClick(String drinkName, Uri contentUri, ViewHolder viewHolder);
     }
 
-    public ReviewAdapter(ReviewAdapterClickHandler mClickHandler, Context context) {
-        this.mClickHandler = mClickHandler;
-        this.mContext = context;
+    private final DrinkAdapterClickHandler mClickHandler;
+
+
+    public DrinkAdapter(DrinkAdapterClickHandler clickHandler, Context context) {
+        this.mClickHandler = clickHandler;
+        mContext = context;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_review_recycler, parent, false);
+                    .inflate(R.layout.list_item_drink_recycler, parent, false);
             view.setFocusable(true);
             return new ViewHolder(view);
         } else {
@@ -60,33 +65,34 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
-        String drinkName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_NAME);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int id = mCursor.getInt(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW__ID);
-            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_producer) + id);
-            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_drink) + id);
+            int id = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
+            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink) + id);
+            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer) + id);
         }
 
-        holder.drinkNameView.setText(drinkName);
-        holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
-
-        String producerName = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_PRODUCER_NAME);
+        String producerName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME);
         holder.producerNameView.setText(producerName);
         holder.producerNameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
 
-        String drinkType = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_DRINK_TYPE);
+        String drinkName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_NAME);
+        holder.drinkNameView.setText(drinkName);
+        holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
+
+        String drinkType = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_TYPE);
         holder.drinkTypeView.setText(drinkType);
         holder.drinkTypeView.setContentDescription(mContext.getString(R.string.a11y_drink_type,
                 mContext.getString(Utils.getReadableDrinkNameId(mContext, drinkType))));
 
-        String reviewRating = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_RATING);
-        holder.reviewRatingView.setText(reviewRating);
-        holder.reviewRatingView.setContentDescription(mContext.getString(R.string.a11y_review_rating, reviewRating));
+        String drinkStyle = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_STYLE);
+        holder.drinkStyleView.setText(drinkStyle);
+        if (drinkStyle == null || drinkStyle.length() == 0) {
+            holder.drinkStyleView.setContentDescription(mContext.getString(R.string.a11y_no_drink_style));
+        } else {
+            holder.drinkStyleView.setContentDescription(mContext.getString(R.string.a11y_drink_style, drinkStyle));
+        }
 
-        String readableDate = mCursor.getString(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW_READABLE_DATE);
-        holder.reviewDateView.setText(readableDate);
-        holder.reviewDateView.setContentDescription(mContext.getString(R.string.a11y_review_date, readableDate));
     }
 
     @Override
@@ -99,34 +105,32 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView producerNameView;
         public final TextView drinkNameView;
         public final TextView drinkTypeView;
-        public final TextView reviewRatingView;
-        public final TextView reviewDateView;
+        public final TextView drinkStyleView;
 
         public ViewHolder(View view) {
             super(view);
-            this.drinkNameView = (TextView) view.findViewById(R.id.list_item_drink_name);
             this.producerNameView = (TextView) view.findViewById(R.id.list_item_producer_name);
+            this.drinkNameView = (TextView) view.findViewById(R.id.list_item_drink_name);
             this.drinkTypeView = (TextView) view.findViewById(R.id.list_item_drink_type);
-            this.reviewRatingView = (TextView) view.findViewById(R.id.list_item_review_rating);
-            this.reviewDateView = (TextView) view.findViewById(R.id.list_item_review_date);
+            this.drinkStyleView = (TextView) view.findViewById(R.id.list_item_drink_style);
             view.setOnClickListener(this);
         }
 
-
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             mCursor.moveToPosition(getAdapterPosition());
-            int reviewId = mCursor.getInt(QueryColumns.MainFragment.ReviewAllQuery.COL_REVIEW__ID);
-            Uri contentUri = DatabaseContract.ReviewEntry.buildUriForShowReview(reviewId);
+            int drinkId = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
+            Uri contentUri = DatabaseContract.DrinkEntry.buildUriIncludingProducer(drinkId);
             mClickHandler.onClick(
+                    mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK_NAME),
                     contentUri,
-                    this);
-
+                    this
+            );
         }
     }
+
 }

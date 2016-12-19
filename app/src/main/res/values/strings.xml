@@ -63,6 +63,11 @@
     <string name="label_list_of_drinks">list of drinks<xliff:g id="numberAppendix">%1$s</xliff:g></string>
     <string name="label_list_of_reviews_preview">list of reviews</string>
     <string name="label_list_of_reviews">list of reviews<xliff:g id="numberAppendix">%1$s</xliff:g></string>
+
+    <string name="label_list_preview">list of entries</string>
+    <string name="label_list_entries_preview">list of <xliff:g id="entries">%1$s</xliff:g></string>
+    <string name="label_list_entries">list of <xliff:g id="entries">%1$s</xliff:g><xliff:g id="numberAppendix">%2$s</xliff:g></string>
+
     <string name="producer_details_label"><xliff:g id="producer">%1$s</xliff:g> details</string>
     <string name="drink_details_label"><xliff:g id="drink">%1$s</xliff:g> details</string>
 

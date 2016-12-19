@@ -105,6 +105,18 @@ public class QueryColumns {
 
         }
 
+        public static class UserQuery {
+            public static final String[] COLUMNS = {
+                    UserEntry.TABLE_NAME + "." + UserEntry._ID,
+                    User.USER_ID,
+                    User.NAME
+            };
+
+            public static final int COL__ID = 0;
+            public static final int COL_ID = COL__ID + 1;
+            public static final int COL_NAME = COL_ID + 1;
+        }
+
         public static class GeocodingQuery {
             public static final String[] COLUMNS = {
                     ReviewEntry.TABLE_NAME + "." + ReviewEntry._ID,
