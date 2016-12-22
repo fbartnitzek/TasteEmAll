@@ -558,7 +558,9 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
         // 2) new location with valid latLng and no location nearby, geocoded or not -> fine
+        // TODO: still buggy? location with empty locationString was added in bayreuth => workaround added
         if (mLocationParcelable != null) {
+//        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
             Log.v(LOG_TAG, "validateLocation with mLocationParcelable - geocode & new, hashCode=" + this.hashCode() + ", " + "");
 
             new InsertLocationTask(getActivity(),
@@ -604,6 +606,7 @@ public class AddReviewFragment extends Fragment implements
                         useAddLocation();   // WORKS!
                     }
                 })
+                // TODO: don't show button if not usable!
                 .setNeutralButton("add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

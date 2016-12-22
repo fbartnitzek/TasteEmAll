@@ -691,6 +691,9 @@ public class AddProducerFragment extends Fragment implements
                     .title(mLocationParcelable.getCountry())
                     .snippet(mLocationParcelable.getFormattedAddress())
                     .draggable(false));
+            // TODO: onClick: fill locationInput with current address => easier to add street number :-p
+            // http://stackoverflow.com/questions/14226453/google-maps-api-v2-how-to-make-markers-clickable
+
             mMap.moveCamera(
                     CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));

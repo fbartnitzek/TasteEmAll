@@ -548,6 +548,8 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
                             showProducerGeocodeDialog(false);
                         } else if (reviewUris != null && !reviewUris.isEmpty()) {
                             showReviewLocationGeocodeDialog(false);
+                        } else {
+                            restartCurrentFragmentLoader();
                         }
                     }
                 });
@@ -641,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
                     showReviewLocationGeocodeDialog(true);
                 } else {
                     Toast.makeText(MainActivity.this, "all geocoding done", Toast.LENGTH_SHORT).show();
+                    restartCurrentFragmentLoader();
                 }
             } else {
                 showProducerGeocodeDialog(true);
@@ -654,6 +657,7 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
 
             if (mReviewLocationUris.isEmpty()) {
                 Toast.makeText(MainActivity.this, "all geocoding done", Toast.LENGTH_SHORT).show();
+                restartCurrentFragmentLoader();
             } else {
                 showReviewLocationGeocodeDialog(true);
             }

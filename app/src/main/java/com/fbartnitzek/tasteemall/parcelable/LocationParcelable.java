@@ -2,6 +2,9 @@ package com.fbartnitzek.tasteemall.parcelable;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
+
+import com.fbartnitzek.tasteemall.Utils;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -112,6 +115,10 @@ public class LocationParcelable implements Parcelable {
 
     public String getCountry() {
         return country;
+    }
+
+    public boolean isGeocodeable() {
+        return Utils.isValidLatLong(latitude, longitude) || !TextUtils.isEmpty(input);
     }
 
     @Override
