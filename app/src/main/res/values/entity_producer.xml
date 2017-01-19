@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entity_producer">Producer</string>
+    <string name="attribute_producer_id">producer id</string>
+    <string name="attribute_producer_name">name</string>
+    <string name="attribute_producer_description">description</string>
+    <string name="attribute_producer_website">website</string>
+    <string name="attribute_producer_latitude">latitude</string>
+    <string name="attribute_producer_longitude">longitude</string>
+    <string name="attribute_producer_country">country</string>
+    <string name="attribute_producer_input">input</string>
+    <string name="attribute_producer_formatted_address">address</string>
+
+</resources>

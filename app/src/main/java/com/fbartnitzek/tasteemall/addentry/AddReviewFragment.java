@@ -140,6 +140,7 @@ public class AddReviewFragment extends Fragment implements
     private LocationParcelable mProducerLocationParcelable;
     private boolean mEditReviewLocationIgnoreTextChange = false;
 
+    // TODO: pagify whole add sequence!
 
     public AddReviewFragment() {
         // Required empty public constructor
@@ -559,8 +560,8 @@ public class AddReviewFragment extends Fragment implements
         }
         // 2) new location with valid latLng and no location nearby, geocoded or not -> fine
         // TODO: still buggy? location with empty locationString was added in bayreuth => workaround added
-        if (mLocationParcelable != null) {
-//        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
+//        if (mLocationParcelable != null) {
+        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
             Log.v(LOG_TAG, "validateLocation with mLocationParcelable - geocode & new, hashCode=" + this.hashCode() + ", " + "");
 
             new InsertLocationTask(getActivity(),
@@ -596,6 +597,7 @@ public class AddReviewFragment extends Fragment implements
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // TODO: message from strings and 2 cases w/o add... (if ever happens...)
         builder.setTitle("location unclear")
                 .setMessage("Do you want to SEARCH for the review-location, " +
                         "ADD a new locaction-stub based on your current input (and geocode it later) " +
@@ -605,23 +607,24 @@ public class AddReviewFragment extends Fragment implements
                     public void onClick(DialogInterface dialog, int which) {
                         useAddLocation();   // WORKS!
                     }
-                })
-                // TODO: don't show button if not usable!
-                .setNeutralButton("add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addLocation();  // WORKS!
+                });
+        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {   // TODO: never happens?
+            builder.setNeutralButton("add", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    addLocation();  // WORKS!
 
-                    }
-                })
-                .setNegativeButton("ignore", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mLocationId = null; // LEFT JOIN instead of INNER JOIN - WORKS!
-                        insertReview();
-                    }
-                })
-                .show();
+                }
+            });
+        }
+
+        builder.setNegativeButton("ignore", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mLocationId = null; // LEFT JOIN instead of INNER JOIN - WORKS!
+                insertReview();
+            }
+        }).show();
 
     }
 

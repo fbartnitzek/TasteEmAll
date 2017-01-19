@@ -62,10 +62,10 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
-        String drinkName = mCursor.getString(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_DRINK_NAME);
+        String drinkName = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_DRINK_NAME);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int id = mCursor.getInt(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_REVIEW__ID);
+            int id = mCursor.getInt(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW__ID);
             holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_producer) + id);
             holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_drink) + id);
         }
@@ -73,20 +73,20 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
         holder.drinkNameView.setText(drinkName);
         holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
 
-        String producerName = mCursor.getString(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_PRODUCER_NAME);
+        String producerName = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_PRODUCER_NAME);
         holder.producerNameView.setText(producerName);
         holder.producerNameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
 
-        String drinkType = mCursor.getString(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_DRINK_TYPE);
+        String drinkType = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_DRINK_TYPE);
         holder.drinkTypeView.setText(drinkType);
         holder.drinkTypeView.setContentDescription(mContext.getString(R.string.a11y_drink_type,
                 mContext.getString(Utils.getReadableDrinkNameId(mContext, drinkType))));
 
-        String reviewRating = mCursor.getString(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_REVIEW_RATING);
+        String reviewRating = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW_RATING);
         holder.reviewRatingView.setText(reviewRating);
         holder.reviewRatingView.setContentDescription(mContext.getString(R.string.a11y_review_rating, reviewRating));
 
-        String readableDate = mCursor.getString(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_REVIEW_READABLE_DATE);
+        String readableDate = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW_READABLE_DATE);
         holder.reviewDateView.setText(readableDate);
         holder.reviewDateView.setContentDescription(mContext.getString(R.string.a11y_review_date, readableDate));
     }
@@ -123,7 +123,7 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
         @Override
         public void onClick(View v) {
             mCursor.moveToPosition(getAdapterPosition());
-            int reviewId = mCursor.getInt(QueryColumns.MapFragment.ReviewsOfLocationQuery.COL_REVIEW__ID);
+            int reviewId = mCursor.getInt(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW__ID);
             Uri contentUri = DatabaseContract.ReviewEntry.buildUriForShowReview(reviewId);
             mClickHandler.onClick(contentUri,this);
 

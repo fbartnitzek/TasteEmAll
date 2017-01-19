@@ -174,7 +174,12 @@
     <string name="action_map_type_normal">normal</string>
     <string name="action_map_type_none">none</string>
     <string name="title_show_map">Show Map</string>
-    <string name="title_show_map_location">Show <xliff:g id="location">%1$s</xliff:g></string>
+    <string name="title_show_map_all_entity">Show <xliff:g id="entity">%1$s</xliff:g> Map</string>
+    <!--<string name="title_show_map_location">Show <xliff:g id="location">%1$s</xliff:g></string>-->
+
+    <string name="title_show_map_reviews_of_entity_location">Show Reviews of <xliff:g id="entity">%1$s</xliff:g> <xliff:g id="location">%2$s</xliff:g></string>
+
+
     <!--<string name="marker_review_title">Review <xliff:g id="number">%3$s</xliff:g> for <xliff:g id="producer">%1$s</xliff:g> - <xliff:g id="drink">%2$s</xliff:g></string>-->
     <!-- TODO: lint - special plural handling ...? - later -->
     <string name="marker_title"><xliff:g id="number">%1$d</xliff:g> Reviews for <xliff:g id="location">%2$s</xliff:g></string>
@@ -359,10 +364,20 @@
     <string name="msg_title_gps_geocoding">GPS geocoding</string>
     <string name="msg_title_choose_map_src">which locations?</string>
     <string name="label_list_map_locations_preview">reviews-locations</string>
+    <string name="label_list_map_producer_locations_preview">producer-locations</string>
     <string name="label_list_map_locations"><xliff:g id="numberAppendix">%1$d</xliff:g> reviews-locations</string>
+    <string name="label_list_map_producer_locations"><xliff:g id="numberAppendix">%1$d</xliff:g> producer-locations</string>
     <string name="label_list_map_sub_list">reviews</string>
     <string name="label_list_map_reviews_of_location_preview">reviews</string>
+    <string name="label_list_map_reviews_of_producer_preview">reviews</string>
     <string name="label_list_map_reviews_of_location"><xliff:g id="numberAppendix">%1$d</xliff:g> reviews</string>
+    <string name="label_list_map_reviews_of_producer"><xliff:g id="numberAppendix">%1$d</xliff:g> reviews</string>
+
+    <string name="search_generic">search_generic</string>
+    <string name="label_attribute_of_entity"><xliff:g id="attribute">%1$s</xliff:g> of <xliff:g id="entity">%2$s</xliff:g></string>
+    <string name="label_attribute_of_entity_n"><xliff:g id="attribute">%1$s</xliff:g> of <xliff:g id="entity">%2$s</xliff:g> (<xliff:g id="number">%3$d</xliff:g>)</string>
+
+    <string name="entity_of_entity"><xliff:g id="childEntity">%1$s</xliff:g> of <xliff:g id="baseEntity">%2$s</xliff:g></string>
 
 
 </resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entity_drink">Drink</string>
+    <string name="attribute_drink_id">drink id</string>
+    <string name="attribute_drink_name">name</string>
+    <string name="attribute_drink_specifics">specifics</string>
+    <string name="attribute_drink_style">style</string>
+    <string name="attribute_drink_type">drink type</string>
+    <string name="attribute_drink_ingredients">ingredients</string>
+</resources>

@@ -107,7 +107,8 @@ public class QueryColumns {
 
         public static class UserQuery {
             public static final String[] COLUMNS = {
-                    UserEntry.TABLE_NAME + "." + UserEntry._ID,
+//                    UserEntry.TABLE_NAME + "." + UserEntry._ID,
+                    UserEntry._ID,
                     User.USER_ID,
                     User.NAME
             };
@@ -636,13 +637,35 @@ public class QueryColumns {
 
         }
 
-        public static class ReviewsOfLocationQuery{
+        public static class ProducerLocations {
+            public static final String[] COLUMNS = {
+                    "DISTINCT " + PA + "." + ProducerEntry._ID,
+                    PA + "." + Producer.PRODUCER_ID,
+                    PA + "." + Producer.LATITUDE,
+                    PA + "." + Producer.LONGITUDE,
+                    PA + "." + Producer.COUNTRY,
+                    PA + "." + Producer.FORMATTED_ADDRESS,
+                    PA + "." + Producer.NAME
+            };
+
+
+            public static final int COL_PRODUCER__ID = 0;
+            public static final int COL_PRODUCER_ID = COL_PRODUCER__ID + 1;
+            public static final int COL_PRODUCER_LOCATION_LAT = COL_PRODUCER_ID + 1;
+            public static final int COL_PRODUCER_LOCATION_LON = COL_PRODUCER_LOCATION_LAT + 1;
+            public static final int COL_COUNTRY = COL_PRODUCER_LOCATION_LON + 1;
+            public static final int COL_FORMATTED = COL_COUNTRY + 1;
+            public static final int COL_NAME = COL_FORMATTED + 1;
+
+        }
+
+        public static class ReviewsSubQuery {
             public static final String[] COLUMNS = {
                     RA + "." + ReviewEntry._ID,
                     RA + "." + Review.LOCATION_ID,
                     RA + "." + Review.RATING,
                     RA + "." + Review.READABLE_DATE,
-                    LAR + "." + LocationEntry._ID,
+//                    LAR + "." + LocationEntry._ID,
                     DA + "." + Drink.NAME,
                     DA + "." + Drink.TYPE,
                     PA + "." + Producer.NAME};
@@ -651,91 +674,14 @@ public class QueryColumns {
             public static final int COL_REVIEW_LOCATION_ID = COL_REVIEW__ID + 1;
             public static final int COL_REVIEW_RATING = COL_REVIEW_LOCATION_ID + 1;
             public static final int COL_REVIEW_READABLE_DATE = COL_REVIEW_RATING + 1;
-            public static final int COL_LOCATION__ID = COL_REVIEW_READABLE_DATE + 1;
-            public static final int COL_DRINK_NAME = COL_LOCATION__ID + 1;
+            //            public static final int COL_LOCATION__ID = COL_REVIEW_READABLE_DATE + 1;
+            public static final int COL_DRINK_NAME = COL_REVIEW_READABLE_DATE + 1;
             public static final int COL_DRINK_TYPE = COL_DRINK_NAME + 1;
             public static final int COL_PRODUCER_NAME = COL_DRINK_TYPE + 1;
 
         }
-
-        public static class Reviews {
-
-            public static final String[] COLUMNS = {
-                    RA + "." + ReviewEntry._ID,
-                    RA + "." + Review.RATING,
-                    RA + "." + Review.DESCRIPTION,
-                    RA + "." + Review.READABLE_DATE,
-
-                    LAR + "." + Location.LATITUDE,
-                    LAR + "." + Location.LONGITUDE,
-                    LAR + "." + Location.COUNTRY,
-                    LAR + "." + Location.FORMATTED_ADDRESS,
-
-                    UA + "." + User.NAME,
-
-                    DA + "." + Drink.NAME,
-                    DA + "." + Drink.TYPE,
-                    DA + "." + Drink.STYLE,
-
-                    PA + "." + Producer.NAME,
-            };
-
-            public static final int COL_REVIEW__ID = 0;
-            public static final int COL_REVIEW_RATING = 1;
-            public static final int COL_REVIEW_DESCRIPTION = 2;
-            public static final int COL_REVIEW_READABLE_DATE = 3;
-
-            public static final int COL_REVIEW_LOCATION_LAT = COL_REVIEW_READABLE_DATE + 1;
-            public static final int COL_REVIEW_LOCATION_LONG = COL_REVIEW_LOCATION_LAT + 1;
-            public static final int COL_REVIEW_LOCATION_COUNTRY = COL_REVIEW_LOCATION_LONG + 1;
-            public static final int COL_REVIEW_LOCATION_FORMATTED = COL_REVIEW_LOCATION_COUNTRY + 1;
-
-            public static final int COL_USER_NAME = COL_REVIEW_LOCATION_FORMATTED +1;
-
-            public static final int COL_DRINK_NAME = COL_USER_NAME +1;
-            public static final int COL_DRINK_TYPE = COL_DRINK_NAME + 1;
-            public static final int COL_DRINK_STYLE = COL_DRINK_TYPE + 1;
-
-            public static final int COL_PRODUCER_NAME = COL_DRINK_STYLE + 1;
-        }
-
-        public static class ReviewsOld {
-
-            public static final String[] COLUMNS = {
-                    RA + "." + ReviewEntry._ID,
-                    RA + "." + Review.RATING,
-                    RA + "." + Review.DESCRIPTION,
-                    RA + "." + Review.READABLE_DATE,
-                    RA + "." + Review.LOCATION_ID, //TODO
-
-                    UA + "." + User.NAME,
-
-                    DA + "." + DrinkEntry._ID,
-                    DA + "." + Drink.NAME,
-                    DA + "." + Drink.TYPE,
-                    DA + "." + Drink.STYLE,
-
-                    PA + "." + ProducerEntry._ID,
-                    PA + "." + Producer.NAME,
-            };
-
-            public static final int COL_REVIEW__ID = 0;
-            public static final int COL_REVIEW_RATING = 1;
-            public static final int COL_REVIEW_DESCRIPTION = 2;
-            public static final int COL_REVIEW_READABLE_DATE = 3;
-            public static final int COL_REVIEW_LOCATION = 4;
-
-            public static final int COL_USER_NAME = 5;
-
-            public static final int COL_DRINK__ID = 6;
-            public static final int COL_DRINK_NAME = 7;
-            public static final int COL_DRINK_TYPE = 8;
-            public static final int COL_DRINK_STYLE = 9;
-
-            public static final int COL_PRODUCER__ID = 10;
-            public static final int COL_PRODUCER_NAME = 11;
-        }
     }
+
 
     public static class Widget {
 

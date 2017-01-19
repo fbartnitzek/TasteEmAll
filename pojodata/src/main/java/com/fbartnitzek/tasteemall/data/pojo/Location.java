@@ -18,6 +18,8 @@ package com.fbartnitzek.tasteemall.data.pojo;
 
 public class Location {
 
+    public static final String ENTITY = "location";
+
     public static final String LOCATION_ID = "location_id";
     public static final String LATITUDE = "location_latitude";
     public static final String LONGITUDE = "location_longitude";

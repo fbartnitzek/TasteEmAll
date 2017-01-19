@@ -18,6 +18,8 @@ package com.fbartnitzek.tasteemall.data.pojo;
 
 public class Drink {
 
+    public static final String ENTITY = "drink";
+
     public static final String DRINK_ID = "drink_id";
     public static final String NAME = "drink_name";
     public static final String SPECIFICS = "drink_specifics"; //alcohol by volume, ...
@@ -29,5 +31,4 @@ public class Drink {
     public static final String TYPE_GENERIC = "generic";
 
     public static final String PRODUCER_ID = "drink_producer_id";
-
 }

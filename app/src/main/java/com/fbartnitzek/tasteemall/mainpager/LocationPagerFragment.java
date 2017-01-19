@@ -23,6 +23,11 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.showentry.ShowLocationActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -46,6 +51,12 @@ public class LocationPagerFragment extends BasePagerFragment implements LoaderMa
 
     private LocationAdapter mLocationAdapter;
     private TextView mLocationHeading;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.entity = Location.ENTITY;
+    }
 
     @Nullable
     @Override
@@ -85,8 +96,49 @@ public class LocationPagerFragment extends BasePagerFragment implements LoaderMa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case LOCATION_LOADER_ID:
+                if (this.jsonUri == null) {
+                    Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                    String pattern = ((MainActivity) getActivity()).getSearchPattern();
+
+                    // Location.FORMATTED_ADDRESS + " LIKE ? OR " + Location.INPUT + " LIKE ? OR "
+                    // + Location.COUNTRY + " LIKE ? OR " + Location.DESCRIPTION + " LIKE ?",
+                    try {
+                        String encodedValue = DatabaseContract.encodeValue(pattern);
+                        if (jsonTextFilter == null) {
+                            jsonTextFilter = new JSONObject().put(Location.ENTITY, new JSONObject()
+                                    .put(DatabaseContract.OR, new JSONObject()
+                                            .put(Location.ENTITY, new JSONObject()
+                                                    .put(Location.FORMATTED_ADDRESS, new JSONObject())
+                                                    .put(Location.INPUT, new JSONObject())
+                                                    .put(Location.COUNTRY, new JSONObject())
+                                                    .put(Location.DESCRIPTION, new JSONObject())
+                                            )
+                                    )
+                            );
+                        }
+
+                        JSONObject location = jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).getJSONObject(Location.ENTITY);
+                        location.getJSONObject(Location.FORMATTED_ADDRESS).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        location.getJSONObject(Location.INPUT).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        location.getJSONObject(Location.COUNTRY).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        location.getJSONObject(Location.DESCRIPTION).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).put(Location.ENTITY, location);
+
+                        jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
+                    } catch (JSONException | UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
+                        throw new RuntimeException("building jsonUri failed");
+                    }
+                    Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                }
+
+
                 return new CursorLoader(getActivity(),
-                        DatabaseContract.LocationEntry.buildUriWithPatternOrDescription(
+                        jsonUri != null ? jsonUri :
+                                DatabaseContract.LocationEntry.buildUriWithPatternOrDescription(
                                 ((MainActivity)getActivity()).getSearchPattern()),
                         QueryColumns.MainFragment.LocationQuery.COLUMNS,
                         null, null,

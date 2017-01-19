@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract.DrinkEntry;
@@ -24,7 +25,18 @@ import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.fbartnitzek.tasteemall.data.DatabaseContract.ReviewEntry.getPathString;
 
@@ -74,7 +86,7 @@ public class DatabaseProvider extends ContentProvider {
     private static final int GEOCODE_TEXT_PRODUCER_LOCATIONS = 211;
 
     private static final int DRINKS = 300;
-    private static final int DRINKS_BY_NAME = 301;
+//    private static final int DRINKS_BY_NAME = 301;
     private static final int DRINK_BY_ID = 302;
     private static final int DRINKS_WITH_PRODUCER_BY_NAME = 310;
     private static final int DRINKS_WITH_PRODUCER_BY_ID = 311;
@@ -91,7 +103,10 @@ public class DatabaseProvider extends ContentProvider {
     private static final int REVIEWS_WITH_ALL_BY_NAME_AND_TYPE = 520;
     private static final int REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE = 5201;
     private static final int REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE = 5202;
-    private static final int REVIEWS_GEOCODE = 530;
+//    private static final int REVIEWS_GEOCODE = 530;
+
+    private static final int JSON = 600;
+
 
     private final UriMatcher mUriMatcher = buildUriMatcher();
 
@@ -190,8 +205,8 @@ public class DatabaseProvider extends ContentProvider {
 
         // all drinks
         matcher.addURI(authority, DatabaseContract.PATH_DRINK, DRINKS);
-        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/", DRINKS_BY_NAME);
-        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/*", DRINKS_BY_NAME);
+//        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/", DRINKS_BY_NAME);
+//        matcher.addURI(authority, DatabaseContract.PATH_DRINK_BY_NAME + "/*", DRINKS_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/", DRINKS_WITH_PRODUCER_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME + "/*", DRINKS_WITH_PRODUCER_BY_NAME);
         matcher.addURI(authority, DatabaseContract.PATH_DRINK_WITH_PRODUCER_BY_NAME_AND_TYPE + "/*/", DRINKS_WITH_PRODUCER_BY_NAME_AND_TYPE);
@@ -221,7 +236,9 @@ public class DatabaseProvider extends ContentProvider {
         matcher.addURI(authority, DatabaseContract.PATH_REVIEW_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/*", REVIEW_LOCATIONS_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/#/", REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE);
         matcher.addURI(authority, DatabaseContract.PATH_REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE + "/*/*/#", REVIEWS_OF_LOCATION_WITH_ALL_BY_NAME_AND_TYPE);
-        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_GEOCODE_LOCATION, REVIEWS_GEOCODE);
+//        matcher.addURI(authority, DatabaseContract.PATH_REVIEW_GEOCODE_LOCATION, REVIEWS_GEOCODE);
+
+        matcher.addURI(authority, DatabaseContract.PATH_JSON + "/*", JSON);
 
         return matcher;
     }
@@ -359,13 +376,13 @@ public class DatabaseProvider extends ContentProvider {
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-            case DRINKS_BY_NAME:
-                pattern = DrinkEntry.getSearchString(uri, false);
-                mySelectionArgs = new String[]{"%" + pattern + "%"};
-                cursor = db.query(DrinkEntry.TABLE_NAME, projection,
-                        DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'",
-                        mySelectionArgs, null, null, sortOrder);
-                break;
+//            case DRINKS_BY_NAME:
+//                pattern = DrinkEntry.getSearchString(uri, false);
+//                mySelectionArgs = new String[]{"%" + pattern + "%"};
+//                cursor = db.query(DrinkEntry.TABLE_NAME, projection,
+//                        DrinkEntry.TABLE_NAME + "." + Drink.NAME + " LIKE '%' || ? || '%'",
+//                        mySelectionArgs, null, null, sortOrder);
+//                break;
             case DRINK_BY_ID:
                 cursor = db.query(DrinkEntry.TABLE_NAME, projection,
                         DrinkEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
@@ -499,19 +516,55 @@ public class DatabaseProvider extends ContentProvider {
                             projection, REVIEWS_DRINKS_OR_PRODUCERS_BY_NAME_AND_TYPE_SELECTION, mySelectionArgs, null, null, sortOrder);
                 }
                 break;
-            case REVIEWS_GEOCODE:
-                cursor = db.query(ReviewEntry.TABLE_NAME, projection,
-                        //TODO!!!
-                        Review.LOCATION_ID + " LIKE '" + LocationEntry.GEOCODE_ME + "%'",
-                        selectionArgs, null, null, sortOrder);
+//            case REVIEWS_GEOCODE:
+//                cursor = db.query(ReviewEntry.TABLE_NAME, projection,
+//                        //TODO!!!
+//                        Review.LOCATION_ID + " LIKE '" + LocationEntry.GEOCODE_ME + "%'",
+//                        selectionArgs, null, null, sortOrder);
+//                break;
+
+
+            case JSON:  // WORKS :-D
+                String json = DatabaseContract.getJson(uri);
+                // f.e. json={"review":{"date":{"GT":"2016-12-01+00:00:00"}}}
+                Log.v(LOG_TAG, "query JSON, json=" + json + ", hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], projection = [" + projection + "], selection = [" + selection + "], selectionArgs = [" + selectionArgs + "], sortOrder = [" + sortOrder + "]");
+
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    String rootEntity = jsonObject.keys().next();   // just 1 rootElement
+                    if (!DatabaseContract.ALIASES.containsKey(rootEntity)) {
+                        throw new RuntimeException("not yet implemented json entity `" + rootEntity + "'");
+                    }
+
+                    String prefix = DatabaseContract.TABLE_NAMES.get(rootEntity) + " " + DatabaseContract.ALIASES.get(rootEntity);
+
+                    StringBuilder customSelection = new StringBuilder();
+                    List<String> customSelectionArgs = new ArrayList<>();
+                    Set<String> joins = parseJsonEntity(jsonObject, rootEntity, customSelection, customSelectionArgs, " AND ");
+                    Log.v(LOG_TAG, "query, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], joins=" + joins);
+
+                    // enrich joins if needed through projection
+                    joins.addAll(joinsFromProjection(projection, rootEntity));
+                    Log.v(LOG_TAG, "query after projection-enrichment, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "], joins=" + joins);
+
+                    SQLiteQueryBuilder jsonQueryBuilder = new SQLiteQueryBuilder();
+                    jsonQueryBuilder.setTables(
+                            prefix + (joins.isEmpty() ? "" : " " + TextUtils.join(" ", joins)));
+
+                    Log.v(LOG_TAG, "query JSON, customSelection=" + customSelection.toString() + ", customArgs=" + customSelectionArgs.toString());
+
+                    cursor = jsonQueryBuilder.query(db, projection,
+                            customSelection.toString(),
+                            customSelectionArgs.toArray(new String[customSelectionArgs.size()]),
+                            null, null, sortOrder);
+
+                } catch (JSONException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, "query JSON, error:" + e.getMessage());
+                    throw new UnsupportedOperationException("invalid json structure: " + json);
+                }
+
                 break;
-            // TODO: special review-searches    - advanced search Fragment...
-            //  ALL_COLUMNS, Selection- and SortOrder- Builder
-            //  - CONTAINS_STRING_IN_DESCRIPTION
-            //  - LOCATION (Country)
-            //  - TIME (last holiday)
-            //  - (other) USER
-            // f.e. best IPA in last years Canada-vacation ;-)
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -520,6 +573,147 @@ public class DatabaseProvider extends ContentProvider {
             cursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
         return cursor;
+    }
+
+    private static String decode(String s) throws UnsupportedEncodingException {
+        // decode attribute-values - see DC.encodeValue() ...
+        return URLDecoder.decode(s, DatabaseContract.UTF8);
+    }
+
+    private Set<String> parseJsonEntity(JSONObject jsonParent, String entityName, StringBuilder customSelection,
+                                        List<String> customSelectionArgs, String compare) throws JSONException, UnsupportedEncodingException {
+
+        JSONObject entity = jsonParent.getJSONObject(entityName);
+        Log.v(LOG_TAG, "parseJsonEntity, hashCode=" + this.hashCode() + ", " + "jsonParent = [" + jsonParent + "], entityName = [" + entityName + "], customSelection = [" + customSelection + "], customSelectionArgs = [" + customSelectionArgs + "]");
+
+        final String alias = DatabaseContract.ALIASES.get(entityName);
+        if (alias == null) {
+            throw new RuntimeException("unknown entity '" + entityName + "'");
+        }
+
+        Iterator<String> keys = entity.keys();
+        Set<String> joins = new LinkedHashSet<>();
+
+        while (keys.hasNext()) {
+            String attributeName = keys.next();
+            if (DatabaseContract.ATTRIBUTES.get(entityName).contains(attributeName)) {
+                JSONObject attribute = entity.getJSONObject(attributeName);
+                String operation = attribute.keys().next(); //just 1 operation
+                if (customSelection.length() > 0) {
+//                    customSelection.append(" AND ");
+                    customSelection.append(compare);    // mostly AND, sometimes OR
+                }
+                switch (operation) {
+                    case DatabaseContract.Operations.GT:
+                        customSelection.append(alias).append(".").append(attributeName).append(" > ?");
+                        customSelectionArgs.add(decode(attribute.getString(operation)));
+                        break;
+                    case DatabaseContract.Operations.LT:
+                        customSelection.append(alias).append(".").append(attributeName).append(" < ?");
+                        customSelectionArgs.add(decode(attribute.getString(operation)));
+                        break;
+                    case DatabaseContract.Operations.BETWEEN: // between: [1,5]
+                        customSelection.append(alias).append(".").append(attributeName).append(" >= ? AND ")
+                                .append(alias).append(".").append(attributeName).append(" <= ?");
+                        customSelectionArgs.add(decode(attribute.getJSONArray(operation).getString(0)));
+                        customSelectionArgs.add(decode(attribute.getJSONArray(operation).getString(1)));
+                        break;
+                    case DatabaseContract.Operations.CONTAINS:
+                        customSelection.append(alias).append(".").append(attributeName).append(" LIKE ?");
+                        customSelectionArgs.add("%" + decode(attribute.getString(operation)) + "%");
+                        break;
+                    case DatabaseContract.Operations.IS:    // {"IS", ["a","b","c"]}
+                        Object something = attribute.get(operation);
+                        if (something instanceof JSONArray) {
+                            JSONArray array = attribute.getJSONArray(operation);
+                            if (array.length() > 0) {
+                                customSelection.append("(");
+
+                                for (int i = 0; i < array.length(); ++i) {
+                                    if (i > 0) {
+                                        customSelection.append(" OR ");
+                                    }
+                                    customSelection.append(alias).append(".").append(attributeName).append(" LIKE ?");
+//                                Log.v(LOG_TAG, "parseJsonEntity, arg" + i + ": '" + array.get(i) + "', decoded: '"+decode((String) array.get(i))+"'" );
+                                    customSelectionArgs.add(decode((String) array.get(i)));
+                                }
+
+                                customSelection.append(")");
+                            }
+                        } else {    // cast it to string
+                            customSelection.append(alias).append(".").append(attributeName).append(" LIKE ?");
+                            customSelectionArgs.add(decode((String) something));
+                        }
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("unsupported operation '" + operation + "' in json structure: " + entity);
+                }
+
+            } else if (DatabaseContract.ASSOCIATIONS.get(entityName).contains(attributeName)) { // f.e. drink of review
+
+                String joinBuilder = (attributeName.equals(Location.ENTITY) ? "LEFT JOIN " : "INNER JOIN ") +
+                        DatabaseContract.TABLE_NAMES.get(attributeName) +
+                        " " + DatabaseContract.ALIASES.get(attributeName) +
+                        " ON " +
+                        DatabaseContract.ALIASES.get(entityName) + "." +
+                        DatabaseContract.FOREIGN_KEYS.get(entityName).get(attributeName) +
+                        " = " +
+                        DatabaseContract.ALIASES.get(attributeName) + "." +
+                        DatabaseContract.PRIMARY_KEYS.get(attributeName);
+                joins.add(joinBuilder);
+
+//                Log.v(LOG_TAG, "parseJsonEntity, entity = [" + entityName + "], child = [" + attributeName + "], preJoin= [" + joinBuilder.toString()+ "]");
+                Set<String> childJoins = parseJsonEntity(entity, attributeName, customSelection, customSelectionArgs, compare);
+//                Log.v(LOG_TAG, "parseJsonEntity, entity = [" + entityName + "], child = [" + attributeName + "], childJoin= [" + TextUtils.join(" ", childJoins) + "]");
+                joins.addAll(childJoins);
+            } else if (DatabaseContract.OR.equals(attributeName)) {
+                JSONObject rootEntity = entity.getJSONObject(DatabaseContract.OR);
+
+                if (customSelection.length() > 0) {
+                    customSelection.append(compare);
+                }
+                customSelection.append("(");
+                StringBuilder orStringBuilder = new StringBuilder();
+                Set<String> orJoins = parseJsonEntity(rootEntity, rootEntity.keys().next(), orStringBuilder, customSelectionArgs, " OR ");
+                joins.addAll(orJoins);
+                customSelection.append(orStringBuilder);
+                customSelection.append(")");
+            }
+        }
+
+//        Log.v(LOG_TAG, "parseJsonEntity, entityName = [" + entityName + "], allJoins= [" + TextUtils.join(" ", joins) + "]");
+        return joins;
+    }
+
+    private Set<String> joinsFromProjection(String[] projection, String rootEntity) {
+        List<String> attributes = Arrays.asList(projection);
+        Set<String> joins = new LinkedHashSet<>();
+
+        for (String attribute : attributes) {
+            if (attribute.indexOf('.') > 0) {
+                String alias = attribute.substring(0, attribute.indexOf('.'));
+                if (rootEntity.equals(Review.ENTITY)) {
+                    switch (alias) {
+                        case LocationEntry.ALIAS_REVIEW:
+                            joins.add("LEFT JOIN " + LocationEntry.TABLE_NAME + " " + LAR + " ON " + RA + "." + Review.LOCATION_ID + " = " + LAR + "." + Location.LOCATION_ID);
+                            break;
+                        case UserEntry.ALIAS:
+                            joins.add("INNER JOIN " + UserEntry.TABLE_NAME + " " + UA + " ON " + RA + "." + Review.USER_ID + " = " + UA + "." + User.USER_ID);
+                            break;
+                        case ProducerEntry.ALIAS:   // join for producer and drink
+                            joins.add("INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON " + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID);
+                        case DrinkEntry.ALIAS:
+                            joins.add("INNER JOIN " + DrinkEntry.TABLE_NAME + " " + DA + " ON " + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID);
+                            break;
+                    }
+                } else if (rootEntity.equals(Drink.ENTITY) && alias.equals(ProducerEntry.ALIAS)) {
+                    joins.add("INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON " + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID);
+                }
+            }
+        }
+
+//        Log.v(LOG_TAG, "joinsFromProjection, hashCode=" + this.hashCode() + ", joins = " + TextUtils.join(" ", joins));
+        return joins;
     }
 
     private static final SQLiteQueryBuilder sDrinksWithProducersQueryBuilder;
@@ -538,8 +732,6 @@ public class DatabaseProvider extends ContentProvider {
                 DrinkEntry.TABLE_NAME + " " + DA
                         + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
                         + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID);
-//                        + " INNER JOIN " + LocationEntry.TABLE_NAME + " " + LAP + " ON "
-//                        + PA + "." + Producer.LOCATION_ID + " = " + LAP + "." + Location.LOCATION_ID);
     }
 
     private static final SQLiteQueryBuilder sReviewWithAllQueryBuilder;
@@ -556,8 +748,6 @@ public class DatabaseProvider extends ContentProvider {
                         + RA + "." + Review.DRINK_ID + " = " + DA + "." + Drink.DRINK_ID
                         + " INNER JOIN " + ProducerEntry.TABLE_NAME + " " + PA + " ON "
                         + DA + "." + Drink.PRODUCER_ID + " = " + PA + "." + Producer.PRODUCER_ID
-//                        + " INNER JOIN " + LocationEntry.TABLE_NAME + " " + LAP + " ON "
-//                        + PA + "." + Producer.LOCATION_ID + " = " + LAP + "." + Location.LOCATION_ID
         );
     }
 
@@ -866,8 +1056,8 @@ public class DatabaseProvider extends ContentProvider {
                 return ProducerEntry.CONTENT_ITEM_TYPE;
             case DRINKS:
                 return DrinkEntry.CONTENT_TYPE;
-            case DRINKS_BY_NAME:
-                return DrinkEntry.CONTENT_TYPE;
+//            case DRINKS_BY_NAME:
+//                return DrinkEntry.CONTENT_TYPE;
             case DRINK_BY_ID:
                 return DrinkEntry.CONTENT_ITEM_TYPE;
             case DRINKS_WITH_PRODUCER_BY_NAME:
@@ -892,8 +1082,8 @@ public class DatabaseProvider extends ContentProvider {
                 return ReviewEntry.CONTENT_ITEM_TYPE;
             case REVIEWS_WITH_ALL_BY_NAME_AND_TYPE:
                 return ReviewEntry.CONTENT_TYPE;
-            case REVIEWS_GEOCODE:
-                return ReviewEntry.CONTENT_TYPE;
+//            case REVIEWS_GEOCODE:
+//                return ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

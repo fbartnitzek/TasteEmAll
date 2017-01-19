@@ -25,6 +25,11 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.showentry.ShowProducerActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -48,6 +53,12 @@ public class ProducerPagerFragment extends BasePagerFragment implements LoaderMa
 
     private ProducerAdapter mProducerAdapter;
     private TextView mProducerHeading;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.entity = Producer.ENTITY;
+    }
 
     @Nullable
     @Override
@@ -96,10 +107,43 @@ public class ProducerPagerFragment extends BasePagerFragment implements LoaderMa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case PRODUCER_LOADER_ID:
-                Uri producersUri = DatabaseContract.ProducerEntry.buildUriIncLocationWithPattern(
-                        ((MainActivity)getActivity()).getSearchPattern());
+                if (this.jsonUri == null) {
+                    Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                    String pattern = ((MainActivity) getActivity()).getSearchPattern();
+                    try {
+                        String encodedValue = DatabaseContract.encodeValue(pattern);
+
+                        if (jsonTextFilter == null) {
+                            jsonTextFilter = new JSONObject().put(Producer.ENTITY, new JSONObject()
+                                    .put(DatabaseContract.OR, new JSONObject()
+                                            .put(Producer.ENTITY, new JSONObject()
+                                                    .put(Producer.NAME, new JSONObject())
+                                                    .put(Producer.FORMATTED_ADDRESS, new JSONObject())
+                                                    .put(Producer.COUNTRY, new JSONObject())
+                                            )
+                                    )
+                            );
+                        }
+
+                        JSONObject producer = jsonTextFilter.getJSONObject(Producer.ENTITY).getJSONObject(DatabaseContract.OR).getJSONObject(Producer.ENTITY);
+                        producer.getJSONObject(Producer.NAME).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        producer.getJSONObject(Producer.FORMATTED_ADDRESS).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        producer.getJSONObject(Producer.COUNTRY).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                        jsonTextFilter.getJSONObject(Producer.ENTITY).getJSONObject(DatabaseContract.OR).put(Producer.ENTITY, producer);
+
+                        jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
+                    } catch (JSONException | UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
+                        throw new RuntimeException("building jsonUri failed");
+                    }
+                    Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                }
+
                 return new CursorLoader(getActivity(),
-                        producersUri, QueryColumns.MainFragment.ProducerQuery.COLUMNS,
+                        jsonUri, QueryColumns.MainFragment.ProducerQuery.COLUMNS,
                         null, null,
                         Producer.NAME);
             default:

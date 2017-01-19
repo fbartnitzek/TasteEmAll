@@ -1,5 +1,6 @@
 package com.fbartnitzek.tasteemall.mainpager;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fbartnitzek.tasteemall.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -30,16 +34,43 @@ import com.fbartnitzek.tasteemall.R;
 abstract public class BasePagerFragment extends Fragment {
 
     private static final String LOG_TAG = BasePagerFragment.class.getName();
+    private static final String STATE_JSON_FILTER = "STATE_JSON_FILTER";
 
 
     protected View mRootView;
+    protected Uri jsonUri = null;
+    protected JSONObject jsonTextFilter = null;
+    protected String entity = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_JSON_FILTER)) {
+            try {
+                this.jsonTextFilter = new JSONObject(savedInstanceState.getString(STATE_JSON_FILTER));
+            } catch (JSONException e) {
+                this.jsonTextFilter = null;
+            }
+        }
+
         restartLoader();
+    }
+
+    public void setJsonUri(Uri jsonUri) {
+        this.jsonUri = jsonUri;
+    }
+
+    public Uri getJsonUri() {
+        return jsonUri;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_JSON_FILTER, jsonTextFilter.toString());
     }
 
     @Nullable
@@ -59,4 +90,7 @@ abstract public class BasePagerFragment extends Fragment {
         restartLoader();
     }
 
+    public String getEntity() {
+        return entity;
+    }
 }

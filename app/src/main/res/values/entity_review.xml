@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entity_review">Review</string>
+    <string name="attribute_review_id">review ID</string>
+    <string name="attribute_review_rating">rating</string>
+    <string name="attribute_review_description">description</string>
+    <string name="attribute_review_readable_date">date</string>
+    <string name="attribute_review_recommended_sides">recommended sides</string>
+</resources>

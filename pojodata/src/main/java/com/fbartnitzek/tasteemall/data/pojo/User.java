@@ -18,6 +18,8 @@ package com.fbartnitzek.tasteemall.data.pojo;
 
 public class User {
 
+    public static final String ENTITY = "user";
+
     public static final String USER_ID = "user_id";
     public static final String NAME = "user_name";
 }

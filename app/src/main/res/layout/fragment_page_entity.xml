@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<!--<android.support.v4.widget.NestedScrollView-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:padding="8dp"-->
+    <!--tools:showIn="@layout/activity_main">-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+
+<!--TODO: sometimes a bit slow...-->
+
+    <LinearLayout
+
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp"
-    tools:showIn="@layout/activity_main">
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -22,17 +28,17 @@
             android:layout_marginTop="@dimen/margin_main_fragment_headings"
             android:text="@string/label_list_preview"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_entities"
-            android:scrollbars="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="300dp">
-        </android.support.v7.widget.RecyclerView>
 
-        <!--TODO: currently no scrolling necessary!-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+        <android.support.v7.widget.RecyclerView
+            android:scrollbars="vertical"
+            android:id="@+id/recyclerview_entities"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
 
 
 
-</android.support.v4.widget.NestedScrollView>
+<!--</android.support.v4.widget.NestedScrollView>-->

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entity_user">User</string>
+    <string name="attribute_user_id">user id</string>
+    <string name="attribute_user_name">name</string>
+</resources>

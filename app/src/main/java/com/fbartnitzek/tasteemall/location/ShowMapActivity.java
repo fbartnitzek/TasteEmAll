@@ -1,18 +1,39 @@
 package com.fbartnitzek.tasteemall.location;
 
 import android.annotation.TargetApi;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
+import com.fbartnitzek.tasteemall.ZoomOutPageTransformer;
+import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Location;
+import com.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
+import com.fbartnitzek.tasteemall.data.pojo.User;
 import com.google.android.gms.maps.GoogleMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -33,56 +54,94 @@ import com.google.android.gms.maps.GoogleMap;
 public class ShowMapActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ShowMapActivity.class.getName();
-    public static final String EXTRA_REVIEWS_URI = LOG_TAG + ".EXTRA_REVIEWS_URI";
+    public static final String BASE_URI = LOG_TAG + ".BASE_URI";
     private static final String FRAGMENT_TAG = LOG_TAG + "_SHOW_MAP_FRAGMENT_TAG";
-    public static final String EXTRA_PRODUCERS_URI = LOG_TAG + ".EXTRA_PRODUCERS_URI";
-    public static final String EXTRA_REVIEWS_SORT_ORDER = LOG_TAG + ".EXTRA_REVIEWS_SORT_ORDER";
-    public static final String EXTRA_PRODUCERS_SORT_ORDER = LOG_TAG + ".EXTRA_PRODUCERS_SORT_ORDER";
+    public static final String BASE_ENTITY = LOG_TAG + ".BASE_ENTITY";
+    public static final String REVIEW_URI = LOG_TAG + ".REVIEW_URI";
+
+
+    private ViewPager mViewPager;
+    private PagerAdapter mPagerAdapter;
+    private String mBaseEntity;
+    private Uri mBaseUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
 
+        // TODO: Pager with ReviewLocation and ProducerLocation [maybe third combined later... if possible...]
+        // Review: json [review/user/producer] in, wrap til review, distinct review.location in upper list, on select review.location=selectedLocation in lower list
+        // Producer: json [review/user/producer] in
+        //  - review/drink/producer: distinct producerLocation in upper list, on select review.drink.producerLocation = selected in lowerList
+        //  - user/location: Toast "not supported - either use reviewLocation or base on r/d/p"
         setContentView(R.layout.activity_show_map);
 
-        if (findViewById(R.id.container_show_map_fragment) != null) {
-            if (savedInstanceState != null) {
-                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-                return;
-            }
-
-            supportPostponeEnterTransition();
-
-            ShowMapFragment fragment = new ShowMapFragment();
-
-            if (getIntent() != null) {
-                Bundle args = new Bundle();
-                Log.v(LOG_TAG, "onCreate with args: " + args);
-                if (getIntent().hasExtra(EXTRA_REVIEWS_URI)) {
-                    args.putParcelable(EXTRA_REVIEWS_URI, getIntent().getParcelableExtra(EXTRA_REVIEWS_URI));
-                }
-                if (getIntent().hasExtra(EXTRA_REVIEWS_SORT_ORDER)) {
-                    args.putString(EXTRA_REVIEWS_SORT_ORDER, getIntent().getStringExtra(EXTRA_REVIEWS_SORT_ORDER));
-                }
-//                if (getIntent().hasExtra(EXTRA_PRODUCERS_URI)) {
-//                    args.putParcelable(EXTRA_PRODUCERS_URI, getIntent().getParcelableExtra(EXTRA_PRODUCERS_URI));
-//                }
-//                if (getIntent().hasExtra(EXTRA_PRODUCERS_SORT_ORDER)) {
-//                    args.putString(EXTRA_PRODUCERS_SORT_ORDER, getIntent().getStringExtra(EXTRA_PRODUCERS_SORT_ORDER));
-//                }
-                fragment.setArguments(args);
-            } else {
-                Log.e(LOG_TAG, "onCreate without intent...?");
-            }
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_show_map_fragment, fragment, FRAGMENT_TAG)
-                    .commit();
-
+        if (getIntent() != null) {
+            mBaseEntity = getIntent().getStringExtra(BASE_ENTITY);
+            mBaseUri = getIntent().getParcelableExtra(BASE_URI);
+        } else if (savedInstanceState != null) {
+            mBaseEntity = savedInstanceState.getString(BASE_ENTITY);
+            mBaseUri = savedInstanceState.getParcelable(BASE_URI);
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+            throw new RuntimeException("wrong kind of call...");
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setCustomView(R.layout.action_bar_title_layout);
+            supportActionBar.setDisplayShowCustomEnabled(true);
+
+            // TODO
+            TextView titleView = (TextView) findViewById(R.id.action_bar_title);
+            titleView.setText(getString(R.string.title_show_map));
+//            if (mLocationName != null) {
+//                titleView.setText(getString(R.string.title_show_map_location, mLocationName));
+//            } else {
+//                titleView.setText(getString(R.string.title_show_map));
+//            }
+        }
+
+        mViewPager = (ViewPager) findViewById(R.id.map_pager);
+        mPagerAdapter = new ShowMapPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        // TODO restore pager Position
+//        mViewPager.setCurrentItem(pos < 0 ? 0 : pos);
+
+
+            // TODO
+        supportPostponeEnterTransition();
+
+    }
+
+    // TODO: called by fragments
+    protected void setHeading(String fragment, String location) {
+        TextView titleView = (TextView) findViewById(R.id.action_bar_title);
+        if (titleView != null) {
+            titleView.setText(getString(R.string.title_show_map));
+            if (location != null) {
+//                titleView.setText(getString(R.string.title_show_map_location, mLocationName));
+                titleView.setText(getString(R.string.title_show_map_reviews_of_entity_location, fragment, location));
+            } else {
+//                titleView.setText(getString(R.string.title_show_map));
+                titleView.setText(getString(R.string.title_show_map_all_entity, fragment));
+            }
+        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(BASE_ENTITY, mBaseEntity);
+        outState.putParcelable(BASE_URI, mBaseUri);
     }
 
     @Override
@@ -91,15 +150,31 @@ public class ShowMapActivity extends AppCompatActivity {
         return true;
     }
 
-    private ShowMapFragment getFragment() {
-        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "");
-        return (ShowMapFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
+        }
+    }
+
+    private ShowBaseMapFragment getFragment(int position) {
+        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
+//        return (ShowReviewMapFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        return (ShowBaseMapFragment) mPagerAdapter.instantiateItem(mViewPager, position);
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ShowMapFragment fragment = getFragment();
+        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+        if (mViewPager == null) {
+            Log.e(LOG_TAG, "onOptionsItemSelected: no viewpager...");
+            return super.onOptionsItemSelected(item);
+        }
+
+        ShowBaseMapFragment fragment = getFragment(mViewPager.getCurrentItem());
         if (fragment != null) {
             switch (item.getItemId()) {
                 case R.id.action_map_type_none:
@@ -162,4 +237,99 @@ public class ShowMapActivity extends AppCompatActivity {
                     });
         }
     }
+
+    private Uri calcReviewUri(Uri origUri) {
+
+        try {
+            JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(origUri));
+            String rootEntity = jsonObject.keys().next();   // just 1 rootElement
+            if (Review.ENTITY.equals(rootEntity)) {
+                return origUri;
+
+            } else {    // get Or and add wrapping review
+                JSONObject prevRootEntity = jsonObject.getJSONObject(rootEntity);
+                Log.v(LOG_TAG, "calcReviewUri, prevRootEntity=" + prevRootEntity.toString() + "]");
+                JSONObject newBaseObject = new JSONObject().put(Review.ENTITY, new JSONObject());
+
+                JSONObject prevOrEntity = null;
+                if (prevRootEntity.has(DatabaseContract.OR)) {
+                    prevOrEntity = prevRootEntity.getJSONObject(DatabaseContract.OR);
+                    prevRootEntity.remove(DatabaseContract.OR);
+                }
+
+                if (Producer.ENTITY.equals(rootEntity)) {
+                    newBaseObject.getJSONObject(Review.ENTITY)
+                            .put(Drink.ENTITY, new JSONObject()
+                                    .put(Producer.ENTITY, prevRootEntity));
+                    if (prevOrEntity != null) {
+                        newBaseObject.getJSONObject(Review.ENTITY)
+                                .put(DatabaseContract.OR, new JSONObject()
+                                        .put(Review.ENTITY, new JSONObject()
+                                                .put(Drink.ENTITY, prevOrEntity)
+                                        ));
+                    }
+                } else {    // drink or location or user
+                    newBaseObject.getJSONObject(Review.ENTITY)
+                            .put(rootEntity, prevRootEntity);
+                    if (prevOrEntity != null) {
+                        newBaseObject.getJSONObject(Review.ENTITY)
+                                .put(DatabaseContract.OR, new JSONObject()
+                                        .put(Review.ENTITY, prevOrEntity)   // contains already old rootEntity
+                                );
+                    }
+                }
+                Log.v(LOG_TAG, "calcReviewUri, newBaseObject=" + newBaseObject.toString() + "]");
+                return DatabaseContract.buildUriWithJson(newBaseObject);
+
+            }
+
+        } catch (JSONException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("reviewify json did not work: " + e.getMessage());
+        }
+    }
+
+    private class ShowMapPagerAdapter extends FragmentStatePagerAdapter {
+
+        public ShowMapPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:{
+                    ShowReviewMapFragment fragment = new ShowReviewMapFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable(REVIEW_URI, calcReviewUri(mBaseUri));
+                    fragment.setArguments(args);
+                    return fragment;}
+
+                case 1:{
+                    ShowProducerMapFragment fragment = new ShowProducerMapFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable(REVIEW_URI, calcReviewUri(mBaseUri));
+                    fragment.setArguments(args);
+                    return fragment;}
+                default:
+                    throw new RuntimeException("wrong position for getItem: " + position);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            // everything as review...!
+            switch (mBaseEntity) {
+                case Review.ENTITY:
+                case Drink.ENTITY:
+                case Producer.ENTITY:
+                case User.ENTITY:
+                case Location.ENTITY:
+                    return 2;
+                default:
+                    throw new RuntimeException("wrong mBaseEntity for pager-pages: " + mBaseEntity);
+            }
+        }
+    }
+
 }

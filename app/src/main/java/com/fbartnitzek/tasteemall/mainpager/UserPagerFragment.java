@@ -22,6 +22,11 @@ import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -44,6 +49,12 @@ public class UserPagerFragment extends BasePagerFragment implements LoaderManage
     private static final String LOG_TAG = UserPagerFragment.class.getName();
     private UserAdapter mUserAdapter;
     private TextView mUsersHeading;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.entity = User.ENTITY;
+    }
 
     @Nullable
     @Override
@@ -83,11 +94,30 @@ public class UserPagerFragment extends BasePagerFragment implements LoaderManage
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case USER_LOADER_ID:
-                return new CursorLoader(getActivity(),
-                        DatabaseContract.UserEntry.buildUriWithName(((MainActivity)getActivity()).getSearchPattern()),
+                if (this.jsonUri == null) {
+                    Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                    String pattern = ((MainActivity) getActivity()).getSearchPattern();
+                    try {
+                        if (jsonTextFilter == null) {
+                            jsonTextFilter = new JSONObject().put(User.ENTITY, new JSONObject()
+                                    .put(User.NAME, new JSONObject()));
+                        }
+                        jsonTextFilter.getJSONObject(User.ENTITY).getJSONObject(User.NAME)
+                                .put(DatabaseContract.Operations.CONTAINS, DatabaseContract.encodeValue(pattern));
+                        jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
+                    } catch (JSONException | UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
+                        throw new RuntimeException("building jsonUri failed");
+                    }
+                    Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+                }
+
+                return new CursorLoader(getActivity(), jsonUri,
                         QueryColumns.MainFragment.UserQuery.COLUMNS,
-                        null, null,
-                        User.NAME);
+                        null, null, User.NAME);
             default:
                 throw new RuntimeException("wrong loader_id in UserPagerFragment...");
         }

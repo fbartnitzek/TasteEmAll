@@ -287,6 +287,20 @@ public class Utils {
         }
     }
 
+    public static int getEntityNameId(Context context, String entity) {
+        if (entity != null && context != null) {
+            return context.getResources().getIdentifier("entity_" + entity, "string", context.getPackageName());
+        }
+        return -1;
+    }
+
+    public static int getAttributeNameId(Context context, String attribute) {
+        if (attribute != null && context != null) {
+            return context.getResources().getIdentifier("attribute_" + attribute, "string", context.getPackageName());
+        }
+        return -1;
+    }
+
     public static int getReadableDrinkNameId(Context context, int drinkTypeId) {
         return getReadableDrinkNameId(context, context.getResources().getString(drinkTypeId));
     }

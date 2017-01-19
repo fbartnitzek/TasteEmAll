@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -34,7 +33,12 @@ import android.widget.Toast;
 import com.fbartnitzek.tasteemall.addentry.AddLocationActivity;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
+import com.fbartnitzek.tasteemall.data.BundleBuilder;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.data.pojo.Producer;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
+import com.fbartnitzek.tasteemall.filter.EntityFilterDialogFragment;
 import com.fbartnitzek.tasteemall.location.ShowMapActivity;
 import com.fbartnitzek.tasteemall.mainpager.BasePagerFragment;
 import com.fbartnitzek.tasteemall.mainpager.DrinkPagerFragment;
@@ -50,10 +54,16 @@ import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.fbartnitzek.tasteemall.filter.EntityFilterTabFragment.BASE_ENTITY;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -72,7 +82,11 @@ import java.util.List;
  */
 
 
-public class MainActivity extends AppCompatActivity implements GeocodeAllLocationsTask.GeocodeProducersUpdateHandler, ImportFilesTask.ImportHandler, ImportFilesOldFormatTask.ImportHandler, ExportToDirTask.ExportHandler, SearchView.OnQueryTextListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements
+        GeocodeAllLocationsTask.GeocodeProducersUpdateHandler, ImportFilesTask.ImportHandler,
+        ImportFilesOldFormatTask.ImportHandler, ExportToDirTask.ExportHandler,
+        SearchView.OnQueryTextListener, View.OnClickListener,
+        EntityFilterDialogFragment.GenericFilterFinishListener {
 
     private static final int NUM_PAGES = 5;
     private static final String LOG_TAG = MainActivity.class.getName();
@@ -93,16 +107,19 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
     private static final int REQUEST_IMPORT_FILES_CODE = 1234;
     private static final int REQUEST_EDIT_PRODUCER_GEOCODE = 1235;
     private static final int REQUEST_EDIT_REVIEW_LOCATION_GEOCODE = 32421;
+//    private static final int REQUEST_GENERIC_SEARCH_DIALOG = 32454;
 
     protected static final int ADD_REVIEW_REQUEST = 546;
 
-
     private ArrayList<Uri> mProducerLocationUris;
     private ArrayList<Uri> mReviewLocationUris;
-    private ArrayList<Integer> mSelectedItems;
     private List<File> mFiles;
     private int mPagerPosition = -1;
     private boolean mReloaded = false;
+
+    // TODO: share filtered list
+
+    // TODO: rotation everywhere - then new version for S6
 
 
     @Override
@@ -169,6 +186,14 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
 
     }
 
+    private String getCurrentFragmentEntity() {
+        if (mViewPager != null && mPagerAdapter != null) {
+            BasePagerFragment fragment = (BasePagerFragment) mPagerAdapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
+            return fragment.getEntity();
+        } else {
+            return null;
+        }
+    }
 
     private BasePagerFragment getFragment(int position) {
         Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
@@ -219,8 +244,18 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
             return false;
         }
         mSearchPattern = query;
+        setJsonUriInCurrentFragment(null);
         restartCurrentFragmentLoader();
         return false;
+    }
+
+    private void setJsonUriInCurrentFragment(Uri uri) {
+        if (mViewPager != null && mViewPager.getCurrentItem() > -1) {
+            BasePagerFragment fragment = getFragment(mViewPager.getCurrentItem());
+            if (fragment != null) {
+                fragment.setJsonUri(uri);
+            }
+        }
     }
 
     @Override
@@ -231,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
             return false;
         }
         mSearchPattern = newText;
+        setJsonUriInCurrentFragment(null);
         restartCurrentFragmentLoader();
         return false;
     }
@@ -259,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
         }
     }
 
-
     private class MainPagerAdapter extends FragmentStatePagerAdapter {
 
         public MainPagerAdapter(FragmentManager fm) {
@@ -269,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
         @Override
         public Fragment getItem(int position) {
             Log.v(LOG_TAG, "getItem, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
-            Fragment fragment;
             switch (position) {
                 case 0:
                     return new ReviewPagerFragment();
@@ -298,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
     private void createSpinner() {
 //        Log.v(LOG_TAG, "createSpinner, hashCode=" + this.hashCode() + ", " + "");
 
-        mDrinkTypeSpinner = (Spinner) findViewById(R.id.spinner_type);    //TODO: NPE DONE?
+        mDrinkTypeSpinner = (Spinner) findViewById(R.id.spinner_type);
 
         String[] typesArray = getResources().getStringArray(R.array.pref_type_filter_values);
         ArrayList<String> typesList = new ArrayList<>(Arrays.asList(typesArray));
@@ -315,6 +349,8 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
                 String drinkType = parent.getItemAtPosition(position).toString();
                 Utils.setSharedPrefsDrinkType(MainActivity.this, drinkType);
                 mDrinkTypeSpinner.setContentDescription(getString(R.string.a11y_chosen_drinkType, drinkType));
+                setJsonUriInCurrentFragment(null);
+
                 restartCurrentFragmentLoader();
             }
 
@@ -382,89 +418,94 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
                 startImport();
                 return true;
             case R.id.action_show_map:
-                startShowMapDialog();
+                startShowMap2();
+                return true;
+//            case R.id.action_demo_search:   // TODO: remove after MultiSelect is working...
+//                startGenericDemoSearch();
+//                return true;
+            case R.id.search_generic:
+                startGenericSearchDialog();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
     }
 
-    private void startShowMapDialog() {
-        Log.v(LOG_TAG, "startShowMapDialog, hashCode=" + this.hashCode() + ", " + "");
-        if (Utils.isNetworkUnavailable(this)) {
-            View view = findViewById(R.id.fragment_detail_layout);
-            if (view != null) {
-                Snackbar.make(view, R.string.msg_show_map_no_network, Snackbar.LENGTH_LONG).show();
-            }
-            return;
-        }
+    private void startGenericSearchDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        EntityFilterDialogFragment filterDialog = new EntityFilterDialogFragment();
+        filterDialog.setArguments(new BundleBuilder()
+                .putString(BASE_ENTITY, getCurrentFragmentEntity())
+                .build());
 
-        // build dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mSelectedItems = new ArrayList<>();
-        builder.setTitle(R.string.msg_title_choose_map_src)
-                .setMultiChoiceItems(R.array.map_src, null, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if (isChecked) {
-                            mSelectedItems.add(which);
-                        } else if (mSelectedItems.contains(which)) {
-                            mSelectedItems.remove(Integer.valueOf(which));
-                        }
-                    }
-                })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startShowMap();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mSelectedItems.clear();
-                    }
-                });
-        builder.show();
+        filterDialog.show(fm, "EntityFilterDialogFragment");
     }
 
-    private void startShowMap() {
-        Log.v(LOG_TAG, "startShowMap, hashCode=" + this.hashCode() + ", " + "mSelectedItems: " + mSelectedItems);
-        if (mSelectedItems.isEmpty()) {
-            Log.w(LOG_TAG, "startShowMap without something to show... - ignoring");
-            return;
+    private void startGenericDemoSearch() {
+        JSONObject json = new JSONObject();
+        Uri jsonUri = null;
+        try {
+//            JSONArray array = new JSONArray();
+//
+//            array.put(DatabaseContract.encodeValue("+"));
+//            array.put(DatabaseContract.encodeValue("+/++"));
+//            array.put(DatabaseContract.encodeValue("++"));
+//            json.put(Review.ENTITY,
+//                    new JSONObject().put(Review.RATING,
+//                            new JSONObject().put(DatabaseContract.Operations.IS, array)));
+
+            json.put(Review.ENTITY, new JSONObject()
+                    .put(Drink.ENTITY, new JSONObject()
+                            .put(Drink.TYPE, new JSONObject().put(DatabaseContract.Operations.IS, "beer"))
+                    )
+                    .put(DatabaseContract.OR, new JSONObject()
+                            .put(Review.ENTITY, new JSONObject()
+                                    .put(Drink.ENTITY, new JSONObject()
+                                            .put(Drink.NAME, new JSONObject().put(DatabaseContract.Operations.CONTAINS, "brew"))
+                                            .put(Producer.ENTITY, new JSONObject()
+                                                    .put(Producer.NAME, new JSONObject().put(DatabaseContract.Operations.CONTAINS, "brew"))
+                                            )
+                                    )
+                            )
+                    )
+            );
+
+
+            jsonUri = DatabaseContract.buildUriWithJson(json);
+        } catch (JSONException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
+        Log.v(LOG_TAG, "startGenericSearch, hashCode=" + this.hashCode() + ", json=" + json.toString() + ", jsonUri=" + jsonUri);
+
+        BasePagerFragment fragment = (BasePagerFragment) mPagerAdapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
+
+        if (fragment != null) {
+            String entity = json.keys().next();
+            if (!fragment.getEntity().equals(entity)) {
+                Toast.makeText(this, "only usable in " + entity + "-view", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        setJsonUriInCurrentFragment(jsonUri);
+        restartCurrentFragmentLoader();
+    }
+
+    @Override
+    public void onFinishEditDialog(Uri genericFilterUri) {
+        Log.v(LOG_TAG, "onFinishEditDialog, hashCode=" + this.hashCode() + ", " + "genericFilterUri = [" + genericFilterUri + "]");
+        setJsonUriInCurrentFragment(genericFilterUri);
+        restartCurrentFragmentLoader();
+    }
+
+
+
+    private void startShowMap2() {
         BasePagerFragment baseFragment = getFragment(mViewPager.getCurrentItem());
-        if (baseFragment == null || !(baseFragment instanceof ReviewPagerFragment)) {
-            Toast.makeText(this, "currently only supported for Reviews", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        ReviewPagerFragment fragment = (ReviewPagerFragment) baseFragment;
 
         Intent intent = new Intent(this, ShowMapActivity.class);
-
-
-        //  [] ReviewsOld      - review locations
-        //  [] Drinks       - review locations of drinks or drinks.producers.locations...
-        //  [] Producers    - self explaining
-
-        if (mSelectedItems.contains(0)) {   // review
-            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_URI,
-                    DatabaseContract.ReviewEntry.getReviewLocationsUriFromMainFragmentReviewsUri(
-                            fragment.getmCurrentReviewsUri()));
-            intent.putExtra(ShowMapActivity.EXTRA_REVIEWS_SORT_ORDER, fragment.getmReviewsSortOrder());
-        }
-
-        if (mSelectedItems.contains(1)) { // drink
-            Log.w(LOG_TAG, "startShowMap, Drinks currently not supported");
-        }
-
-        if (mSelectedItems.contains(2)) { // producer
-            Log.w(LOG_TAG, "startShowMap, Producers currently not supported");
-            // intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_URI, fragment.getmCurrentProducersUri());
-            // intent.putExtra(ShowMapActivity.EXTRA_PRODUCERS_SORT_ORDER, fragment.getmProducersSortOrder());
-        }
+        intent.putExtra(ShowMapActivity.BASE_URI, baseFragment.getJsonUri());
+        intent.putExtra(ShowMapActivity.BASE_ENTITY, baseFragment.getEntity());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
             View rootView = findViewById(R.id.pager);
@@ -511,10 +552,11 @@ public class MainActivity extends AppCompatActivity implements GeocodeAllLocatio
 
     private void startGeocoding() { //all geocoding seems to work :-)
         if (Utils.isNetworkUnavailable(this)) {
-            View view = findViewById(R.id.fragment_detail_layout);
-            if (view != null) {
-                Snackbar.make(view, R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
-            }
+            Toast.makeText(this, R.string.msg_mass_geocoder_no_network, Toast.LENGTH_SHORT).show();
+//            View view = findViewById(R.id.fragment_detail_layout);
+//            if (view != null) {
+//                Snackbar.make(view, R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
+//            }
             return;
         }
 

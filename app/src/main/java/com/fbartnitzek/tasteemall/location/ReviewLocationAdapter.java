@@ -38,7 +38,7 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
     private final ReviewLocationAdapterClickHandler mClickHandler;
 
     public interface ReviewLocationAdapterClickHandler {
-        void onClick(int reviewLocation_Id, ViewHolder viewHolder, LatLng latLng, String formatted, String description);
+        void onClick(String reviewLocationId, ViewHolder viewHolder, LatLng latLng, String formatted, String description);
     }
 
     public ReviewLocationAdapter(Context mContext, ReviewLocationAdapterClickHandler mClickHandler) {
@@ -96,12 +96,12 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
         @Override
         public void onClick(View v) {
             mCursor.moveToPosition(getAdapterPosition());
-            int location_Id = mCursor.getInt(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION__ID);
+            String locationId = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_ID);
             double lat = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LAT);
             double lon = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LON);
             String formatted = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_FORMATTED);
             String description = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_DESCRIPTION);
-            mClickHandler.onClick(location_Id, this, new LatLng(lat, lon), formatted, description);
+            mClickHandler.onClick(locationId, this, new LatLng(lat, lon), formatted, description);
         }
     }
 
