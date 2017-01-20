@@ -13,11 +13,14 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
@@ -74,9 +77,21 @@ public class AttributeFilterTextTabFragment extends AttributeBaseFilterFragment 
             @Override
             public void afterTextChanged(Editable s) {
                 mAttributeFilter = s.toString();
-                Log.v(LOG_TAG, "afterTextChanged, hashCode=" + this.hashCode() + ", " + "s = [" + s + "]");
+//                Log.v(LOG_TAG, "afterTextChanged, hashCode=" + this.hashCode() + ", " + "s = [" + s + "]");
                 getLoaderManager().restartLoader(ATTRIBUTE_VALUES_LOADER_ID, null, AttributeFilterTextTabFragment.this);
+            }
+        });
 
+        mEditFilter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                Log.v(LOG_TAG, "onEditorAction, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], actionId = [" + actionId + "], event = [" + event + "]");
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mEditFilter.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
             }
         });
 
