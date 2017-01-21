@@ -26,6 +26,7 @@ import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.JsonHelper;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -177,6 +178,7 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
             case R.id.filter:
                 // return filter baseEntity with collected json
                 try {
+                    Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", mFilterJson:" + mFilterJson);
                     finishListener.onFinishEditDialog(DatabaseContract.buildUriWithJson(mFilterJson));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -307,34 +309,30 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
             String attribute = intent.getStringExtra(EXTRA_ATTRIBUTE_NAME);
             String entity = intent.getStringExtra(EXTRA_BASE_ENTITY);
             String json = intent.getStringExtra(EXTRA_JSON);
-            Log.v(LOG_TAG, "onReceive, baseEntity=" + mBaseEntity + ", entity=" + entity + ", attribute=" + attribute + ", json=" + json + ", hashCode=" + this.hashCode() + "]");
+            Log.v(LOG_TAG, "onReceive, baseEntity=" + mBaseEntity + ", entity=" + entity + ", attribute=" + attribute + ", json=" + json + ", hashCode=" + this.hashCode());
+//            Log.v(LOG_TAG, "onReceive start, mFilterJson=" + mFilterJson);
 
             try {
+
                 JSONObject baseEntity = mFilterJson.getJSONObject(mBaseEntity);
                 if (mBaseEntity.equals(entity)) {
                     mFilterJson.put(entity, updateEntity(baseEntity, attribute, json));
                 } else if (Drink.ENTITY.equals(mBaseEntity) && Producer.ENTITY.equals(entity)) {
-                    JSONObject producerEntity = baseEntity.has(entity) ?
-                            baseEntity.getJSONObject(entity) :
-                            new JSONObject();
+                    JSONObject producerEntity = JsonHelper.getOrCreateJsonObject(baseEntity, entity);
                     producerEntity = updateEntity(producerEntity, attribute, json);
+
                     mFilterJson.getJSONObject(mBaseEntity).put(entity, producerEntity);
                 } else if (Review.ENTITY.equals(mBaseEntity)) {
                     if (!Producer.ENTITY.equals(entity)){
-                        JSONObject childEntity = baseEntity.has(entity) ?
-                                baseEntity.getJSONObject(entity) :
-                                new JSONObject();
+                        JSONObject childEntity = JsonHelper.getOrCreateJsonObject(baseEntity, entity);
                         childEntity = updateEntity(childEntity, attribute, json);
+
                         mFilterJson.getJSONObject(mBaseEntity).put(entity, childEntity);
                     } else {    // review.drink.producer
-                        JSONObject drinkEntity = baseEntity.has(Drink.ENTITY) ?
-                                baseEntity.getJSONObject(Drink.ENTITY) :
-                                new JSONObject();
-                        drinkEntity = updateEntity(drinkEntity, attribute, json);
-                        JSONObject producerEntity = drinkEntity.has(Producer.ENTITY) ?
-                                drinkEntity.getJSONObject(Producer.ENTITY) :
-                                new JSONObject();
+                        JSONObject drinkEntity = JsonHelper.getOrCreateJsonObject(baseEntity, Drink.ENTITY);
+                        JSONObject producerEntity = JsonHelper.getOrCreateJsonObject(drinkEntity, Producer.ENTITY);
                         producerEntity = updateEntity(producerEntity, attribute, json);
+
                         mFilterJson.getJSONObject(mBaseEntity).put(Drink.ENTITY, drinkEntity.put(Producer.ENTITY, producerEntity));
                     }
                 } else {
@@ -344,6 +342,8 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "onReceive: jsonException", e);
             }
+
+//            Log.v(LOG_TAG, "onReceive end, mFilterJson=" + mFilterJson.toString());
         }
     };
 

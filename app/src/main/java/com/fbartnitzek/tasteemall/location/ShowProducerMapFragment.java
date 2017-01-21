@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.JsonHelper;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
@@ -129,7 +130,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
     }
 
     private void addProducerLocationMarker(String producerId, ProducerLocationAdapter.ViewHolder viewHolder, LatLng latLng, String formatted, String name) {
-        Log.v(LOG_TAG, "addProducerLocationMarker, hashCode=" + this.hashCode() + ", " + "producerId = [" + producerId + "], viewHolder = [" + viewHolder + "], latLng = [" + latLng + "], formatted = [" + formatted + "], name = [" + name + "]");
+//        Log.v(LOG_TAG, "addProducerLocationMarker, hashCode=" + this.hashCode() + ", " + "producerId = [" + producerId + "], viewHolder = [" + viewHolder + "], latLng = [" + latLng + "], formatted = [" + formatted + "], name = [" + name + "]");
         mProducerId = producerId;
         mMarkerOptions = new MarkerOptions()
                 .position(latLng)
@@ -142,18 +143,19 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
     }
 
     private void updateReviews() {
-        Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", " + "");
 
         try {
             JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(mBaseUri));
+//            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject" + jsonObject.toString());
             JSONObject reviewObject = jsonObject.getJSONObject(Review.ENTITY);
-            JSONObject drinkObject = reviewObject.has(Drink.ENTITY) ? reviewObject.getJSONObject(Drink.ENTITY) : new JSONObject();
-            JSONObject producerObject = drinkObject.has(Producer.ENTITY) ? reviewObject.getJSONObject(Producer.ENTITY) : new JSONObject();
+            JSONObject drinkObject = JsonHelper.getOrCreateJsonObject(reviewObject, Drink.ENTITY);
+            JSONObject producerObject = JsonHelper.getOrCreateJsonObject(drinkObject, Producer.ENTITY);
             producerObject.put(Producer.PRODUCER_ID, new JSONObject()
                     .put(DatabaseContract.Operations.IS, DatabaseContract.encodeValue(mProducerId)));
             drinkObject.put(Producer.ENTITY, producerObject);
             jsonObject.getJSONObject(Review.ENTITY).put(Drink.ENTITY, drinkObject);
-            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject=" + jsonObject.toString());
+//            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject=" + jsonObject.toString());
             mReviewsOfProducerUri = DatabaseContract.buildUriWithJson(jsonObject);
         } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -169,7 +171,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+//        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         switch (id) {
             case PRODUCERS_LOADER_ID:
                 return new CursorLoader(getActivity(),
@@ -185,11 +187,11 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+//        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         int count = data == null ? 0 : data.getCount();
         switch (loader.getId()) {
             case PRODUCERS_LOADER_ID:
-                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Producers");
+//                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Producers");
                 mProducerLocationAdapter.swapCursor(data);
                 mHeadingProducerLocations.setText(getString(R.string.label_list_map_producer_locations, count));
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -197,7 +199,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
                 }
                 break;
             case REVIEWS_OF_PRODUCER_LOADER_ID:
-                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Producer");
+//                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Producer");
                 mReviewOfProducerAdapter.swapCursor(data);
                 mHeadingReviewsOfProducer.setText(getString(R.string.label_list_map_reviews_of_producer, count));
                 break;
@@ -206,7 +208,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+//        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
         switch (loader.getId()) {
             case PRODUCERS_LOADER_ID:
                 mProducerLocationAdapter.swapCursor(null);

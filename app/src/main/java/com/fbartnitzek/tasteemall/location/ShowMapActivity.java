@@ -55,7 +55,6 @@ public class ShowMapActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ShowMapActivity.class.getName();
     public static final String BASE_URI = LOG_TAG + ".BASE_URI";
-    private static final String FRAGMENT_TAG = LOG_TAG + "_SHOW_MAP_FRAGMENT_TAG";
     public static final String BASE_ENTITY = LOG_TAG + ".BASE_ENTITY";
     public static final String REVIEW_URI = LOG_TAG + ".REVIEW_URI";
 
@@ -70,11 +69,6 @@ public class ShowMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
 
-        // TODO: Pager with ReviewLocation and ProducerLocation [maybe third combined later... if possible...]
-        // Review: json [review/user/producer] in, wrap til review, distinct review.location in upper list, on select review.location=selectedLocation in lower list
-        // Producer: json [review/user/producer] in
-        //  - review/drink/producer: distinct producerLocation in upper list, on select review.drink.producerLocation = selected in lowerList
-        //  - user/location: Toast "not supported - either use reviewLocation or base on r/d/p"
         setContentView(R.layout.activity_show_map);
 
         if (getIntent() != null) {
@@ -160,7 +154,7 @@ public class ShowMapActivity extends AppCompatActivity {
     }
 
     private ShowBaseMapFragment getFragment(int position) {
-        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
+//        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
 //        return (ShowReviewMapFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         return (ShowBaseMapFragment) mPagerAdapter.instantiateItem(mViewPager, position);
 
@@ -168,7 +162,7 @@ public class ShowMapActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+//        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         if (mViewPager == null) {
             Log.e(LOG_TAG, "onOptionsItemSelected: no viewpager...");
             return super.onOptionsItemSelected(item);
@@ -218,7 +212,7 @@ public class ShowMapActivity extends AppCompatActivity {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void scheduleStartPostponedTransition(final View view) {
         // http://www.androiddesignpatterns.com/2015/03/activity-postponed-shared-element-transitions-part3b.html
-        Log.v(LOG_TAG, "scheduleStartPostponedTransition, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
+//        Log.v(LOG_TAG, "scheduleStartPostponedTransition, hashCode=" + this.hashCode() + ", " + "view = [" + view + "]");
         if (view == null) {    //simple transition
             supportStartPostponedEnterTransition(); //does not work as expected
 
@@ -244,11 +238,12 @@ public class ShowMapActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(origUri));
             String rootEntity = jsonObject.keys().next();   // just 1 rootElement
             if (Review.ENTITY.equals(rootEntity)) {
+//                Log.v(LOG_TAG, "calcReviewUri, json already reviewEntity =" + jsonObject.toString());
                 return origUri;
 
             } else {    // get Or and add wrapping review
                 JSONObject prevRootEntity = jsonObject.getJSONObject(rootEntity);
-                Log.v(LOG_TAG, "calcReviewUri, prevRootEntity=" + prevRootEntity.toString() + "]");
+//                Log.v(LOG_TAG, "calcReviewUri, prevRootEntity=" + prevRootEntity.toString());
                 JSONObject newBaseObject = new JSONObject().put(Review.ENTITY, new JSONObject());
 
                 JSONObject prevOrEntity = null;

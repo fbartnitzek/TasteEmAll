@@ -152,7 +152,7 @@ public class AttributeFilterTextTabFragment extends AttributeBaseFilterFragment 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case ATTRIBUTE_VALUES_LOADER_ID:
-                Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+//                Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
                 mAttributeValuesAdapter.swapCursor(data);
                 mNameView.setText(getAttributeTitle(getContext(), data.getCount()));
                 break;

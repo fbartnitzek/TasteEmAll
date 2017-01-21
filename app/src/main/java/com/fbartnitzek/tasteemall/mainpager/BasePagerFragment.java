@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +43,7 @@ abstract public class BasePagerFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+//        Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
@@ -76,7 +75,7 @@ abstract public class BasePagerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+//        Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         mRootView = inflater.inflate(R.layout.fragment_page_entity, container, false);
         return mRootView;
     }
@@ -86,7 +85,7 @@ abstract public class BasePagerFragment extends Fragment {
     public abstract void restartLoader();
 
     public void fragmentBecameVisible() {
-        Log.v(LOG_TAG, "fragmentBecameVisible, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "fragmentBecameVisible, hashCode=" + this.hashCode() + ", " + "");
         restartLoader();
     }
 

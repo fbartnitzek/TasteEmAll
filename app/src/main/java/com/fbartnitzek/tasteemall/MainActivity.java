@@ -34,10 +34,6 @@ import com.fbartnitzek.tasteemall.addentry.AddLocationActivity;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
-import com.fbartnitzek.tasteemall.data.DatabaseContract;
-import com.fbartnitzek.tasteemall.data.pojo.Drink;
-import com.fbartnitzek.tasteemall.data.pojo.Producer;
-import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.filter.EntityFilterDialogFragment;
 import com.fbartnitzek.tasteemall.location.ShowMapActivity;
 import com.fbartnitzek.tasteemall.mainpager.BasePagerFragment;
@@ -54,11 +50,7 @@ import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -169,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                Log.v(LOG_TAG, "onPageSelected, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
+//                Log.v(LOG_TAG, "onPageSelected, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
                 mPagerPosition = position;
                 getFragment(position).fragmentBecameVisible();
             }
@@ -196,13 +188,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private BasePagerFragment getFragment(int position) {
-        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
+//        Log.v(LOG_TAG, "getFragment, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
         // helpful advice: http://stackoverflow.com/questions/17845641/alternative-for-the-onresume-during-fragment-switching
         return (BasePagerFragment) mPagerAdapter.instantiateItem(mViewPager, position);
     }
 
     private void restartCurrentFragmentLoader() { // guarded restart
-        Log.v(LOG_TAG, "restartCurrentFragmentLoader, hashCode=" + this.hashCode() + ", " + "");
+//        Log.v(LOG_TAG, "restartCurrentFragmentLoader, hashCode=" + this.hashCode() + ", " + "");
         if (mViewPager != null && mPagerAdapter != null) {
             BasePagerFragment fragment = (BasePagerFragment) mPagerAdapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
             if (fragment != null) {
@@ -224,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
+//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
         super.onSaveInstanceState(outState);
         outState.putString(STATE_SEARCH_PATTERN, mSearchPattern);
         outState.putParcelableArrayList(STATE_PRODUCERS_TO_GEOCODE, mProducerLocationUris);
@@ -238,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Log.v(LOG_TAG, "onQueryTextSubmit, hashCode=" + this.hashCode() + ", " + "query = [" + query + "]");
+//        Log.v(LOG_TAG, "onQueryTextSubmit, hashCode=" + this.hashCode() + ", " + "query = [" + query + "]");
         if (mReloaded){
             mReloaded = false;
             return false;
@@ -260,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.v(LOG_TAG, "onQueryTextChange, hashCode=" + this.hashCode() + ", " + "newText = [" + newText + "]");
+//        Log.v(LOG_TAG, "onQueryTextChange, hashCode=" + this.hashCode() + ", " + "newText = [" + newText + "]");
         if (mReloaded){
             mReloaded = false;
             return false;
@@ -387,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(this);
 
-        // todo: restore the right way...   - still not working
+        // todo: restore the right way...   - still not working - should work!...?
         if (!TextUtils.isEmpty(mSearchPattern)) {
             item.expandActionView();
             searchView.setQuery(mSearchPattern, true);
@@ -441,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements
         filterDialog.show(fm, "EntityFilterDialogFragment");
     }
 
-    private void startGenericDemoSearch() {
+    /*private void startGenericDemoSearch() {
         JSONObject json = new JSONObject();
         Uri jsonUri = null;
         try {
@@ -489,11 +481,11 @@ public class MainActivity extends AppCompatActivity implements
 
         setJsonUriInCurrentFragment(jsonUri);
         restartCurrentFragmentLoader();
-    }
+    }*/
 
     @Override
     public void onFinishEditDialog(Uri genericFilterUri) {
-        Log.v(LOG_TAG, "onFinishEditDialog, hashCode=" + this.hashCode() + ", " + "genericFilterUri = [" + genericFilterUri + "]");
+//        Log.v(LOG_TAG, "onFinishEditDialog, hashCode=" + this.hashCode() + ", " + "genericFilterUri = [" + genericFilterUri + "]");
         setJsonUriInCurrentFragment(genericFilterUri);
         restartCurrentFragmentLoader();
     }

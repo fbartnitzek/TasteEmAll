@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.JsonHelper;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
@@ -134,7 +135,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         reviewsRecyclerView.setAdapter(mReviewOfLocationAdapter);
 
-        Log.v(LOG_TAG, "onCreateView before MapFragment, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+//        Log.v(LOG_TAG, "onCreateView before MapFragment, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
 
         return mRootView;
     }
@@ -145,7 +146,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
     }
 
     private void addReviewLocationMarker(String reviewLocationId, LatLng latLng, String formatted, String description) {
-        Log.v(LOG_TAG, "addReviewLocationMarker, hashCode=" + this.hashCode() + ", " + "reviewLocationId = [" + reviewLocationId + "], latLng = [" + latLng + "]");
+//        Log.v(LOG_TAG, "addReviewLocationMarker, hashCode=" + this.hashCode() + ", " + "reviewLocationId = [" + reviewLocationId + "], latLng = [" + latLng + "]");
 
         mReviewLocationId = reviewLocationId;
 
@@ -163,16 +164,16 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
     }
 
     private void updateReviews() {
-        Log.v(LOG_TAG, "updateReviews, mReviewLocationId=" + mReviewLocationId);
+//        Log.v(LOG_TAG, "updateReviews, mReviewLocationId=" + mReviewLocationId);
 
         try {
             JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(mBaseUri));
             JSONObject reviewObject = jsonObject.getJSONObject(Review.ENTITY);
-            JSONObject locationObject = reviewObject.has(Location.ENTITY) ? reviewObject.getJSONObject(Location.ENTITY) : new JSONObject();
+            JSONObject locationObject = JsonHelper.getOrCreateJsonObject(reviewObject, Location.ENTITY);
             locationObject.put(Location.LOCATION_ID, new JSONObject()
                     .put(DatabaseContract.Operations.IS, DatabaseContract.encodeValue(mReviewLocationId)));
             jsonObject.getJSONObject(Review.ENTITY).put(Location.ENTITY, locationObject);
-            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject=" + jsonObject.toString());
+//            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject=" + jsonObject.toString());
             mReviewsOfLocationUri = DatabaseContract.buildUriWithJson(jsonObject);
         } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -189,7 +190,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+//        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         switch (id) {
             case REVIEW_LOCATIONS_LOADER_ID:
                 return new CursorLoader(getActivity(),
@@ -206,11 +207,11 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+//        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         int count = data == null ? 0 : data.getCount();
         switch (loader.getId()) {
             case REVIEW_LOCATIONS_LOADER_ID:
-                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " ReviewLocation");
+//                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " ReviewLocation");
                 mReviewLocationAdapter.swapCursor(data);
                 mHeadingLocations.setText(getString(R.string.label_list_map_locations, count));
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -218,7 +219,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
                 }
                 break;
             case REVIEWS_OF_LOCATION_LOADER_ID:
-                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Location");
+//                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Location");
                 mReviewOfLocationAdapter.swapCursor(data);
                 mHeadingReviewsOfLocation.setText(getString(R.string.label_list_map_reviews_of_location, count));
                 break;
@@ -227,7 +228,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
+//        Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
         switch (loader.getId()) {
             case REVIEW_LOCATIONS_LOADER_ID:
                 mReviewLocationAdapter.swapCursor(null);
