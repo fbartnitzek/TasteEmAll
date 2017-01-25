@@ -179,6 +179,10 @@ public class Utils {
         return iso8601Format.format(new java.util.Date());
     }
 
+    public static String getIso8601Time(Date date) {
+        return iso8601Format.format(date);
+    }
+
     public static String getCurrentLocalTimePrefix() {
         return filePrefixFormat.format(new java.util.Date());
     }

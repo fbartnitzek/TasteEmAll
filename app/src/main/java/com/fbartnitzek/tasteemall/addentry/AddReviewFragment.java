@@ -62,6 +62,8 @@ import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
 import com.fbartnitzek.tasteemall.tasks.ValidateUserTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 import com.fbartnitzek.tasteemall.ui.OnTouchHideKeyboardListener;
+import com.github.jjobes.slidedatetimepicker.SlideDateTimeListener;
+import com.github.jjobes.slidedatetimepicker.SlideDateTimePicker;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -73,6 +75,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -141,6 +144,16 @@ public class AddReviewFragment extends Fragment implements
     private boolean mEditReviewLocationIgnoreTextChange = false;
 
     // TODO: pagify whole add sequence!
+
+    private SlideDateTimeListener listener = new SlideDateTimeListener() {
+        @Override
+        public void onDateTimeSet(Date date) {
+            Log.v(LOG_TAG, "onDateTimeSet, hashCode=" + this.hashCode() + ", " + "date = [" + date + "]");
+            if (mEditReviewReadableDate != null) {
+                mEditReviewReadableDate.setText(Utils.getIso8601Time(date));
+            }
+        }
+    };
 
     public AddReviewFragment() {
         // Required empty public constructor
@@ -300,6 +313,20 @@ public class AddReviewFragment extends Fragment implements
         } else if (!mEditValuesLoaded){ // TODO: needed variable
             mEditReviewReadableDate.setText(Utils.getCurrentLocalIso8601Time());
         }
+
+        mEditReviewReadableDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
+                        .setListener(listener)
+                        .setInitialDate(new Date())
+                        .setIs24HourTime(true)
+                        //.setTheme(SlideDateTimePicker.HOLO_DARK)
+                        //.setIndicatorColor(Color.parseColor("#990000"))
+                        .build()
+                        .show();
+            }
+        });
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         // usually hide it first

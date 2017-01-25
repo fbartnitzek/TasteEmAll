@@ -14,6 +14,8 @@ Here is a solution which hopefully will at least work for me. :-)
 
 
 ## Installation
+
+### Google Maps
 To include google maps for the map and the geocoder, the API Key (or a reference to it) needs to be inserted below `app/src/debug/res/values` and `app/src/release/res/values` in a file f.e. **api_keys.xml** with the following format:
 ```
 <resources>
@@ -27,4 +29,16 @@ RELEASE_STORE_FILE=/home/userName/keystores/android.jks
 RELEASE_STORE_PASSWORD=*******
 RELEASE_KEY_ALIAS=MYANDROIDKEY
 RELEASE_KEY_PASSWORD=********
+```
+
+### DateTimePicker
+
+The external project SlideDateTimePicker is used for a nice date-time-picker-dialog.
+To use it, you need to clone from https://github.com/jjobes/SlideDateTimePicker and reference it correctly.
+
+`settings.gradle`:
+```
+include ':app', ':pojodata', ':slideDateTimePicker'
+
+project(':slideDateTimePicker').projectDir = new File(settingsDir, '../SlideDateTimePicker/slideDateTimePicker')
 ```

@@ -1,1 +1,5 @@
-include ':app', ':pojodata'
+include ':app', ':pojodata', ':slideDateTimePicker'
+
+// use external dateTimePicker project and specify path to module
+// src: https://github.com/jjobes/SlideDateTimePicker
+project(':slideDateTimePicker').projectDir = new File(settingsDir, '../SlideDateTimePicker/slideDateTimePicker')

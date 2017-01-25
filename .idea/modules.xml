@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/TasteEmAll.iml" filepath="$PROJECT_DIR$/TasteEmAll.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/pojodata/pojodata.iml" filepath="$PROJECT_DIR$/pojodata/pojodata.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SlideDateTimePicker/slideDateTimePicker/slideDateTimePicker.iml" filepath="$PROJECT_DIR$/../SlideDateTimePicker/slideDateTimePicker/slideDateTimePicker.iml" />
     </modules>
   </component>
 </project>
