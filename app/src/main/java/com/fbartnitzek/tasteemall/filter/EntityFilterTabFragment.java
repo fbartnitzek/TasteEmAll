@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
+import com.fbartnitzek.tasteemall.data.pojo.Review;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,15 +119,32 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
 //        Toast.makeText(getActivity(), attributeName + " was clicked", Toast.LENGTH_SHORT).show();
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        AttributeFilterDialogFragment attributeFilterDialog = new AttributeFilterDialogFragment();
-        attributeFilterDialog.setArguments(new BundleBuilder()
-                .putString(EntityFilterTabFragment.BASE_ENTITY, mBaseEntity)
-                .putString(AttributeFilterDialogFragment.ATTRIBUTE_NAME, attributeName)
-                .build());
-        mPosition = adapterPosition;
-        Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "attributeName = [" + attributeName + "], adapterPosition = [" + adapterPosition + "]");
-        attributeFilterDialog.setTargetFragment(this, REQUEST_ATTRIBUTE_FILTER_CODE);
-        attributeFilterDialog.show(fm, "AttributeFilterDialogFragment");
+
+        // special fragments
+        if (Review.ENTITY.equals(mBaseEntity) && Review.READABLE_DATE.equals(attributeName)) {
+
+            DateFilterDialogFragment dateFilterDialogFragment = new DateFilterDialogFragment();
+            dateFilterDialogFragment.setArguments(new BundleBuilder()
+                    .putString(EntityFilterTabFragment.BASE_ENTITY, mBaseEntity)
+                    .putString(AttributeFilterDialogFragment.ATTRIBUTE_NAME, attributeName)
+                    .build());
+            mPosition = adapterPosition;
+            dateFilterDialogFragment.setTargetFragment(this, REQUEST_ATTRIBUTE_FILTER_CODE);
+            dateFilterDialogFragment.show(fm, "DateFilterDialogFragment");
+
+        } else {
+
+            AttributeFilterDialogFragment attributeFilterDialog = new AttributeFilterDialogFragment();
+            attributeFilterDialog.setArguments(new BundleBuilder()
+                    .putString(EntityFilterTabFragment.BASE_ENTITY, mBaseEntity)
+                    .putString(AttributeFilterDialogFragment.ATTRIBUTE_NAME, attributeName)
+                    .build());
+            mPosition = adapterPosition;
+            Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "attributeName = [" + attributeName + "], adapterPosition = [" + adapterPosition + "]");
+            attributeFilterDialog.setTargetFragment(this, REQUEST_ATTRIBUTE_FILTER_CODE);
+            attributeFilterDialog.show(fm, "AttributeFilterDialogFragment");
+        }
+
     }
 
     private static final String LOG_TAG = EntityFilterTabFragment.class.getName();

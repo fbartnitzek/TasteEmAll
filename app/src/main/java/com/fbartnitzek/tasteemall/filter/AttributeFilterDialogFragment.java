@@ -1,37 +1,25 @@
 package com.fbartnitzek.tasteemall.filter;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-import static com.fbartnitzek.tasteemall.filter.EntityFilterDialogFragment.EXTRA_ATTRIBUTE_NAME;
-import static com.fbartnitzek.tasteemall.filter.EntityFilterDialogFragment.EXTRA_BASE_ENTITY;
-import static com.fbartnitzek.tasteemall.filter.EntityFilterDialogFragment.EXTRA_JSON;
 import static com.fbartnitzek.tasteemall.filter.EntityFilterTabFragment.BASE_ENTITY;
 
 /**
@@ -50,67 +38,11 @@ import static com.fbartnitzek.tasteemall.filter.EntityFilterTabFragment.BASE_ENT
  * limitations under the License.
  */
 
-public class AttributeFilterDialogFragment extends DialogFragment implements View.OnClickListener {
-    public static final String ATTRIBUTE_NAME = "ATTRIBUTE_NAME";
-    private String mBaseEntity;
-    private String mAttributeName;
+public class AttributeFilterDialogFragment extends AttributeFilterBaseDialogFragment {
+
     private ViewPager mViewPager;
     private SelectionsPagerAdapter mSelectionPagerAdapter;
     private static final String LOG_TAG = AttributeFilterDialogFragment.class.getName();
-
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        Bundle bundle = getArguments();
-        if (bundle == null) {
-            bundle = savedInstanceState;
-        }
-        if (bundle == null) {
-            throw new RuntimeException("neither args nor savedInstance - should never happen...");
-        }
-
-        mBaseEntity = bundle.getString(BASE_ENTITY);
-        mAttributeName = bundle.getString(ATTRIBUTE_NAME);
-
-        // nothing really works to restrict the size => TODO
-
-        Window window = dialog.getWindow();
-
-        window.setGravity(Gravity.CENTER);
-//        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-//        WindowManager.LayoutParams p = window.getAttributes();
-//        Log.v(LOG_TAG, "onCreateDialog, p.verticalMargin=" + p.verticalMargin + ", " + "p.horizontalMargin = [" + p.horizontalMargin+ "]");
-
-//        p.height = getActivity().getResources().getDisplayMetrics().heightPixels / 2;
-//        float vertMargin = p.verticalMargin;
-//        p.verticalMargin = vertMargin + dpToPx(100);
-//        p.y = prevY + dpToPx(100);
-
-//        p.x = 150;
-//        window.setAttributes(p);
-        // fullscreen: height and width = -1
-//        Log.v(LOG_TAG, "onCreateDialog, p.width=" + p.width + ", " + "p.height = [" + p.height+ "]");
-
-        return dialog;
-    }
-
-//    public int dpToPx(float valueInDp) {
-//        DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
-//        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
-//    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putString(BASE_ENTITY, mBaseEntity);
-        outState.putString(ATTRIBUTE_NAME, mAttributeName);
-        super.onSaveInstanceState(outState);
-    }
-
 
 
     @Nullable
@@ -127,12 +59,10 @@ public class AttributeFilterDialogFragment extends DialogFragment implements Vie
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
             public void onPageSelected(int position) {
-
             }
 
             @Override
@@ -150,51 +80,22 @@ public class AttributeFilterDialogFragment extends DialogFragment implements Vie
             }
         });
 
-        view.findViewById(R.id.ok).setOnClickListener(this);
-        view.findViewById(R.id.cancel).setOnClickListener(this);
+        setButtonListeners(view);
         return view;
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.ok:
-                if (mViewPager != null && mSelectionPagerAdapter != null) {
-                    AttributeBaseFilterFragment fragment = (AttributeBaseFilterFragment) mSelectionPagerAdapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
-
-                    try {
-                        sendFilterUpdate(fragment.getFilter());
-                    } catch (JSONException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-
-            case R.id.clear:
-                sendFilterUpdate(null);
-            case R.id.cancel:
+    protected void onOkClicked() {
+        if (mViewPager != null && mSelectionPagerAdapter != null) {
+            AttributeBaseFilterFragment fragment =
+                    (AttributeBaseFilterFragment) mSelectionPagerAdapter.instantiateItem(
+                            mViewPager, mViewPager.getCurrentItem());
+            try {
+                sendFilterUpdate(fragment.getFilter());
+            } catch (JSONException | UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
-        this.dismiss();
-    }
-
-
-
-    private void sendFilterUpdate(JSONObject filter) {
-        Intent intent = new Intent(EntityFilterDialogFragment.ACTION_FILTER_UPDATES);
-        intent.putExtra(EXTRA_ATTRIBUTE_NAME, mAttributeName);
-        intent.putExtra(EXTRA_BASE_ENTITY, mBaseEntity);
-        Intent data = new Intent();
-        data.putExtra(EntityFilterTabFragment.EXTRA_ATTRIBUTE_FILTERED, filter != null);
-        if (filter != null) {
-            intent.putExtra(EXTRA_JSON, filter.toString());
-        }
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, data);
-    }
-
-    @Override
-    public void onAttach(Context activity) {
-        super.onAttach(activity);
     }
 
     public class SelectionsPagerAdapter extends FragmentPagerAdapter{

@@ -608,8 +608,16 @@ public class DatabaseProvider extends ContentProvider {
                         customSelection.append(alias).append(".").append(attributeName).append(" > ?");
                         customSelectionArgs.add(decode(attribute.getString(operation)));
                         break;
+                    case DatabaseContract.Operations.GTE:
+                        customSelection.append(alias).append(".").append(attributeName).append(" >= ?");
+                        customSelectionArgs.add(decode(attribute.getString(operation)));
+                        break;
                     case DatabaseContract.Operations.LT:
                         customSelection.append(alias).append(".").append(attributeName).append(" < ?");
+                        customSelectionArgs.add(decode(attribute.getString(operation)));
+                        break;
+                    case DatabaseContract.Operations.LTE:
+                        customSelection.append(alias).append(".").append(attributeName).append(" <= ?");
                         customSelectionArgs.add(decode(attribute.getString(operation)));
                         break;
                     case DatabaseContract.Operations.BETWEEN: // between: [1,5]

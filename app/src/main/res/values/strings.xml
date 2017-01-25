@@ -379,5 +379,11 @@
 
     <string name="entity_of_entity"><xliff:g id="childEntity">%1$s</xliff:g> of <xliff:g id="baseEntity">%2$s</xliff:g></string>
 
+    <string name="label_filter_from_date">from</string>
+    <string name="label_filter_to_date">to</string>
+    <string name="hint_filter_from_date">start date for filtered reviews</string>
+    <string name="hint_filter_to_date">end date for filtered reviews</string>
+    <string name="filter_date_unlimited">unlimited</string>
+
 
 </resources>

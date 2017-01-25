@@ -113,7 +113,9 @@ public class DatabaseContract {
 
     public static class Operations {
         public static final String GT = "GT";
+        public static final String GTE = "GTE";
         public static final String LT = "LT";
+        public static final String LTE = "LTE";
         public static final String BETWEEN = "BETWEEN";
         public static final String CONTAINS = "CONTAINS";
         public static final String IS = "IS";
