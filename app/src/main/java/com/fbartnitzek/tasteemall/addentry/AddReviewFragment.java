@@ -317,9 +317,15 @@ public class AddReviewFragment extends Fragment implements
         mEditReviewReadableDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Date date;
+                if (mEditReviewReadableDate.getText() != null) {
+                    date = Utils.getDate(mEditReviewReadableDate.getText().toString());
+                } else {
+                    date = new Date();
+                }
                 new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
                         .setListener(listener)
-                        .setInitialDate(new Date())
+                        .setInitialDate(date)
                         .setIs24HourTime(true)
                         //.setTheme(SlideDateTimePicker.HOLO_DARK)
                         //.setIndicatorColor(Color.parseColor("#990000"))
