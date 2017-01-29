@@ -90,11 +90,6 @@
                 android:value="com.fbartnitzek.tasteemall.MainActivity"/>
         </activity>
         <activity
-            android:name=".location.ChooseLocationActivity"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_settings"
             android:parentActivityName=".MainActivity"

@@ -112,6 +112,8 @@ public class AddLocationFragment extends Fragment implements
     private long mLocation_Id;
     private String mLocationId;
 
+    // TODO: when used from startGeocode: switch to external app and switch back will reload values from db...
+    // quite complicated to restore in the right way -> later...
 
 
     @Override
