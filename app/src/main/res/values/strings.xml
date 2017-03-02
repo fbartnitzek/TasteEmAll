@@ -260,6 +260,8 @@
     <string name="msg_entries_imported"><xliff:g id="number">%1$d</xliff:g> <xliff:g id="entries">%2$s</xliff:g> imported into database<xliff:g id="optUnusedColText">%3$s</xliff:g></string>
     <string name="msg_unused_column_names"> (detected some unknown columns: <xliff:g id="colNames">%1$s</xliff:g>)</string>
     <string name="msg_wrong_number_files">wrong number of <xliff:g id="entry">%1$s</xliff:g>-files (<xliff:g id="number">%2$d</xliff:g>)</string>
+    <string name="all_in_one_imported_msg">inserted/updated the following entities:\nProducers: <xliff:g id="iP">%1$d</xliff:g> / <xliff:g id="uP">%2$d</xliff:g>\nDrinks: <xliff:g id="iD">%3$d</xliff:g> / <xliff:g id="uD">%4$d</xliff:g>\nUsers: <xliff:g id="iU">%5$d</xliff:g>\nLocations:<xliff:g id="iL">%6$d</xliff:g> / <xliff:g id="uL">%7$d</xliff:g>\nReviews: <xliff:g id="iR">%8$d</xliff:g></string>
+
 
     <string name="msg_populated_map">populated the map with <xliff:g id="numSuccess">%1$d</xliff:g> entries (<xliff:g id="numFailed">%2$d</xliff:g> failed)</string>
     <string name="msg_map_no_cursor">querying the database failed</string>
@@ -384,6 +386,7 @@
     <string name="hint_filter_from_date">start date for filtered reviews</string>
     <string name="hint_filter_to_date">end date for filtered reviews</string>
     <string name="filter_date_unlimited">unlimited</string>
+    <string name="delete_db">delete db</string>
 
 
 </resources>

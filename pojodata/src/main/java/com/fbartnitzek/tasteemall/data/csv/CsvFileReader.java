@@ -47,6 +47,13 @@ public class CsvFileReader {
             csvParser = new CSVParser(csvReader, CsvFileWriter.CSV_FORMAT_RFC4180.withHeader());
             Map<String, Integer> headerMap = csvParser.getHeaderMap();
 
+            // print headerMap
+            for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
+                System.out.println(entry.getValue() + ": " + entry.getKey());
+            }
+
+            // should be same order!
+
             // 0 columns seems impossible, but valid
 
             // ordered columns instead unordered set (for insert)!
@@ -54,7 +61,10 @@ public class CsvFileReader {
             for (CSVRecord record : csvParser) {
                 List<String> dataEntry = new ArrayList<>();
                 for (int i=0 ; i < headers.size(); ++i) {
-                    dataEntry.add(record.get(headers.get(i)));
+                    if (i < record.size()) {
+                        dataEntry.add(record.get(i));
+                    }
+//                    dataEntry.add(record.get(headers.get(i)));
                 }
                 data.add(dataEntry);
             }

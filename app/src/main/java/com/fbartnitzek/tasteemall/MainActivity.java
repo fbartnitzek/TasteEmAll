@@ -45,6 +45,7 @@ import com.fbartnitzek.tasteemall.mainpager.UserPagerFragment;
 import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
 import com.fbartnitzek.tasteemall.tasks.ExportToDirTask;
 import com.fbartnitzek.tasteemall.tasks.GeocodeAllLocationsTask;
+import com.fbartnitzek.tasteemall.tasks.ImportAllInOneFileTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesOldFormatTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements
         GeocodeAllLocationsTask.GeocodeProducersUpdateHandler, ImportFilesTask.ImportHandler,
         ImportFilesOldFormatTask.ImportHandler, ExportToDirTask.ExportHandler,
         SearchView.OnQueryTextListener, View.OnClickListener,
-        EntityFilterDialogFragment.GenericFilterFinishListener {
+        EntityFilterDialogFragment.GenericFilterFinishListener, ImportAllInOneFileTask.ImportAllInOneHandler {
 
     private static final int NUM_PAGES = 5;
     private static final String LOG_TAG = MainActivity.class.getName();
@@ -287,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+
     private class MainPagerAdapter extends FragmentStatePagerAdapter {
 
         public MainPagerAdapter(FragmentManager fm) {
@@ -415,6 +417,9 @@ public class MainActivity extends AppCompatActivity implements
 //            case R.id.action_demo_search:   // TODO: remove after MultiSelect is working...
 //                startGenericDemoSearch();
 //                return true;
+            case R.id.action_delete_all:
+                startDeleteAll();
+                return true;
             case R.id.search_generic:
                 startGenericSearchDialog();
                 return true;
@@ -513,6 +518,35 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             startActivity(intent);
         }
+
+    }
+
+    private void startDeleteAll() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you really want to delete all? Do you want to export first?")
+                .setNeutralButton("export", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startExport();
+                        // TODO: state CALL_DELETE_AFTERWARDS
+                    }
+                })
+                .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "TODO - deleteAllTask", Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(MainActivity.this, AddProducerActivity.class);
+//                        MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_PRODUCER_GEOCODE);
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        builder.show();
 
     }
 
@@ -634,7 +668,7 @@ public class MainActivity extends AppCompatActivity implements
                     mFiles = files;
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("which import shall be used?")
-                            .setPositiveButton("new", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("class-based", new DialogInterface.OnClickListener() {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -643,12 +677,28 @@ public class MainActivity extends AppCompatActivity implements
                                     mFiles = null;
                                 }
                             })
-                            .setNegativeButton("old", new DialogInterface.OnClickListener() {
+//                            .setNegativeButton("old", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    new ImportFilesOldFormatTask(MainActivity.this, MainActivity.this)
+//                                            .execute(mFiles.toArray(new File[mFiles.size()]));
+//                                    mFiles = null;
+//                                }
+//                            });
+                            .setNegativeButton("all-in-1", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    new ImportFilesOldFormatTask(MainActivity.this, MainActivity.this)
-                                            .execute(mFiles.toArray(new File[mFiles.size()]));
+
+                                    // multiple all-in-1-files?
+                                    new ImportAllInOneFileTask(MainActivity.this, MainActivity.this)
+                                            .execute(mFiles.get(0));
                                     mFiles = null;
+                                    // to get all easier:
+                                        // either all ids are known or lots of parallel stuff...
+                                        // dialog with warning!
+                                    // task won't help => needs Dialog everywhere... => Task
+                                    // merge is to complicated for now :-p
+
                                 }
                             });
                     builder.show();
@@ -696,6 +746,7 @@ public class MainActivity extends AppCompatActivity implements
                 showReviewLocationGeocodeDialog(true);
             }
         } else if (requestCode == ADD_REVIEW_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+// TODO bugfix: refresh current pager
             startActivity(new Intent(this, ShowReviewActivity.class).setData(data.getData()));
         }
 
@@ -798,6 +849,29 @@ public class MainActivity extends AppCompatActivity implements
 //        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
         restartCurrentFragmentLoader();
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onImportAllInOneFinished(String message) {
+        restartCurrentFragmentLoader();
+        new AlertDialog.Builder(this).setMessage(message)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {}
+                })
+                .show();
+    }
+
+    @Override
+    public void onImportAllInOneFailed(String message) {
+        new AlertDialog.Builder(this).setMessage(message)
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+        .show();
     }
 
 }

@@ -71,7 +71,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Producer.NAME + " TEXT NOT NULL, "
                 + Producer.DESCRIPTION + " TEXT,"
                 + Producer.WEBSITE + " TEXT,"
-//                + Producer.LOCATION_ID + " TEXT NOT NULL," //TODO: rawInput => formatted address, country
                 + Producer.INPUT + " TEXT NOT NULL,"
                 + Producer.LATITUDE + " REAL,"
                 + Producer.LONGITUDE + " REAL,"

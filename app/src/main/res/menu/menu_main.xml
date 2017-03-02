@@ -10,6 +10,12 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/action_delete_all"
+        android:orderInCategory="80"
+        android:title="@string/delete_db"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_geocode"
         android:orderInCategory="50"
         android:title="@string/action_geocode"
