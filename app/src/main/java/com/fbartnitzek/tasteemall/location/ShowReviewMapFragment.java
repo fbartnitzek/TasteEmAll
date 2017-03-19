@@ -24,7 +24,9 @@ import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.JsonHelper;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+import com.fbartnitzek.tasteemall.data.pojo.Drink;
 import com.fbartnitzek.tasteemall.data.pojo.Location;
+import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +37,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
+import static com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry.ALIAS_REVIEW;
 import static com.fbartnitzek.tasteemall.location.ShowMapActivity.REVIEW_URI;
 
 /**
@@ -204,11 +207,14 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
             case REVIEW_LOCATIONS_LOADER_ID:
                 return new CursorLoader(getActivity(),
                         mBaseUri, QueryColumns.MapFragment.ReviewLocations.COLUMNS,
-                        null, null, null);
+                        null, null,
+                        ALIAS_REVIEW + "." + Location.COUNTRY + " ASC, " + ALIAS_REVIEW + "." + Location.FORMATTED_ADDRESS + " ASC");
             case REVIEWS_OF_LOCATION_LOADER_ID:
-                // TODO: use original sort order?
                 return new CursorLoader(getActivity(), mReviewsOfLocationUri,
-                        QueryColumns.MapFragment.ReviewsSubQuery.COLUMNS, null, null, null);
+                        QueryColumns.MapFragment.ReviewsSubQuery.COLUMNS, null, null,
+                        DatabaseContract.ReviewEntry.ALIAS + "." + Review.READABLE_DATE + " DESC, " +
+                        DatabaseContract.ProducerEntry.ALIAS + "." + Producer.NAME + " ASC, " +
+                        DatabaseContract.DrinkEntry.ALIAS + "." + Drink.NAME + " ASC");
             default:
                 throw new RuntimeException("wrong loaderId in " + ShowReviewMapFragment.class.getSimpleName());
         }

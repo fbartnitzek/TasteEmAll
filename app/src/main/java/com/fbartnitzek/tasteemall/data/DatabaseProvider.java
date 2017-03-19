@@ -662,6 +662,9 @@ public class DatabaseProvider extends ContentProvider {
                 // special handling for NULL (no review location given)
                 if (attributeName.equals(Location.ENTITY)
                         && entity.getJSONObject(Location.ENTITY).has(DatabaseContract.Operations.NULL)) {
+                    if (customSelection.length() > 0) {
+                        customSelection.append(compare);    // mostly AND, sometimes OR
+                    }
                     customSelection.append(alias).append(".").append(Review.LOCATION_ID).append(" IS NULL");
                 } else {
 

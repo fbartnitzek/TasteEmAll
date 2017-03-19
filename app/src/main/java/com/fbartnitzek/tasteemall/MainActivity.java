@@ -405,10 +405,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_geocode:
                 startGeocoding();
                 return true;
-            case R.id.action_export:
+            case R.id.action_export:    // TODO: class-based- and all-in-1-export
                 startExport();
                 return true;
-            case R.id.action_import:
+            case R.id.action_import:    // TODO: restore and class-based-import
                 startImport();
                 return true;
             case R.id.action_show_map:
