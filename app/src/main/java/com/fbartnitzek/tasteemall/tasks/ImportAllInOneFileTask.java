@@ -74,6 +74,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
         mErrorHappened = false;
         db.beginTransaction();
         Cursor cursor = null;
+        int row = 1;
         try {
 
             List<String> dataColumns = new ArrayList<>();
@@ -115,7 +116,6 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
             int iR = 0; int iL = 0; int iU = 0; int iD = 0; int iP = 0;
             int uL = 0; int uD = 0; int uP = 0;
 
-            int row = 1;
             for (List<String> entry : dataEntries) {    // per line
                 row++;
 
@@ -159,7 +159,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
                             }
 
                         } else {
-                            if (cursor.getString(i).isEmpty()) {
+                            if (cursor.getString(i) == null || cursor.getString(i).isEmpty()) {
                                 emptyAttributes.add(attrName);
                             }
                         }
@@ -253,7 +253,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
                     cursor.moveToFirst();
                     List<String> emptyAttributes = new ArrayList<>();   // get empty cursor-attributes
                     for (int i=0; i < drinkAttrArray.length; ++i) {
-                        if (cursor.getString(i).isEmpty()) {
+                        if (cursor.getString(i) == null || cursor.getString(i).isEmpty()) {
                             emptyAttributes.add(drinkAttrArray[i]);
                         }
                     }
@@ -369,7 +369,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
 
                 // 4) update or add or ignore location
                 String locationId = null;
-
+//                Log.v(LOG_TAG, "doInBackground, locationId:" + (locationIdCol > 0 && entry.size() > locationIdCol ? entry.get(locationIdCol) : "n/a"));
                 if (locationIdCol > 0 && entry.size() > locationIdCol && !entry.get(locationIdCol).isEmpty()) {
                     locationId = entry.get(locationIdCol);
                     cursor = db.query(DatabaseContract.LocationEntry.TABLE_NAME, locationAttrArray,
@@ -379,6 +379,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
                         throw new ValidationException("review location in line " + row
                                 + " was not found with locationId '" + locationId + "'!");
                     }
+//                    Log.v(LOG_TAG, "doInBackground, query location...");
 
                     cursor.moveToFirst();
                     List<String> emptyAttributes = new ArrayList<>();
@@ -395,12 +396,14 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
                             }
 
                         } else {
-                            if (cursor.getString(i).isEmpty()) {
+
+                            if (cursor.getString(i) == null || cursor.getString(i).isEmpty()) {
                                 emptyAttributes.add(attrName);
                             }
                         }
                     }
                     cursor.close();
+//                    Log.v(LOG_TAG, "doInBackground, queried location" );
 
                     // get attributes from csv
                     ContentValues nonEmptyCVs = getContentValues(entry, dataColumns, emptyAttributes, true);
@@ -455,6 +458,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
 
 
                 // 5) review - add it anytime
+//                Log.v(LOG_TAG, "doInBackground, before review");
 
                 if (reviewDateCol < 0 || entry.size() <= reviewDateCol || entry.get(reviewDateCol).isEmpty()
                         || Utils.getDate(entry.get(reviewDateCol)) == null) {
@@ -514,7 +518,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
         } catch (Exception e) {
             // no successful = rollback
             mErrorHappened = true;
-            message = e.getMessage();
+            message = "error in line " + row + ": " + e.getMessage();
         } finally {
             db.endTransaction();
             if (cursor != null) {
