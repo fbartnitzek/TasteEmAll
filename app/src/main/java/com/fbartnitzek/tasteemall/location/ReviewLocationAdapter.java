@@ -64,7 +64,13 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
         String country = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_COUNTRY);
         String formatted = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_FORMATTED);
         String description = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_DESCRIPTION);
-        holder.formattedView.setText(formatted);
+//        Log.v(LOG_TAG, "onBindViewHolder, country=" + country + ", " + "formatted = [" + formatted + "], position = [" + position + "]");
+        if (mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_ID) == null) {
+            holder.formattedView.setText(R.string.no_review_location_given);
+        } else {
+            holder.formattedView.setText(formatted);
+        }
+
         holder.countryView.setText(country);
         holder.descriptionView.setText(description);
     }
@@ -96,12 +102,17 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
         @Override
         public void onClick(View v) {
             mCursor.moveToPosition(getAdapterPosition());
+//            Log.v(LOG_TAG, "onClick, getAdapterPosition=" + getAdapterPosition());
             String locationId = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_ID);
-            double lat = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LAT);
-            double lon = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LON);
-            String formatted = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_FORMATTED);
-            String description = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_DESCRIPTION);
-            mClickHandler.onClick(locationId, this, new LatLng(lat, lon), formatted, description);
+            if (locationId == null) {   // workaround for null (empty location)
+                mClickHandler.onClick(null, this, null, null, null);
+            } else {
+                double lat = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LAT);
+                double lon = mCursor.getDouble(QueryColumns.MapFragment.ReviewLocations.COL_REVIEW_LOCATION_LON);
+                String formatted = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_FORMATTED);
+                String description = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_DESCRIPTION);
+                mClickHandler.onClick(locationId, this, new LatLng(lat, lon), formatted, description);
+            }
         }
     }
 

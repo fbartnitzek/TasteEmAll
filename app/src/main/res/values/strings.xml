@@ -387,6 +387,7 @@
     <string name="hint_filter_to_date">end date for filtered reviews</string>
     <string name="filter_date_unlimited">unlimited</string>
     <string name="delete_db">delete db</string>
+    <string name="no_review_location_given">without location</string>
 
 
 </resources>

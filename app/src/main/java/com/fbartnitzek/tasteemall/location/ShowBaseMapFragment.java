@@ -38,6 +38,7 @@ public abstract class ShowBaseMapFragment extends Fragment implements OnMapReady
 
     private static final String LOG_TAG = ShowBaseMapFragment.class.getName();
     protected GoogleMap mMap;
+    private SupportMapFragment mMapFragment;
     protected int mMapType = -1;
     protected View mRootView;
     protected MarkerOptions mMarkerOptions;
@@ -49,14 +50,13 @@ public abstract class ShowBaseMapFragment extends Fragment implements OnMapReady
         mRootView = inflater.inflate(getTabLayout(), container, false);
 
         //src: http://stackoverflow.com/questions/15525111/getsupportfragmentmanager-findfragmentbyid-returns-null
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
-        if (mapFragment == null) {
+        if (mMapFragment == null) {
             Log.e(LOG_TAG, "onCreateView, MapFragment not found...");
         } else {
             Log.v(LOG_TAG, "onCreateView - calling getMapAsync, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-            mapFragment.getMapAsync(this);
+            mMapFragment.getMapAsync(this);
         }
 
         return mRootView;
@@ -83,6 +83,18 @@ public abstract class ShowBaseMapFragment extends Fragment implements OnMapReady
         }
 
         tryUpdatingMarker();
+    }
+
+    protected void showMap() {
+        if (mMapFragment != null && mMapFragment.getView() != null) {
+            mMapFragment.getView().setVisibility(View.VISIBLE);
+        }
+    }
+
+    protected void hideMap() {
+        if (mMapFragment != null && mMapFragment.getView() != null) {
+            mMapFragment.getView().setVisibility(View.INVISIBLE);
+        }
     }
 
     protected void tryUpdatingMarker() {

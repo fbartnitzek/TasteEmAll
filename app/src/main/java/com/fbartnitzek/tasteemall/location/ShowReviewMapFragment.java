@@ -146,18 +146,22 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
     }
 
     private void addReviewLocationMarker(String reviewLocationId, LatLng latLng, String formatted, String description) {
-//        Log.v(LOG_TAG, "addReviewLocationMarker, hashCode=" + this.hashCode() + ", " + "reviewLocationId = [" + reviewLocationId + "], latLng = [" + latLng + "]");
-
+        Log.v(LOG_TAG, "addReviewLocationMarker, hashCode=" + this.hashCode() + ", " + "reviewLocationId = [" + reviewLocationId + "], latLng = [" + latLng + "], formatted = [" + formatted + "], description = [" + description + "]");
         mReviewLocationId = reviewLocationId;
 
-        if (latLng != null && Utils.isValidLatLong(latLng.latitude, latLng.longitude)) {
-            mLocationName = description == null || description.isEmpty() ? formatted : description;
-            mMarkerOptions = new MarkerOptions()
-                    .position(latLng)
-                    .title(mLocationName)
-                    .snippet(formatted)
-                    .draggable(false);
-            tryUpdatingMarker();
+        if (reviewLocationId == null) {
+            hideMap();
+        } else {
+            showMap();
+            if (latLng != null && Utils.isValidLatLong(latLng.latitude, latLng.longitude)) {
+                mLocationName = description == null || description.isEmpty() ? formatted : description;
+                mMarkerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(mLocationName)
+                        .snippet(formatted)
+                        .draggable(false);
+                tryUpdatingMarker();
+            }
         }
 
         updateReviews();
@@ -170,8 +174,13 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
             JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(mBaseUri));
             JSONObject reviewObject = jsonObject.getJSONObject(Review.ENTITY);
             JSONObject locationObject = JsonHelper.getOrCreateJsonObject(reviewObject, Location.ENTITY);
-            locationObject.put(Location.LOCATION_ID, new JSONObject()
-                    .put(DatabaseContract.Operations.IS, DatabaseContract.encodeValue(mReviewLocationId)));
+            if (mReviewLocationId == null) {
+                Log.v(LOG_TAG, "updateReviews, ReviewLocation is null");
+                locationObject.put(DatabaseContract.Operations.NULL, DatabaseContract.Operations.NULL);
+            } else {
+                locationObject.put(Location.LOCATION_ID, new JSONObject()
+                        .put(DatabaseContract.Operations.IS, DatabaseContract.encodeValue(mReviewLocationId)));
+            }
             jsonObject.getJSONObject(Review.ENTITY).put(Location.ENTITY, locationObject);
 //            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject=" + jsonObject.toString());
             mReviewsOfLocationUri = DatabaseContract.buildUriWithJson(jsonObject);

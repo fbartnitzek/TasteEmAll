@@ -659,21 +659,29 @@ public class DatabaseProvider extends ContentProvider {
 
             } else if (DatabaseContract.ASSOCIATIONS.get(entityName).contains(attributeName)) { // f.e. drink of review
 
-                String joinBuilder = (attributeName.equals(Location.ENTITY) ? "LEFT JOIN " : "INNER JOIN ") +
-                        DatabaseContract.TABLE_NAMES.get(attributeName) +
-                        " " + DatabaseContract.ALIASES.get(attributeName) +
-                        " ON " +
-                        DatabaseContract.ALIASES.get(entityName) + "." +
-                        DatabaseContract.FOREIGN_KEYS.get(entityName).get(attributeName) +
-                        " = " +
-                        DatabaseContract.ALIASES.get(attributeName) + "." +
-                        DatabaseContract.PRIMARY_KEYS.get(attributeName);
-                joins.add(joinBuilder);
+                // special handling for NULL (no review location given)
+                if (attributeName.equals(Location.ENTITY)
+                        && entity.getJSONObject(Location.ENTITY).has(DatabaseContract.Operations.NULL)) {
+                    customSelection.append(alias).append(".").append(Review.LOCATION_ID).append(" IS NULL");
+                } else {
+
+                    String joinBuilder = (attributeName.equals(Location.ENTITY) ? "LEFT JOIN " : "INNER JOIN ") +
+                            DatabaseContract.TABLE_NAMES.get(attributeName) +
+                            " " + DatabaseContract.ALIASES.get(attributeName) +
+                            " ON " +
+                            DatabaseContract.ALIASES.get(entityName) + "." +
+                            DatabaseContract.FOREIGN_KEYS.get(entityName).get(attributeName) +
+                            " = " +
+                            DatabaseContract.ALIASES.get(attributeName) + "." +
+                            DatabaseContract.PRIMARY_KEYS.get(attributeName);
+                    joins.add(joinBuilder);
 
 //                Log.v(LOG_TAG, "parseJsonEntity, entity = [" + entityName + "], child = [" + attributeName + "], preJoin= [" + joinBuilder.toString()+ "]");
-                Set<String> childJoins = parseJsonEntity(entity, attributeName, customSelection, customSelectionArgs, compare);
+                    Set<String> childJoins = parseJsonEntity(entity, attributeName, customSelection, customSelectionArgs, compare);
 //                Log.v(LOG_TAG, "parseJsonEntity, entity = [" + entityName + "], child = [" + attributeName + "], childJoin= [" + TextUtils.join(" ", childJoins) + "]");
-                joins.addAll(childJoins);
+                    joins.addAll(childJoins);
+                }
+
             } else if (DatabaseContract.OR.equals(attributeName)) {
                 JSONObject rootEntity = entity.getJSONObject(DatabaseContract.OR);
 

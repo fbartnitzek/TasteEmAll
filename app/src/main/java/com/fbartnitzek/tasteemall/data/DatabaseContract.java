@@ -119,6 +119,7 @@ public class DatabaseContract {
         public static final String BETWEEN = "BETWEEN";
         public static final String CONTAINS = "CONTAINS";
         public static final String IS = "IS";
+        public static final String NULL = "NULL";
     }
 
     public final static String OR = "OR";
