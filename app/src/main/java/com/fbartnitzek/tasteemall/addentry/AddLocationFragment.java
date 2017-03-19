@@ -84,6 +84,7 @@ public class AddLocationFragment extends Fragment implements
     private static final String STATE_LOCATION_INPUT = "STATE_LOCATION_INPUT";
     private static final String STATE_LOCATION_DESCRIPTION = "STATE_LOCATION_DESCRIPTION";
     private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
+//    private static final String STATE_ORIGINAL_LOCATION_FORMATTED = "STATE_ORIGINAL_LOCATION_FORMATTED";
 
     private View mRootView;
 //    private EditText mEditLocation;
@@ -108,6 +109,7 @@ public class AddLocationFragment extends Fragment implements
     private String mLocationInput;
     private Uri mContentUri;
     private String mOriginalLocationInput;
+    private String mOriginalLocationFormatted;
     private String mLocationDescription;
     private long mLocation_Id;
     private String mLocationId;
@@ -190,9 +192,16 @@ public class AddLocationFragment extends Fragment implements
                 // TODO: for now: just show it
                 if (s.length() > 1) {
                     hideMap();
-                    mLocationParcelable = null;
-                    mLocationInput = s.toString();
-                    startGeocodeService(s.toString());
+                    if (mOriginalLocationFormatted != null && mOriginalLocationFormatted.length() > 0 && mOriginalLocationFormatted.equals(s.toString())) {
+                        // workaround: not all searches with formatted_location get address result :-p
+                        showMap();
+                        focusOnMap();
+                        updateAndMoveToMarker();
+                    } else {
+                        mLocationParcelable = null;
+                        mLocationInput = s.toString();
+                        startGeocodeService(s.toString());
+                    }
                 }
             }
         });
@@ -295,6 +304,10 @@ public class AddLocationFragment extends Fragment implements
         if (mContentUri != null) {
             outState.putParcelable(STATE_CONTENT_URI, mContentUri);
         }
+        // guess: not needed, on rotation loader will load again
+//        if (mOriginalLocationFormatted != null) {
+//            outState.putString(STATE_ORIGINAL_LOCATION_FORMATTED, mOriginalLocationFormatted);
+//        }
         super.onSaveInstanceState(outState);
     }
 
@@ -677,7 +690,7 @@ public class AddLocationFragment extends Fragment implements
                             toastRes = R.string.msg_no_location_provided;
                             break;
                         default:
-                            return;
+                            return; // searching with complete address sometimes does not work...!
                         // ignore that one - TODO: just show it for "complete search" - how to detect...?
 //                        case GeocodeIntentService.FAILURE_NO_RESULT_FOUND:
 //                            toastRes = R.string.msg_no_address_found;
@@ -738,18 +751,20 @@ public class AddLocationFragment extends Fragment implements
 //            }
 
             mOriginalLocationInput = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_INPUT);
-            String formatted = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_FORMATTED_ADDRESS);
+            mOriginalLocationFormatted = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_FORMATTED_ADDRESS);
             mLocationParcelable = new LocationParcelable(
-                    LocationParcelable.INVALID_ID,
+                    LocationParcelable.INVALID_ID,  // ignored by update
                     data.getString(QueryColumns.LocationFragment.ShowQuery.COL_COUNTRY),
-                    "",
+                    "", // ignored by update
                     data.getDouble(QueryColumns.LocationFragment.ShowQuery.COL_LATITUDE),
                     data.getDouble(QueryColumns.LocationFragment.ShowQuery.COL_LONGITUDE),
                     mOriginalLocationInput,
-                    formatted,
+                    mOriginalLocationFormatted,
                     null);
 
-            if (!Utils.isNetworkUnavailable(getActivity()) && DatabaseContract.LocationEntry.GEOCODE_ME.equals(formatted)) {
+            Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", mLocationParcelable=[" + mLocationParcelable + "]");
+
+            if (!Utils.isNetworkUnavailable(getActivity()) && DatabaseContract.LocationEntry.GEOCODE_ME.equals(mOriginalLocationFormatted)) {
                 // geocode
                 mEditLocation.setText(mOriginalLocationInput);
             } else {
