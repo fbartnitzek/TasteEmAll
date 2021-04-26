@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
@@ -39,6 +40,8 @@ import java.util.TimeZone;
  */
 
 public class Utils {
+
+    private static final String LOG_TAG = Utils.class.getName();
     // to confusing for now...
 //    public static String calcDegreesPlato(double stammwuerze) {
 //        //https://de.wikipedia.org/wiki/Stammw%C3%BCrze#Umrechnung_zwischen_Grad_Plato_und_Massendichte
@@ -341,21 +344,26 @@ public class Utils {
 //    }
 
     public static String formatAddress(Address address) {
-        StringBuilder stringBuilder = new StringBuilder();
+        // somehow the Address-format changed in the last 4-5years to only 1 line ...
+        // https://developer.android.com/reference/android/location/Address.html#getMaxAddressLineIndex()
 
-        for(int i = address.getMaxAddressLineIndex() -1 ; i >= 0; --i) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = address.getMaxAddressLineIndex() ; i >= 0; --i) {
             stringBuilder.append(address.getAddressLine(i)).append(", ");  //seems to be quite good
         }
         if (stringBuilder.length() > 2) {
             stringBuilder.setLength(stringBuilder.length() -2);
         }
-//        currentAddress = currentAddress.substring(0, currentAddress.length() - 2); //65432 FFM, some street nr
+
+        String formatted;
         if (stringBuilder.length() > 0) {
-            return stringBuilder.toString();
+            formatted = stringBuilder.toString();
         } else {    //bugfix for Sri Lanka :-p
-            return address.getCountryName();
+            formatted = address.getCountryName();
         }
 
+        Log.v(LOG_TAG, "formatAddress, formatted: " + formatted + ", address: " + address);
+        return formatted;
     }
 
     public static boolean checkGeocodeAddressFormat(String formattedAddress) {
@@ -377,6 +385,7 @@ public class Utils {
     }
 
     public static LocationParcelable getLocationFromAddress(Address address, String locationInput, String description) {
+        Log.v(LOG_TAG, "getLocationFromAddress, address: " + address + ", locationInput: " + locationInput);
         return new LocationParcelable(
                 LocationParcelable.INVALID_ID,
                 address.getCountryName(),
