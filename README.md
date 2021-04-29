@@ -16,7 +16,8 @@ Here is a solution which hopefully will at least work for me. :-)
 ## Installation
 
 ### Google Maps
-To include google maps for the map and the geocoder, the API Key (or a reference to it) needs to be inserted below `app/src/debug/res/values` and `app/src/release/res/values` in a file f.e. **api_keys.xml** with the following format:
+To include google maps for the map and the geocoder, the API Key (or a reference to it) needs to be inserted
+below `app/src/debug/res/values` and `app/src/release/res/values` in a file f.e. **my_api_keys.xml** with the following format:
 ```
 <resources>
     <string name="GoogleMapsApiKey">INSERT_KEY_HERE</string>

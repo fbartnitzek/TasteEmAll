@@ -30,12 +30,12 @@
 
 
     <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:scrollbars="vertical"
             android:id="@+id/recyclerview_entities"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
     </LinearLayout>
 

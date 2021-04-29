@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/nested_scrollView"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:layout_marginTop="@dimen/margin_main_fragment_headings"
                 android:text="@string/label_list_map_locations_preview"/>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_map_locations"
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                 android:layout_marginTop="@dimen/margin_main_fragment_headings"
                 android:text="@string/label_list_map_sub_list"/>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_map_sub_list"
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
@@ -61,7 +61,7 @@
 
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>
 

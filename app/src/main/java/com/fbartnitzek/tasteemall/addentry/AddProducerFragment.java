@@ -12,18 +12,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -94,6 +94,7 @@ public class AddProducerFragment extends Fragment implements
     private Marker mCurrentMarker = null;
     private Address[] mLocationAddresses;
     private int mPosition = ListView.INVALID_POSITION;
+//    private int mDontGeocode = 0;
 
 
     private String mProducerName;
@@ -184,6 +185,12 @@ public class AddProducerFragment extends Fragment implements
 
             @Override
             public void afterTextChanged(Editable s) {
+                // todo DEBUG fast abort, quick hack, markers don't work anymore
+//                if (mDontGeocode == 1) {
+//                    mDontGeocode--;
+//                    return;
+//                }
+
                 if (s.length() > 1) {
                     hideMap();
                     mLocationParcelable = null;
@@ -244,7 +251,9 @@ public class AddProducerFragment extends Fragment implements
                 showMap();
                 focusOnMap();
                 Address address = mLocationArrayAdapter.getItem(mPosition);
+                Log.v(LOG_TAG, "onItemClick, hashCode=" + this.hashCode() + ", " + "address = [" + address + "]");
                 mLocationParcelable = Utils.getLocationFromAddress(address, mLocationInput, null);
+                Log.v(LOG_TAG, "onItemClick, hashCode=" + this.hashCode() + ", " + "mLocationParcelable = [" + mLocationParcelable + "]");
                 updateAndMoveToMarker();
             }
         });
@@ -484,6 +493,17 @@ public class AddProducerFragment extends Fragment implements
     private void startGeocodeService(String address) {
         Log.v(LOG_TAG, "startGeocodeService, address=" + address + ", lastLocation=" + mLastLocation);
 
+        // todo buggy behaviour: recall with lat long as address-string malicious
+        if (mLastLocation != null && address != null) {
+            if (address.equals(Utils.getLocationInput(mLastLocation.getLatitude(), mLastLocation.getLongitude()))){
+                Log.v(LOG_TAG, "could abort fast");
+//                return;
+            } else {
+                Log.v(LOG_TAG, "originally no abort");
+            }
+        }
+
+
         if (Utils.isNetworkUnavailable(getActivity())){
             if (!mNetworkErrorShown) {
                 Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
@@ -681,6 +701,7 @@ public class AddProducerFragment extends Fragment implements
     }
 
     private void updateAndMoveToMarker() {
+        Log.v(LOG_TAG, "updateAndMoveToMarker, mMap=[" + mMap + "], mLocationParcelable=[" + mLocationParcelable + "]");
         if (mMap != null && mLocationParcelable != null) {
             if (mCurrentMarker != null) {
                 mCurrentMarker.remove();

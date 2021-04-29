@@ -2,7 +2,7 @@ package com.fbartnitzek.tasteemall.addentry;
 
 import android.app.Activity;
 import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.widget.TextView;
 

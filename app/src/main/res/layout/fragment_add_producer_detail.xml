@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -97,7 +97,7 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_marginBottom="12dp"/>
 
         <LinearLayout
@@ -145,4 +145,4 @@
         </LinearLayout>
 
     </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

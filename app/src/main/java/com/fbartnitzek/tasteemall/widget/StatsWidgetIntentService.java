@@ -7,7 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.TaskStackBuilder;
+import androidx.core.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 

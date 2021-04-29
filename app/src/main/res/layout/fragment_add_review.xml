@@ -4,7 +4,7 @@
              android:layout_height="match_parent"
              tools:context=".addentry.AddReviewFragment">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -14,7 +14,7 @@
 
         <include layout="@layout/fragment_add_review_detail"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 </FrameLayout>

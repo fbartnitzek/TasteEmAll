@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".showentry.ShowReviewActivity">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,7 +15,7 @@
 
         <include layout="@layout/fragment_show_review_detail"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_share"
             android:focusable="true"
             android:layout_width="wrap_content"
@@ -25,6 +25,6 @@
             android:contentDescription="@string/a11y_share_review"
             android:src="@android:drawable/ic_menu_share"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </FrameLayout>

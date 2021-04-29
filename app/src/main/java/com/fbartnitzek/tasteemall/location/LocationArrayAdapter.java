@@ -2,6 +2,7 @@ package com.fbartnitzek.tasteemall.location;
 
 import android.app.Activity;
 import android.location.Address;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class LocationArrayAdapter extends ArrayAdapter<Address> {
         if (rowView == null) {
             LayoutInflater inflater = mActivity.getLayoutInflater();
             rowView = inflater.inflate(R.layout.list_item_location_list, parent, false);
+            Log.v(LOG_TAG, "guess rowView by id: " + rowView);
 
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.countryView = (TextView) rowView.findViewById(R.id.list_item_location_country);

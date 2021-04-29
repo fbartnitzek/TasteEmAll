@@ -10,12 +10,12 @@ task fatJar(type: Jar){
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'org.apache.commons:commons-csv:1.0'
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'org.apache.commons:commons-csv:1.0'
+    testImplementation 'junit:junit:4.12'
 //    compile 'com.google.code.gson:gson:2.4'
 
-    compile 'com.google.maps:google-maps-services:0.1.8'
+    implementation 'com.google.maps:google-maps-services:0.1.8'
 }
 
 sourceCompatibility = 1.7   //TODO: when and why did I introduce this...?

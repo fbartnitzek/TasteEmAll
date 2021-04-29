@@ -11,7 +11,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -23,7 +23,7 @@
             <!--android:id="@+id/fragment_detail_layout"-->
             <!--layout="@layout/fragment_page_entity_detail"/>-->
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -31,7 +31,7 @@
             android:layout_height="match_parent" />
 
         <!-- add float button -->
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,6 +43,6 @@
 
         <!--TODO: contentDescription addReview programmatically-->
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>
