@@ -41,6 +41,10 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/LICENSE'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 
@@ -55,8 +59,13 @@ dependencies {
 
     // selection for used google play services - see: https://developers.google.com/android/guides/setup
     implementation 'com.google.android.gms:play-services-location:18.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    // todo maybe...
+    implementation 'com.google.android.gms:play-services-places:17.0.0'
+//    implementation 'com.google.android.libraries.places:places:2.4.0'
+
+    implementation "androidx.work:work-runtime:2.6.0-alpha02"
+    implementation "androidx.work:work-runtime-ktx:2.6.0-alpha02"
 
 
     testImplementation 'junit:junit:4.12'
