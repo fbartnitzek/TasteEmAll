@@ -70,7 +70,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     //    compile 'com.google.code.gson:gson:2.6'
-    implementation 'com.nononsenseapps:filepicker:2.5.2'
+    // https://mvnrepository.com/artifact/com.nononsenseapps/filepicker
+    implementation group: 'com.nononsenseapps', name: 'filepicker', version: '4.2.1'
     implementation 'org.apache.commons:commons-csv:1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     //enable multidex on v4.3 devices - part 2

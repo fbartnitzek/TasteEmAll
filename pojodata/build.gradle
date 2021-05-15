@@ -18,4 +18,5 @@ dependencies {
     implementation 'com.google.maps:google-maps-services:0.1.8'
 }
 
-sourceCompatibility = 1.7   //TODO: when and why did I introduce this...?
+java.targetCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_1_8
