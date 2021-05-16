@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.location.AddressData;
 import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 
 import java.lang.reflect.Array;
@@ -397,6 +398,19 @@ public class Utils {
                 description);
     }
 
+    public static LocationParcelable getLocationFromAddressData(AddressData address, String description) {
+        Log.v(LOG_TAG, "getLocationFromAddress, address: " + address);
+        return new LocationParcelable(
+                LocationParcelable.INVALID_ID,
+                address.getCountryName(),
+                calcLocationId(address.getOrigInput()),
+                address.getLatitude(),
+                address.getLongitude(),
+                address.getOrigInput(),
+                address.getFormatted(),
+                description);
+    }
+
     public static LocationParcelable getLocationStubFromLastLocation(Location mLastLocation, String description) {
         String locationInput = getLocationInput(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         return new LocationParcelable(
@@ -490,5 +504,4 @@ public class Utils {
         }
         return customClasses;
     }
-
 }

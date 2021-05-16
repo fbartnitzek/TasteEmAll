@@ -35,11 +35,12 @@ public class AddProducerActivity extends AppCompatActivity {
 
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
-            AddProducerFragment fragment = getFragment();
+//            AddProducerFragment fragment = getFragment();
+            AddProducerFragment2 fragment = getFragment();
 
             // use name from calling activity
             if (fragment == null) {
-                fragment = new AddProducerFragment();
+                fragment = new AddProducerFragment2();
                 if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
                     fragment.setProducerName(getIntent().getStringExtra(PRODUCER_NAME_EXTRA));
                 } else if (getIntent().getData() != null) {
@@ -66,8 +67,8 @@ public class AddProducerActivity extends AppCompatActivity {
         return true;
     }
 
-    private AddProducerFragment getFragment() {
-        return (AddProducerFragment) getSupportFragmentManager().findFragmentByTag(ADD_PRODUCER_FRAGMENT_TAG);
+    private AddProducerFragment2 getFragment() {
+        return (AddProducerFragment2) getSupportFragmentManager().findFragmentByTag(ADD_PRODUCER_FRAGMENT_TAG);
     }
 
     // TODO: might be better directly in fragment...
@@ -79,7 +80,7 @@ public class AddProducerActivity extends AppCompatActivity {
                 supportFinishAfterTransition();
                 return true;
             case R.id.action_save:
-                AddProducerFragment fragment = getFragment();
+                AddProducerFragment2 fragment = getFragment();
                 if (fragment != null) {
                     Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
                     fragment.saveData();
