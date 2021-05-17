@@ -112,18 +112,14 @@ public class ShowProducerActivity extends AppCompatActivity {
         );
         builder.setNegativeButton(
                 R.string.keep_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ShowProducerActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                (dialog, which) -> Toast.makeText(ShowProducerActivity.this, "keeping entry", Toast.LENGTH_SHORT).show()
         );
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
     private void startEditActivity() {
+        Log.v(LOG_TAG, "edit producer via AddProducerActivity");
         Intent intent = new Intent(this, AddProducerActivity.class);
         intent.setData(mContentUri);
         View view = findViewById(R.id.producer_name);
