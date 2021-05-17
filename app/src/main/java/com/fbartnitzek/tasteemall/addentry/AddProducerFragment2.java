@@ -73,11 +73,10 @@ import static com.fbartnitzek.tasteemall.data.QueryColumns.ProducerFragment.Show
 public class AddProducerFragment2 extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor>, OnMapReadyCallback {
 
+    private static final int EDIT_PRODUCER_LOADER_ID = 12345;
     private static final int REQUEST_LOCATION_PERMISSION_CODE = 32456;
     private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
-    private static final String STATE_PRODUCER_ID = "STATE_PRODUCER_ID";
     private static final String STATE_ADDRESS = "STATE_ADDRESS";
-//    private static final String STATE_ADDRESSES = "STATE_ADDRESSES";
     private static final String STATE_ORIGINAL_LOCATION_INPUT = "STATE_ORIGINAL_LOCATION_INPUT";
     private static final String STATE_NETWORK_ERROR_SHOWN = "STATE_NETWORK_ERROR_SHOWN";
     private static final String STATE_LAST_LOCATION = "STATE_LAST_LOCATION";
@@ -98,13 +97,12 @@ public class AddProducerFragment2 extends Fragment implements
     private SupportMapFragment mapFragment;
     private static GoogleMap map;
 
-//    private String producerId;
     private String originalLocationInput;
+
     // todo: both needed?
     private boolean networkErrorShown = false;
 
     private LocationDataArrayAdapter locationDataArrayAdapter;
-//    private String locationInput;
     private Location lastLocation;
     private ListView listView;
     private int position;
@@ -123,11 +121,10 @@ public class AddProducerFragment2 extends Fragment implements
             restoreInstanceState(savedInstanceState);
         }
         setRetainInstance(true);
-        // todo: something for the worker instead of resultReceiver
         super.onCreate(savedInstanceState);
     }
 
-    // todo: test gps / name without network
+    // todo: test name without network
     // todo: test rotation
     // todo: remove locationParcelable?
     // todo: other location-fragments...
@@ -136,9 +133,6 @@ public class AddProducerFragment2 extends Fragment implements
         if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
             contentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
         }
-//        if (savedInstanceState.containsKey(STATE_PRODUCER_ID)) {
-//            producerId = savedInstanceState.getString(STATE_PRODUCER_ID);
-//        }
         if (savedInstanceState.containsKey(STATE_ADDRESS)) {
             address = savedInstanceState.getParcelable(STATE_ADDRESS);
         }
@@ -288,15 +282,14 @@ public class AddProducerFragment2 extends Fragment implements
                 Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
                 networkErrorShown = true;
             }
-
-            if (input == null && lastLocation != null) {
-//                updateLocationText(); // todo: ??? now might use lastLocation
-            }
             return;
         }
 
         Data.Builder dataBuilder = new Data.Builder();
-        if (input != null) {
+        if (isGeocodeMeLatLong(address)) {
+            dataBuilder.putDouble(GeocodeWorker.INPUT_LATITUDE, address.getLatitude());
+            dataBuilder.putDouble(GeocodeWorker.INPUT_LONGITUDE, address.getLongitude());
+        } else if (input != null) {
             dataBuilder.putString(GeocodeWorker.INPUT_TEXT, input);
         } else if (lastLocation != null) {
             dataBuilder.putDouble(GeocodeWorker.INPUT_LATITUDE, lastLocation.getLatitude());
@@ -332,6 +325,12 @@ public class AddProducerFragment2 extends Fragment implements
                         }
                     }
                 });
+    }
+
+    private boolean isGeocodeMeLatLong(AddressData address) {
+        return address != null
+                && DatabaseContract.LocationEntry.GEOCODE_ME.equals(address.getFormatted())
+                && Utils.isValidLatLong(address.getLatitude(), address.getLongitude());
     }
 
     private void updateAddressesFromWorkerOutput(Data outData) {
@@ -371,23 +370,6 @@ public class AddProducerFragment2 extends Fragment implements
                 Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION_CODE);
     }
 
-
-//    private void updateLocationText() {
-//        // todo: both seem useless!
-//        if (editLocation != null) {
-//            if (address != null) {
-//                if (address.getFormatted() != null) {
-//                    editLocation.setText(address.getFormatted());
-//                }
-//            }
-//
-//            // geocoder unreachable
-//            if (lastLocation != null && address == null) {
-//                Log.v(LOG_TAG, "updateLocationText, call geocoder later - happens ever? hashCode=" + this.hashCode() + ", " + "");
-//                editLocation.setText(R.string.call_geocoder_later);
-//            }
-//        }
-//    }
 
     private void createToolbar() {
         Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
@@ -527,6 +509,13 @@ public class AddProducerFragment2 extends Fragment implements
         this.contentUri = contentUri;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        if (contentUri != null) {
+            LoaderManager.getInstance(this).initLoader(EDIT_PRODUCER_LOADER_ID, null, this);
+        }
+        super.onActivityCreated(savedInstanceState);
+    }
 
     @NonNull
     @NotNull
@@ -562,14 +551,18 @@ public class AddProducerFragment2 extends Fragment implements
                     getString(R.string.shared_transition_producer_producer)
                             + data.getInt(ShowQuery.COL_PRODUCER__ID));
 
-
             originalLocationInput = data.getString(ShowQuery.COL_PRODUCER_INPUT);
             String formatted = data.getString(ShowQuery.COL_PRODUCER_FORMATTED_ADDRESS);
             String countryName = data.getString(ShowQuery.COL_PRODUCER_COUNTRY);
-
-            Optional<String> countryCode = Arrays.stream(Locale.getISOCountries())
-                    .filter(code -> countryName.equals(new Locale("", code).getDisplayCountry()))
-                    .findFirst();
+            Optional<String> countryCode = Optional.empty();
+            if (countryName != null) {
+                Log.v(LOG_TAG, "countryName of loaded entry: " + countryName);
+                countryCode = Arrays.stream(Locale.getISOCountries())
+                        .filter(code -> countryName.equals(new Locale("", code).getDisplayCountry()))
+                        .findFirst();
+            } else {
+                Log.v(LOG_TAG, "countryName of loaded entry is null!");
+            }
 
             address = new AddressData(
                     data.getDouble(ShowQuery.COL_PRODUCER_LATITUDE),
@@ -580,28 +573,16 @@ public class AddProducerFragment2 extends Fragment implements
                     data.getString(ShowQuery.COL_PRODUCER_INPUT)
             );
 
-            // todo: replace me
-//            mLocationParcelable = new LocationParcelable(
-//                    LocationParcelable.INVALID_ID,
-//                    data.getString(ShowQuery.COL_PRODUCER_COUNTRY),
-//                    "",
-//                    data.getDouble(ShowQuery.COL_PRODUCER_LATITUDE),
-//                    data.getDouble(ShowQuery.COL_PRODUCER_LONGITUDE),
-//                    mOriginalLocationInput,
-//                    formatted,
-//                    null);
-
             if (!Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))
                     && DatabaseContract.LocationEntry.GEOCODE_ME.equals(formatted)) {
                 // geocode
                 editLocation.setText(originalLocationInput);
-//            } else {
-//                updateLocationText();
+            } else {
+                ignoreEdit = 1;
+                editLocation.setText(address.getFormatted());
             }
 
-            // todo
-            if (Utils.isValidLocation(locationParcelable)) {
-                showMap();
+            if (Utils.isValidLatLong(address.getLatitude(), address.getLongitude())) {
                 updateAndMoveToMarker();
             } else {
                 hideMap();
@@ -611,7 +592,6 @@ public class AddProducerFragment2 extends Fragment implements
             editProducerWebsite.setText(website);
             String description = data.getString(ShowQuery.COL_PRODUCER_DESCRIPTION);
             editProducerDescription.setText(description);
-//            producerId = data.getString(ShowQuery.COL_PRODUCER_ID);
 
             updateToolbar(name);
             resumeActivityEnterTransition();    // from edit
@@ -621,15 +601,11 @@ public class AddProducerFragment2 extends Fragment implements
     public void saveData() {
         Log.v(LOG_TAG, "saveData, hashCode=" + this.hashCode() + ", " + "");
         producerName = editProducerName.getText().toString().trim();
-//        locationInput = editLocation.getText().toString().trim();
 
         //validate
         if (producerName.length() == 0) {
             Snackbar.make(rootView, R.string.msg_enter_producer_name, Snackbar.LENGTH_SHORT).show();
             return;
-//        } else if (locationInput.length() == 0) {
-//            Snackbar.make(rootView, R.string.msg_enter_producer_location, Snackbar.LENGTH_SHORT).show();
-//            return;
         }
 
         if (contentUri != null) { //update
