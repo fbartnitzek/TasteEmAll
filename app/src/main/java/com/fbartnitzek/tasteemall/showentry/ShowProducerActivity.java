@@ -119,7 +119,7 @@ public class ShowProducerActivity extends AppCompatActivity {
     }
 
     private void startEditActivity() {
-        Log.v(LOG_TAG, "edit producer via AddProducerActivity");
+        Log.v(LOG_TAG, "edit producer via AddProducerActivity with ContentUri: " + mContentUri);
         Intent intent = new Intent(this, AddProducerActivity.class);
         intent.setData(mContentUri);
         View view = findViewById(R.id.producer_name);

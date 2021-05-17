@@ -124,8 +124,7 @@ public class AddProducerFragment2 extends Fragment implements
         super.onCreate(savedInstanceState);
     }
 
-    // todo: test name without network
-    // todo: test rotation
+    // todo: test rotation: rotation in show before edit breaks activity-mContentUri
     // todo: remove locationParcelable?
     // todo: other location-fragments...
 
