@@ -98,8 +98,6 @@ public class AddProducerFragment2 extends Fragment implements
     private static GoogleMap map;
 
     private String originalLocationInput;
-
-    // todo: both needed?
     private boolean networkErrorShown = false;
 
     private LocationDataArrayAdapter locationDataArrayAdapter;
@@ -114,6 +112,28 @@ public class AddProducerFragment2 extends Fragment implements
 
 
     @Override
+    public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        outState.putString(STATE_PRODUCER_NAME, editProducerName.getText().toString().trim().trim());
+        outState.putString(STATE_LOCATION, editLocation.getText().toString().trim());
+        outState.putString(STATE_PRODUCER_WEBSITE, editProducerWebsite.getText().toString().trim());
+        outState.putString(STATE_PRODUCER_DESCRIPTION, editProducerDescription.getText().toString().trim());
+        outState.putBoolean(STATE_NETWORK_ERROR_SHOWN, networkErrorShown);
+        if (contentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, contentUri);
+        }
+        if (address != null) {
+            outState.putParcelable(STATE_ADDRESS, address);
+        }
+        if (originalLocationInput != null) {
+            outState.putString(STATE_ORIGINAL_LOCATION_INPUT, originalLocationInput);
+        }
+        if (lastLocation != null) {
+            outState.putParcelable(STATE_LAST_LOCATION, lastLocation);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 
         locationDataArrayAdapter = new LocationDataArrayAdapter(getActivity());
@@ -124,7 +144,6 @@ public class AddProducerFragment2 extends Fragment implements
         super.onCreate(savedInstanceState);
     }
 
-    // todo: test rotation: rotation in show before edit breaks activity-mContentUri
     // todo: remove locationParcelable?
     // todo: other location-fragments...
 

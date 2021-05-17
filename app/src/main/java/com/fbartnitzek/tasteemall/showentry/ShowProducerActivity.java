@@ -3,13 +3,10 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -18,6 +15,10 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
@@ -25,13 +26,24 @@ import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.tasks.DeleteEntryTask;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ShowProducerActivity extends AppCompatActivity {
 
     private static final String FRAGMENT_TAG = "SHOW_PRODUCER_TAG";
     private static final String LOG_TAG = ShowProducerActivity.class.getName();
     public static final String EXTRA_PRODUCER_URI = "EXTRA_PRODUCER_URI";
+    private static final String STATE_CONTENT_URI = "SPA_STATE_CONTENT_URI"; 
     private static final int EDIT_PRODUCER_REQUEST = 444;
     private Uri mContentUri;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,29 +52,34 @@ public class ShowProducerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_producer);
 
         if (findViewById(R.id.container_show_producer_fragment) != null) {
-            if (savedInstanceState != null) {
-//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-                return;
-            }
-
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
-            ShowProducerFragment fragment = new ShowProducerFragment();
 
-            mContentUri = getIntent().getData();
-            if (mContentUri != null) {
-                Bundle args = new Bundle();
-                args.putParcelable(EXTRA_PRODUCER_URI, mContentUri);
-                fragment.setArguments(args);
+            if (getIntent().getData() != null) {
+                mContentUri = getIntent().getData();
+            } else if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+                mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+            } else {
+                Log.wtf(LOG_TAG, "contentUri missing!");
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_show_producer_fragment, fragment, FRAGMENT_TAG)
-                    .commit();
+            addShowProducerFragment();
 
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
+    }
 
+    private void addShowProducerFragment() {
+        ShowProducerFragment fragment = new ShowProducerFragment();
+
+        if (mContentUri != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(EXTRA_PRODUCER_URI, mContentUri);
+            fragment.setArguments(args);
+        }
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container_show_producer_fragment, fragment, FRAGMENT_TAG)
+                .commit();
     }
 
     @Override
