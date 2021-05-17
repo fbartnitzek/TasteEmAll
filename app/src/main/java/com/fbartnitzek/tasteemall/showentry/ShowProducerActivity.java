@@ -39,7 +39,6 @@ public class ShowProducerActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_producer);
 
-
         if (findViewById(R.id.container_show_producer_fragment) != null) {
             if (savedInstanceState != null) {
 //                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
@@ -100,18 +99,15 @@ public class ShowProducerActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 R.string.delete_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);   //TODO: joined error
-                        // TODO: check for foreign keys ... generic seems unlikely...?
-//                        int id = DatabaseContract.getIdFromUri(deleteUri);
-//                        Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
-                        new DeleteEntryTask(
-                                ShowProducerActivity.this,
-                                DatabaseContract.ProducerEntry.TABLE_NAME + "." + Producer.NAME)
-                                .execute(deleteUri);
-                    }
+                (dialog, which) -> {
+                    Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);//TODO: joined error
+                    // TODO: check for foreign keys ... generic seems unlikely...?
+                    // int id = DatabaseContract.getIdFromUri(deleteUri);
+                    // Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
+                    new DeleteEntryTask(
+                            ShowProducerActivity.this,
+                            DatabaseContract.ProducerEntry.TABLE_NAME + "." + Producer.NAME)
+                            .execute(deleteUri);
                 }
         );
         builder.setNegativeButton(
@@ -186,9 +182,7 @@ public class ShowProducerActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

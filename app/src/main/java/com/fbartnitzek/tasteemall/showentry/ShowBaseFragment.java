@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.fbartnitzek.tasteemall.R;
 
+import java.util.Objects;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -36,10 +38,10 @@ abstract class ShowBaseFragment extends Fragment implements LoaderManager.Loader
     abstract void updateFragment(Uri uri);
 
     void createToolbar(View rootView, String LOG_TAG) {
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
+            Objects.requireNonNull(activity).setSupportActionBar(toolbar);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar == null) {
                 Log.e(LOG_TAG, "createToolbar - no supportActionBar found..., hashCode=" + this.hashCode() + ", " + "");

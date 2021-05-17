@@ -2,17 +2,18 @@ package com.fbartnitzek.tasteemall.showentry;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
@@ -22,8 +23,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 
 /**
@@ -45,7 +51,6 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     private Uri mUri;
     private View mRootView;
     private LatLng mLatLng;
-    // --Commented out by Inspection (07.05.16 22:47):private int mDrinkTypeIndex;
 
     public ShowProducerFragment() {
         Log.v(LOG_TAG, "ShowProducerFragment, " + "");
@@ -62,7 +67,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "]");
         mUri = contentUri;
         calcCompleteUri();
-        getLoaderManager().restartLoader(SHOW_PRODUCER_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(SHOW_PRODUCER_LOADER_ID, null, this);
     }
 
     @Override
@@ -82,22 +87,22 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
             }
         }
 
-        mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
-        mProducerLocationCountryView = (TextView) mRootView.findViewById(R.id.producer_location_country);
-        mProducerLocationAddressView = (TextView) mRootView.findViewById(R.id.producer_location_address);
+        mProducerNameView = mRootView.findViewById(R.id.producer_name);
+        mProducerLocationCountryView = mRootView.findViewById(R.id.producer_location_country);
+        mProducerLocationAddressView = mRootView.findViewById(R.id.producer_location_address);
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(this);
+        if (mMapFragment != null) {
+            mMapFragment.getMapAsync(this);
+        } else {
+            Log.e(LOG_TAG, "onCreateView, MapFragment not found...");
+        }
 
-
-        mProducerDescriptionView = (TextView) mRootView.findViewById(R.id.producer_description);
-        mProducerWebsiteView = (TextView) mRootView.findViewById(R.id.producer_website);
-        mProducerWebsiteView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String website = mProducerWebsiteView.getText().toString();
-                Utils.openInBrowser(website, getActivity());
-            }
+        mProducerDescriptionView = mRootView.findViewById(R.id.producer_description);
+        mProducerWebsiteView = mRootView.findViewById(R.id.producer_website);
+        mProducerWebsiteView.setOnClickListener(v -> {
+            String website = mProducerWebsiteView.getText().toString();
+            Utils.openInBrowser(website, getActivity());
         });
         createToolbar(mRootView, LOG_TAG);
 
@@ -106,24 +111,24 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
 
     @Override
     public void onResume() {
-        getLoaderManager().initLoader(SHOW_PRODUCER_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).initLoader(SHOW_PRODUCER_LOADER_ID, null, this);
         super.onResume();
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
         Log.v(LOG_TAG, "onCreateLoader, mUri=" + mUri + ", hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         if (mUri != null) {
             return new CursorLoader(
-                    getActivity(),
+                    Objects.requireNonNull(getActivity()),
                     mUri,
                     QueryColumns.ProducerFragment.ShowQuery.COLUMNS,
                     null,
                     null,
                     null);
         }
-
+        // todo: what would be appropriate?
         return null;
     }
 
@@ -131,7 +136,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     void updateToolbar() {
 //        Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar();
         if (actionBar != null) {
 
             // later: when called from drink you may use the drinkType - now it's ... wrong
@@ -145,7 +150,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NotNull Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
         if (data != null && data.moveToFirst()) {
@@ -166,9 +171,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
                     data.getDouble(QueryColumns.ProducerFragment.ShowQuery.COL_PRODUCER_LONGITUDE));
             updateToolbar();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ((ShowProducerActivity) getActivity()).scheduleStartPostponedTransition(mProducerNameView);
-            }
+            ((ShowProducerActivity) Objects.requireNonNull(getActivity())).scheduleStartPostponedTransition(mProducerNameView);
 
             updateAndMoveToMarker();
 
@@ -177,7 +180,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
@@ -185,12 +188,11 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     // map
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         updateAndMoveToMarker();
     }
 
-    // TODO: not centered on Galaxy S6...
     private void updateAndMoveToMarker() {
         Log.v(LOG_TAG, "updateAndMoveToMarker, mMap=" + mMap + ", mLatLng=" + mLatLng);
         if (mMap != null && mLatLng != null) {
@@ -199,9 +201,13 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
                     .title(mProducerNameView.getText().toString())
                     .snippet(mProducerLocationAddressView.getText().toString())
                     .draggable(false));
-            mMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(mLatLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            mMap.animateCamera(
+                    CameraUpdateFactory
+                            .newCameraPosition(new CameraPosition.Builder()
+                                    .target(mLatLng)
+                                    .zoom(9)
+                                    .build()),
+                    2000, null);
         }
     }
 }
