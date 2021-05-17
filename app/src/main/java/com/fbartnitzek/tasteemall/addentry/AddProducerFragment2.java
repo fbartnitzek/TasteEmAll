@@ -34,6 +34,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
@@ -86,6 +87,7 @@ public class AddProducerFragment2 extends Fragment implements
     private static final String STATE_LOCATION = "STATE_LOCATION";
 
     private static final String LOG_TAG = AddProducerFragment2.class.getName();
+    private static final String GEOCODE_WORKER = "AddProducerFragment_GeocodeWorker";
     private String producerName;
     private Uri contentUri;
 
@@ -321,7 +323,7 @@ public class AddProducerFragment2 extends Fragment implements
                 .build();
         WorkManager
                 .getInstance(Objects.requireNonNull(getContext()))
-                .enqueue(workRequest);
+                .enqueueUniqueWork(GEOCODE_WORKER, ExistingWorkPolicy.REPLACE, workRequest);
 
         WorkManager
                 .getInstance(Objects.requireNonNull(getContext()))
