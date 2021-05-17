@@ -53,10 +53,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -85,13 +90,10 @@ public class AddLocationFragment extends Fragment implements
     private static final String STATE_LOCATION_INPUT = "STATE_LOCATION_INPUT";
     private static final String STATE_LOCATION_DESCRIPTION = "STATE_LOCATION_DESCRIPTION";
     private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
-//    private static final String STATE_ORIGINAL_LOCATION_FORMATTED = "STATE_ORIGINAL_LOCATION_FORMATTED";
 
     private View mRootView;
-//    private EditText mEditLocation;
     private LocationAutoCompleteTextView mEditLocation;
     private AutoCompleteTextView mEditLocationDescription;
-//    private EditText mEditLocationDescription;
 
     private LocationArrayAdapter mLocationListAdapter;
     private CompletionLocationAdapter mLocationAdapter;
@@ -115,10 +117,6 @@ public class AddLocationFragment extends Fragment implements
     private long mLocation_Id;
     private String mLocationId;
 
-    // TODO: when used from startGeocode: switch to external app and switch back will reload values from db...
-    // quite complicated to restore in the right way -> later...
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -133,32 +131,26 @@ public class AddLocationFragment extends Fragment implements
         super.onCreate(savedInstanceState);
     }
 
-    // TODO: query known locations in AddLocationActivity and reuse them!
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         mRootView = inflater.inflate(R.layout.fragment_add_location, container, false);
 
-        //        mEditLocationDescription = (EditText) mRootView.findViewById(R.id.location_description);
-        mEditLocationDescription = (AutoCompleteTextView) mRootView.findViewById(R.id.location_description);
+        mEditLocationDescription = mRootView.findViewById(R.id.location_description);
         mEditLocationDescription.setThreshold(1);
         mLocationDescriptionAdapter = new CompletionLocationDescriptionAdapter(getActivity());
         mEditLocationDescription.setAdapter(mLocationDescriptionAdapter);
 
-        mEditLocationDescription.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor c = (Cursor) parent.getItemAtPosition(position);
-                mLocation_Id = c.getLong(QueryColumns.LocationPart.CompletionQuery.COL__ID);
-                mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
-                Log.v(LOG_TAG, "editDescription.onItemClick Cursor with locationId=" + mLocationId);
+        mEditLocationDescription.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor c = (Cursor) parent.getItemAtPosition(position);
+            mLocation_Id = c.getLong(QueryColumns.LocationPart.CompletionQuery.COL__ID);
+            mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
+            Log.v(LOG_TAG, "editDescription.onItemClick Cursor with locationId=" + mLocationId);
 
-                if (mEditLocation.getText().toString().isEmpty()) {
-                    String location = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_FORMATTED_ADDRESS);
-                    if (location != null && !location.isEmpty()) {
-                        mEditLocation.setText(location);    // TODO: no reloading - should work
-                    }
+            if (mEditLocation.getText().toString().isEmpty()) {
+                String location = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_FORMATTED_ADDRESS);
+                if (location != null && !location.isEmpty()) {
+                    mEditLocation.setText(location);
                 }
             }
         });
@@ -172,20 +164,17 @@ public class AddLocationFragment extends Fragment implements
             mMapFragment.getMapAsync(this);
         }
 
-        mEditLocation = (LocationAutoCompleteTextView) mRootView.findViewById(R.id.location_location);
+        mEditLocation = mRootView.findViewById(R.id.location_location);
         mEditLocation.setThreshold(1);
         mLocationAdapter = new CompletionLocationAdapter(getActivity(), true);
         mEditLocation.setAdapter(mLocationAdapter);
-//        mEditLocation = (EditText) mRootView.findViewById(R.id.location_location);
         mEditLocation.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
@@ -207,20 +196,17 @@ public class AddLocationFragment extends Fragment implements
             }
         });
 
-        mEditLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor c = (Cursor) parent.getItemAtPosition(position);
-                mLocation_Id = c.getLong(QueryColumns.LocationPart.CompletionQuery.COL__ID);
-                mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
-                Log.v(LOG_TAG, "editLocation.onItemClick Cursor with locationId=" + mLocationId);
+        mEditLocation.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor c = (Cursor) parent.getItemAtPosition(position);
+            mLocation_Id = c.getLong(QueryColumns.LocationPart.CompletionQuery.COL__ID);
+            mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
+            Log.v(LOG_TAG, "editLocation.onItemClick Cursor with locationId=" + mLocationId);
 
-                if (mEditLocationDescription.getText().toString().isEmpty()) {
-                    String description = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_DESCRIPTION);
-                    if (description != null && !description.isEmpty()) {
-                        mEditLocationDescription.setText(description);
-                        mEditLocationDescription.setEnabled(false);
-                    }
+            if (mEditLocationDescription.getText().toString().isEmpty()) {
+                String description = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_DESCRIPTION);
+                if (description != null && !description.isEmpty()) {
+                    mEditLocationDescription.setText(description);
+                    mEditLocationDescription.setEnabled(false);
                 }
             }
         });
@@ -250,7 +236,7 @@ public class AddLocationFragment extends Fragment implements
         });
 
 
-        mListView = (ListView) mRootView.findViewById(R.id.listview_locations);
+        mListView = mRootView.findViewById(R.id.listview_locations);
         mListView.setAdapter(mLocationListAdapter);
 
         if (mLocationAddresses != null && mLocationAddresses.length > 0) {
@@ -305,19 +291,15 @@ public class AddLocationFragment extends Fragment implements
         if (mContentUri != null) {
             outState.putParcelable(STATE_CONTENT_URI, mContentUri);
         }
-        // guess: not needed, on rotation loader will load again
-//        if (mOriginalLocationFormatted != null) {
-//            outState.putString(STATE_ORIGINAL_LOCATION_FORMATTED, mOriginalLocationFormatted);
-//        }
         super.onSaveInstanceState(outState);
     }
 
     private void createToolbar() {
         Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
-        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
+            Objects.requireNonNull(activity).setSupportActionBar(toolbar);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar == null) {
                 return;
@@ -349,19 +331,14 @@ public class AddLocationFragment extends Fragment implements
         }
 
         if (mContentUri != null) { //update
-
             updateData();   // location exists
-
         } else { // insert
-
             Log.v(LOG_TAG, "saveData with mLocationId=" + mLocationId);
             if (mLocationId != null) {
                 finish();
             } else {
                 insertData();
             }
-
-
         }
     }
 
@@ -369,7 +346,7 @@ public class AddLocationFragment extends Fragment implements
         Log.v(LOG_TAG, "finish, hashCode=" + this.hashCode() + ", " + "");
         Intent output = new Intent();
         output.setData(DatabaseContract.LocationEntry.buildUri(mLocation_Id));
-        getActivity().setResult(Activity.RESULT_OK, output);
+        Objects.requireNonNull(getActivity()).setResult(Activity.RESULT_OK, output);
         getActivity().finish();
     }
 
@@ -406,7 +383,6 @@ public class AddLocationFragment extends Fragment implements
     }
 
     private void updateData() {
-
         Log.v(LOG_TAG, "updateData, hashCode=" + this.hashCode() + ", " + "");
         Uri locationUri = Utils.calcSingleLocationUri(mContentUri);
         if (mLocationParcelable == null) {
@@ -418,7 +394,6 @@ public class AddLocationFragment extends Fragment implements
         }
 
         Log.v(LOG_TAG, "updateData, locationParcelable=" + mLocationParcelable.toString());
-
         new UpdateEntryTask(getActivity(), locationUri, mLocationParcelable.getFormattedAddress(), mRootView)
                 .execute(DatabaseHelper.buildLocationUpdateValues(
                         mLocationParcelable.getLatitude(),
@@ -451,7 +426,6 @@ public class AddLocationFragment extends Fragment implements
         if (REQUEST_LOCATION_PERMISSION_CODE == requestCode && permissions.length > 0) {
             if (PackageManager.PERMISSION_GRANTED == grantResults[0] ||
                     PackageManager.PERMISSION_GRANTED == grantResults[grantResults.length - 1]) { // at least one allowed
-//                Log.v(LOG_TAG, "onRequestPermissionsResult - permission granted, try again!");
                 getCurrentLocation();
             }
         }
@@ -461,7 +435,7 @@ public class AddLocationFragment extends Fragment implements
     // map parts
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         updateAndMoveToMarker();
     }
@@ -485,7 +459,8 @@ public class AddLocationFragment extends Fragment implements
             public void run() {
                 Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", " + "");
 
-                NestedScrollView scrollView = (NestedScrollView) getActivity().findViewById(R.id.nested_scrollView);
+                NestedScrollView scrollView = Objects.requireNonNull(getActivity())
+                        .findViewById(R.id.nested_scrollView);
                 if (scrollView != null) {
                     Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", position=" + scrollView.getBottom() + "");
                     scrollView.smoothScrollTo(0, scrollView.getBottom());
@@ -507,9 +482,14 @@ public class AddLocationFragment extends Fragment implements
                     .title(mLocationParcelable.getCountry())
                     .snippet(mLocationParcelable.getFormattedAddress())
                     .draggable(false));
-            mMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+
+            mMap.animateCamera(
+                    CameraUpdateFactory
+                            .newCameraPosition(new CameraPosition.Builder()
+                                    .target(latLng)
+                                    .zoom(9)
+                                    .build()),
+                    2000, null);
         }
     }
 
@@ -557,7 +537,6 @@ public class AddLocationFragment extends Fragment implements
 
             Log.v(LOG_TAG, "getCurrentLocation - no permission");
             Toast.makeText(AddLocationFragment.this.getActivity(), R.string.msg_no_location_access, Toast.LENGTH_SHORT).show();
-
             return;
         } else {
             Log.v(LOG_TAG, "getCurrentLocation - with permission");
@@ -565,15 +544,12 @@ public class AddLocationFragment extends Fragment implements
 
         if (CustomApplication.isGoogleApiClientConnected()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(CustomApplication.getGoogleApiClient());
-            if (mLastLocation != null) {
-                Log.v(LOG_TAG, "getCurrentLocation - startGeocodeServiceByLatLng, mLastLocation=" + mLastLocation);
+            Log.v(LOG_TAG, "getCurrentLocation - startGeocodeServiceByLatLng, mLastLocation=" + mLastLocation);
 
-                startGeocodeService(null);
-                return;
-            }
+            startGeocodeService(null);
+            return;
         }
         Toast.makeText(AddLocationFragment.this.getActivity(), R.string.msg_no_location_provided, Toast.LENGTH_SHORT).show();
-
     }
 
 // Geocoder
@@ -581,14 +557,13 @@ public class AddLocationFragment extends Fragment implements
     private void startGeocodeService(String address) {
         Log.v(LOG_TAG, "startGeocodeService, address=" + address + ", lastLocation=" + mLastLocation);
 
-        if (Utils.isNetworkUnavailable(getActivity())){
+        if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))){
             if (!mNetworkErrorShown) {
                 Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
                 mNetworkErrorShown = true;
             }
 
             if (address == null && mLastLocation != null) {
-                // bugfix 2
                 mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation,
                         mEditLocationDescription.getText().toString());
                 updateLocationText(); // now might use mLastLocation
@@ -600,6 +575,7 @@ public class AddLocationFragment extends Fragment implements
             Log.e(LOG_TAG, "startGeocodeService - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
             return;
         }
+        // todo: change to geocode worker!
         Intent intent = new Intent(this.getActivity(), GeocodeIntentService.class);
         intent.putExtra(GeocodeIntentService.RECEIVER, mResultReceiver);
         if (address != null) {
@@ -610,8 +586,6 @@ public class AddLocationFragment extends Fragment implements
 
         getActivity().startService(intent);
     }
-
-
 
 
     @SuppressLint("ParcelCreator")
@@ -666,9 +640,7 @@ public class AddLocationFragment extends Fragment implements
                 }
 
             } else if (getActivity() == null) { // fast enough on back button - useless result
-
                 return;
-
             } else {  // somehow failed
 
                 if (mLastLocation != null) {    //queried by here
@@ -691,14 +663,7 @@ public class AddLocationFragment extends Fragment implements
                             break;
                         default:
                             return; // searching with complete address sometimes does not work...!
-                        // ignore that one - TODO: just show it for "complete search" - how to detect...?
-//                        case GeocodeIntentService.FAILURE_NO_RESULT_FOUND:
-//                            toastRes = R.string.msg_no_address_found;
-//                            break;
-//                        default:
-//                            toastRes = R.string.msg_no_location_generic;
                     }
-
                     Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
                 }
             }
@@ -711,20 +676,21 @@ public class AddLocationFragment extends Fragment implements
     public void onResume() {    //TODO: onActivityCreated or onResume for loader.init?
         if (mContentUri != null) {
             Log.v(LOG_TAG, "onResume with contentUri - edit, hashCode=" + this.hashCode() + ", " + "");
-            getLoaderManager().initLoader(EDIT_LOCATION_LOADER_ID, null, this);
+            LoaderManager.getInstance(this).initLoader(EDIT_LOCATION_LOADER_ID, null, this);
         } else {
             Log.v(LOG_TAG, "onResume without contentUri - add, hashCode=" + this.hashCode() + ", " + "");
         }
         super.onResume();
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
 
         if (mContentUri != null) {
             return new CursorLoader(
-                    getActivity(),
+                    Objects.requireNonNull(getActivity()),
                     mContentUri,
                     QueryColumns.LocationFragment.ShowQuery.COLUMNS,
                     null,
@@ -736,7 +702,7 @@ public class AddLocationFragment extends Fragment implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NotNull Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
         if (data != null && data.moveToFirst()) {
@@ -744,11 +710,6 @@ public class AddLocationFragment extends Fragment implements
             int location_Id = data.getInt(QueryColumns.LocationFragment.ShowQuery.COL__ID);
             String desc = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_DESCRIPTION);
             mEditLocationDescription.setText(desc);
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                mEditProducerName.setTransitionName(
-//                        getString(R.string.shared_transition_producer_producer) + producer_Id);
-//            }
 
             mOriginalLocationInput = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_INPUT);
             mOriginalLocationFormatted = data.getString(QueryColumns.LocationFragment.ShowQuery.COL_FORMATTED_ADDRESS);
@@ -764,7 +725,8 @@ public class AddLocationFragment extends Fragment implements
 
             Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", mLocationParcelable=[" + mLocationParcelable + "]");
 
-            if (!Utils.isNetworkUnavailable(getActivity()) && DatabaseContract.LocationEntry.GEOCODE_ME.equals(mOriginalLocationFormatted)) {
+            if (!Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))
+                    && DatabaseContract.LocationEntry.GEOCODE_ME.equals(mOriginalLocationFormatted)) {
                 // geocode
                 mEditLocation.setText(mOriginalLocationInput);
             } else {
@@ -777,16 +739,10 @@ public class AddLocationFragment extends Fragment implements
             } else {
                 hideMap();
             }
-
-//            updateToolbar(name);
-//            resumeActivityEnterTransition();    // from edit
-
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
     }
-
 }

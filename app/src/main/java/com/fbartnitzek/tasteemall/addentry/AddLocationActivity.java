@@ -48,7 +48,6 @@ public class AddLocationActivity extends AppCompatActivity {
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, ...!");
         }
-
     }
 
 
