@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.appcompat.app.ActionBar;
@@ -21,8 +22,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -58,7 +64,6 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
     private LatLng mLatLng;
     private Uri mUri;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
@@ -74,16 +79,17 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
             }
         }
 
-        mLocationInputView = (TextView) mRootView.findViewById(R.id.location_input);
-        mLocationIdView = (TextView) mRootView.findViewById(R.id.location_id);
-        mLocationCountryView = (TextView) mRootView.findViewById(R.id.location_country);
-        mLocationAddressView = (TextView) mRootView.findViewById(R.id.location_address);
-        mLocationDescriptionView = (TextView) mRootView.findViewById(R.id.location_description);
-        mLocationLatitudeView = (TextView) mRootView.findViewById(R.id.location_latitude);
-        mLocationLongitudeView = (TextView) mRootView.findViewById(R.id.location_longitude);
+        mLocationInputView = mRootView.findViewById(R.id.location_input);
+        mLocationIdView = mRootView.findViewById(R.id.location_id);
+        mLocationCountryView = mRootView.findViewById(R.id.location_country);
+        mLocationAddressView = mRootView.findViewById(R.id.location_address);
+        mLocationDescriptionView = mRootView.findViewById(R.id.location_description);
+        mLocationLatitudeView = mRootView.findViewById(R.id.location_latitude);
+        mLocationLongitudeView = mRootView.findViewById(R.id.location_longitude);
 
-        SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(this);
+        SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
+        Objects.requireNonNull(mMapFragment).getMapAsync(this);
         createToolbar(mRootView, LOG_TAG);
 
         return mRootView;
@@ -96,9 +102,9 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
 
     @Override
     void updateToolbar() {
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity) Objects.requireNonNull(getActivity()))
+                .getSupportActionBar();
         if (actionBar != null) {
-
             String formatted = mLocationAddressView.getText().toString();
             ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(formatted);
         } else {
@@ -108,7 +114,7 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
 
     @Override
     public void onResume() {
-        getLoaderManager().initLoader(SHOW_LOCATION_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).initLoader(SHOW_LOCATION_LOADER_ID, null, this);
         super.onResume();
     }
 
@@ -117,15 +123,16 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "uri = [" + uri + "]");
         mUri = uri;
         calcCompleteUri();
-        getLoaderManager().restartLoader(SHOW_LOCATION_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(SHOW_LOCATION_LOADER_ID, null, this);
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         if (mUri != null) {
             return new CursorLoader(
-                    getActivity(),
+                    Objects.requireNonNull(getActivity()),
                     mUri,
                     QueryColumns.LocationFragment.ShowQuery.COLUMNS,
                     null,
@@ -134,11 +141,10 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
         } else {
             return null;
         }
-
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NotNull Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
         if (data != null && data.moveToFirst()) {
@@ -154,7 +160,6 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
 
             mLatLng = new LatLng(lat, longitude);
             updateToolbar();
-
             updateAndMoveToMarker();
         }
     }
@@ -167,19 +172,24 @@ public class ShowLocationFragment extends ShowBaseFragment implements OnMapReady
                     .title(mLocationDescriptionView.getText().toString())
                     .snippet(mLocationAddressView.getText().toString())
                     .draggable(false));
-            mMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(mLatLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+
+            mMap.animateCamera(
+                    CameraUpdateFactory
+                            .newCameraPosition(new CameraPosition.Builder()
+                                    .target(mLatLng)
+                                    .zoom(9)
+                                    .build()),
+                    2000, null);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
         Log.v(LOG_TAG, "onLoaderReset, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "]");
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         updateAndMoveToMarker();
     }
