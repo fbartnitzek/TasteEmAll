@@ -130,18 +130,14 @@ public class ShowProducerActivity extends AppCompatActivity {
     private void startEditActivity() {
         Intent intent = new Intent(this, AddProducerActivity.class);
         intent.setData(mContentUri);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            View view = findViewById(R.id.producer_name);
-            int producer_Id = DatabaseContract.getIdFromUri(mContentUri);
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    this,
-                    new Pair<>(view, //view.getTransitionName())
-                            getString(R.string.shared_transition_producer_producer) + producer_Id)
-            ).toBundle();
-            startActivityForResult(intent, EDIT_PRODUCER_REQUEST, bundle);
-        } else {
-            startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
-        }
+        View view = findViewById(R.id.producer_name);
+        int producer_Id = DatabaseContract.getIdFromUri(mContentUri);
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                this,
+                new Pair<>(view, //view.getTransitionName())
+                        getString(R.string.shared_transition_producer_producer) + producer_Id)
+        ).toBundle();
+        startActivityForResult(intent, EDIT_PRODUCER_REQUEST, bundle);
     }
 
 

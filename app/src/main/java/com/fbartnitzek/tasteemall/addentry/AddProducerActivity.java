@@ -38,7 +38,7 @@ public class AddProducerActivity extends AppCompatActivity {
 //            AddProducerFragment fragment = getFragment();
             AddProducerFragment2 fragment = getFragment();
 
-            // use name from calling activity
+            // use name from calling activity or contentUri for edit
             if (fragment == null) {
                 fragment = new AddProducerFragment2();
                 if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
@@ -123,9 +123,7 @@ public class AddProducerActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

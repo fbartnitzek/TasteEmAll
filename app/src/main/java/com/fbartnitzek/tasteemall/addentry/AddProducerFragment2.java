@@ -408,7 +408,8 @@ public class AddProducerFragment2 extends Fragment implements
             supportActionBar.setDisplayShowCustomEnabled(true);
 
             int drinkType = Utils.getDrinkTypeIndexFromSharedPrefs(activity, false);
-            String readableProducer = getString(Utils.getReadableProducerNameId(getActivity(), drinkType));
+            String readableProducer = getString(Utils.getReadableProducerNameId(
+                    getActivity(), drinkType));
             if (contentUri != null) {
                 ((TextView) rootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_producer_activity_preview,
@@ -522,6 +523,7 @@ public class AddProducerFragment2 extends Fragment implements
     }
 
     public void setContentUri(Uri contentUri) {
+        Log.v(LOG_TAG, "set contentUri to " + contentUri);
         this.contentUri = contentUri;
     }
 
