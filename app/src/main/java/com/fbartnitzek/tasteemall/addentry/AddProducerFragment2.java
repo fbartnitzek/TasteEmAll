@@ -306,7 +306,7 @@ public class AddProducerFragment2 extends Fragment implements
         }
 
         Data.Builder dataBuilder = new Data.Builder();
-        if (isGeocodeMeLatLong(address)) {
+        if (Utils.isGeocodeMeLatLong(address)) {
             dataBuilder.putDouble(GeocodeWorker.INPUT_LATITUDE, address.getLatitude());
             dataBuilder.putDouble(GeocodeWorker.INPUT_LONGITUDE, address.getLongitude());
         } else if (input != null) {
@@ -345,12 +345,6 @@ public class AddProducerFragment2 extends Fragment implements
                         }
                     }
                 });
-    }
-
-    private boolean isGeocodeMeLatLong(AddressData address) {
-        return address != null
-                && DatabaseContract.LocationEntry.GEOCODE_ME.equals(address.getFormatted())
-                && Utils.isValidLatLong(address.getLatitude(), address.getLongitude());
     }
 
     private void updateAddressesFromWorkerOutput(Data outData) {

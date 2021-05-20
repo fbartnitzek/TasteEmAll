@@ -156,6 +156,12 @@ public class Utils {
         return activeNetwork == null || !activeNetwork.isConnectedOrConnecting();
     }
 
+    public static boolean isGeocodeMeLatLong(AddressData address) {
+        return address != null
+                && DatabaseContract.LocationEntry.GEOCODE_ME.equals(address.getFormatted())
+                && Utils.isValidLatLong(address.getLatitude(), address.getLongitude());
+    }
+
 
     public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
         StringBuilder sb = new StringBuilder();
