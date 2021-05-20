@@ -61,7 +61,6 @@ public class GeocodeWorker extends Worker {
         }
 
         Geocoder geocoder = new Geocoder(this.getApplicationContext(), Locale.getDefault());
-
         List<Address> addresses;
         boolean isLatLong = false;
         if (text != null) {
