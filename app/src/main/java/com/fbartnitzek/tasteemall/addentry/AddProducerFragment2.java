@@ -130,6 +130,11 @@ public class AddProducerFragment2 extends GeocoderFragment implements
         return rootView;
     }
 
+    @Override
+    void resetLocationId() {
+        // skip reset, only for AddLocationFragment
+    }
+
     private void createToolbar() {
         Log.v(LOG_TAG, "createToolbar, hashCode=" + this.hashCode() + ", " + "");
         Toolbar toolbar = rootView.findViewById(R.id.toolbar);
@@ -245,15 +250,7 @@ public class AddProducerFragment2 extends GeocoderFragment implements
             originalLocationInput = data.getString(ShowQuery.COL_PRODUCER_INPUT);
             String formatted = data.getString(ShowQuery.COL_PRODUCER_FORMATTED_ADDRESS);
             String countryName = data.getString(ShowQuery.COL_PRODUCER_COUNTRY);
-            Optional<String> countryCode = Optional.empty();
-            if (countryName != null) {
-                Log.v(LOG_TAG, "countryName of loaded entry: " + countryName);
-                countryCode = Arrays.stream(Locale.getISOCountries())
-                        .filter(code -> countryName.equals(new Locale("", code).getDisplayCountry()))
-                        .findFirst();
-            } else {
-                Log.v(LOG_TAG, "countryName of loaded entry is null!");
-            }
+            Optional<String> countryCode = calcCountryCode(countryName);
 
             address = new AddressData(
                     data.getDouble(ShowQuery.COL_PRODUCER_LATITUDE),

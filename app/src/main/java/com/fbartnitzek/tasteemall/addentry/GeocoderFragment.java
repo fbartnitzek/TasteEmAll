@@ -14,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,9 +51,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
-public class GeocoderFragment extends Fragment implements
+public abstract class GeocoderFragment extends Fragment implements
         OnMapReadyCallback, TextWatcher, AdapterView.OnItemClickListener {
 
     private static final int REQUEST_LOCATION_PERMISSION_CODE = 32456;
@@ -64,7 +66,7 @@ public class GeocoderFragment extends Fragment implements
     private static final String STATE_NETWORK_ERROR_SHOWN = "STATE_NETWORK_ERROR_SHOWN";
 
     View rootView;
-    EditText editLocation;
+    TextView editLocation;
     private SupportMapFragment mapFragment;
     private GoogleMap map;
 
@@ -133,6 +135,21 @@ public class GeocoderFragment extends Fragment implements
         listView.setOnItemClickListener(this);
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+
+    @NotNull
+    Optional<String> calcCountryCode(String countryName) {
+        Optional<String> countryCode = Optional.empty();
+        if (countryName != null) {
+            Log.v(LOG_TAG, "countryName of loaded entry: " + countryName);
+            countryCode = Arrays.stream(Locale.getISOCountries())
+                    .filter(code -> countryName.equals(new Locale("", code).getDisplayCountry()))
+                    .findFirst();
+        } else {
+            Log.v(LOG_TAG, "countryName of loaded entry is null!");
+        }
+        return countryCode;
     }
 
     private void startGeocodeWorker(String input) {
@@ -264,6 +281,8 @@ public class GeocoderFragment extends Fragment implements
         showMap();
         Log.v(LOG_TAG, "updateAndMoveToMarker, map=[" + map + "], address=[" + address + "]");
         if (map != null && address != null) {
+            // todo: weird marker behaviour on updates
+            //  but is not parcelable, has no id, but survives...
             if (currentMarker != null) {
                 Log.v(LOG_TAG, "remove marker");
                 currentMarker.remove();
@@ -374,7 +393,10 @@ public class GeocoderFragment extends Fragment implements
         address = locationDataArrayAdapter.getItem(pos);
         Log.v(LOG_TAG, "onItemClick, hashCode=" + this.hashCode() + ", " + "address = [" + address + "]");
         updateAndMoveToMarker();
+        resetLocationId();
     }
+
+    abstract void resetLocationId();
 
     private void focusOnMap() {
         new Handler().post(new Runnable() {
