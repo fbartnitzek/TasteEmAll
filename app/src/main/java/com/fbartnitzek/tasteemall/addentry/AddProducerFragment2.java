@@ -28,7 +28,6 @@ import com.fbartnitzek.tasteemall.location.AddressData;
 import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
 import com.fbartnitzek.tasteemall.tasks.UpdateEntryTask;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,7 @@ import java.util.Optional;
 import static com.fbartnitzek.tasteemall.data.QueryColumns.ProducerFragment.ShowQuery;
 
 public class AddProducerFragment2 extends GeocoderFragment implements
-        LoaderManager.LoaderCallbacks<Cursor>, OnMapReadyCallback {
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EDIT_PRODUCER_LOADER_ID = 12345;
     private static final String STATE_CONTENT_URI = "STATE_CONTENT_URI";
