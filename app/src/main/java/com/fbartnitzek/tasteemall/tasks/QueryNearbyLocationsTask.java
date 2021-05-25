@@ -33,7 +33,6 @@ public class QueryNearbyLocationsTask extends AsyncTask<double[], Void, Location
     private static final String LOG_TAG = QueryNearbyLocationsTask.class.getName();
 
     public interface QueryNearbyLocationHandler {
-//        void onNearbyLocationsFound(Uri locationUri, String locationId, String text);
         void onNearbyLocationsFound(LocationParcelable[] locations);
         void onNearbyLocationNotFound();
     }
@@ -54,8 +53,6 @@ public class QueryNearbyLocationsTask extends AsyncTask<double[], Void, Location
                 DatabaseContract.LocationEntry.buildUriWithLatLng(params[0][0], params[0][1]),
                 QueryColumns.LocationPart.CompletionQuery.COLUMNS, null, null, null);
 
-//        String [] strings = null;
-        // if list - return all - try to fill adapter...
         if (cursor != null) {
             LocationParcelable[] locations = new LocationParcelable[cursor.getCount()];
 
@@ -78,21 +75,6 @@ public class QueryNearbyLocationsTask extends AsyncTask<double[], Void, Location
                 cursor.close();
             }
 
-//            if (cursor.moveToFirst()) {     // for now: returns first or nothing
-//                int location_Id = cursor.getInt(QueryColumns.LocationPart.CompletionQuery.COL__ID);
-//                String locationId = cursor.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
-//                String formatted = cursor.getString(QueryColumns.LocationPart.CompletionQuery.COL_FORMATTED_ADDRESS);
-//                String input = cursor.getString(QueryColumns.LocationPart.CompletionQuery.COL_INPUT);
-//
-////                Log.v(LOG_TAG, "doInBackground - found, locationId=" + locationId + ", " + "formatted= [" + formatted + "], input = [" + input + "]");
-//
-//                strings = new String[]{
-//                        Integer.toString(location_Id),
-//                        locationId,
-//                        (formatted != null && !formatted.isEmpty()) ? formatted : input
-//                };
-//            }
-//            cursor.close();
             return locations;
         } else {
             return null;
@@ -108,6 +90,4 @@ public class QueryNearbyLocationsTask extends AsyncTask<double[], Void, Location
             mFoundHandler.onNearbyLocationNotFound();
         }
     }
-
-
 }

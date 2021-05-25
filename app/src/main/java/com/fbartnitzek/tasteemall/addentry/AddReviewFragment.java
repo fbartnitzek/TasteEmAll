@@ -105,8 +105,8 @@ public class AddReviewFragment extends Fragment implements
     private static final int EDIT_REVIEW_LOADER_ID = 57892;
     private static final int REQUEST_LOCATION_PERMISSION_CODE = 43923;
     private static final int LOCATION_ACTIVITY_REQUEST_CODE = 2356;
-    private View mRootView;
 
+    private View mRootView;
     private AutoCompleteTextView mEditCompletionDrinkName;
     private AutoCompleteTextView mEditCompletionUserName;
     private LocationAutoCompleteTextView mEditReviewLocation;
@@ -115,6 +115,8 @@ public class AddReviewFragment extends Fragment implements
     private EditText mEditReviewRecommendedSides;
     private EditText mEditReviewReadableDate;
     private EditText mEditReviewLocationDescription;
+    private static GoogleMap mMap;
+    private SupportMapFragment mMapFragment;
 
     private String mDrinkName;
     private String mProducerName;
@@ -131,15 +133,11 @@ public class AddReviewFragment extends Fragment implements
     private Location mLastLocation;
     private AddressResultReceiver mResultReceiver;
     private boolean mEditValuesLoaded = false;
-    private static GoogleMap mMap;
-    private SupportMapFragment mMapFragment;
     private Marker mCurrentMarker = null;
     private LocationParcelable mLocationParcelable;
     private String mLocationInput;
     private LocationParcelable mProducerLocationParcelable;
     private boolean mEditReviewLocationIgnoreTextChange = false;
-
-    // TODO: pagify whole add sequence!
 
     private final SlideDateTimeListener listener = new SlideDateTimeListener() {
         @Override
@@ -253,7 +251,6 @@ public class AddReviewFragment extends Fragment implements
 
         mSpinnerRating = mRootView.findViewById(R.id.review_rating);
 
-
         // try later: http://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
         String[] reviewRatings = Objects.requireNonNull(getActivity()).getResources()
                 .getStringArray(R.array.pref_rating_values);
@@ -281,7 +278,6 @@ public class AddReviewFragment extends Fragment implements
 
         // might be buggy...
         mSpinnerRating.setOnTouchListener(new OnTouchHideKeyboardListener(this));
-
 
         // restore usual fields
         mEditReviewDescription = mRootView.findViewById(R.id.review_description);
@@ -345,7 +341,6 @@ public class AddReviewFragment extends Fragment implements
                     mLocationId = null;
                     mLocationParcelable = null;
                 }
-
             }
         });
 
@@ -565,13 +560,12 @@ public class AddReviewFragment extends Fragment implements
         // c) neutral:  ignore location and choose to not enter it for review (not recommended)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
-        // TODO: message from strings and 2 cases w/o add... (if ever happens...)
         builder.setTitle("location unclear")
                 .setMessage("Do you want to SEARCH for the review-location, " +
                         "ADD a new locaction-stub based on your current input (and geocode it later) " +
                         "or IGNORE the review-location (not recommended)")
-                .setPositiveButton("SEARCH", (dialog, which) -> useAddLocation());
-        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {   // TODO: never happens?
+                .setPositiveButton("SEARCH", (dialog, which) -> startAddLocation());
+        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
             builder.setNeutralButton("add", (dialog, which) -> {
                 addLocation();  // WORKS!
             });
@@ -581,7 +575,6 @@ public class AddReviewFragment extends Fragment implements
             mLocationId = null; // LEFT JOIN instead of INNER JOIN - WORKS!
             insertReview();
         }).show();
-
     }
 
     private void addLocation() {
@@ -643,7 +636,7 @@ public class AddReviewFragment extends Fragment implements
         } else if (id == R.id.add_user_button) {
             validateNewUser();
         } else if (id == R.id.search_review_location_button) {
-            useAddLocation();
+            startAddLocation();
         } else if (id == R.id.help_review_rating_button) {
             showHelp();
         }
@@ -672,8 +665,10 @@ public class AddReviewFragment extends Fragment implements
                         (dialog, which) -> createUser()
                 )
                 .setNegativeButton(R.string.do_not_add_button,
-                        (dialog, which) -> Toast.makeText(getActivity(), getString(R.string.msg_user_not_added,
-                                mEditCompletionUserName.getText().toString()), Toast.LENGTH_SHORT).show()
+                        (dialog, which) -> Toast.makeText(getActivity(),
+                                getString(R.string.msg_user_not_added,
+                                mEditCompletionUserName.getText().toString()),
+                                Toast.LENGTH_SHORT).show()
                 );
         builder.show();
     }
@@ -723,15 +718,13 @@ public class AddReviewFragment extends Fragment implements
         mEditCompletionDrinkName.dismissDropDown();
 
         updateToolbar();
-        // should be invoked on found after add and hopefully in completionHandler... TODO!!!
         queryNearbyProducer();
     }
 
-
     // location via fragment handling
 
-    private void useAddLocation() {
-        Log.v(LOG_TAG, "useAddLocation, hashCode=" + this.hashCode() + ", " + "");
+    private void startAddLocation() {
+        Log.v(LOG_TAG, "startAddLocation, hashCode=" + this.hashCode() + ", " + "");
         Intent intent = new Intent(getActivity(), AddLocationActivity.class);
         intent.putExtra(AddLocationActivity.LOCATION_INPUT_EXTRA, mEditReviewLocation.getText().toString().trim());
         intent.putExtra(AddLocationActivity.LOCATION_DESCRIPTION_EXTRA, mEditReviewLocationDescription.getText().toString().trim());
@@ -771,8 +764,12 @@ public class AddReviewFragment extends Fragment implements
             Log.v(LOG_TAG, "getCurrentLocation - with permission");
         }
         if (CustomApplication.isGoogleApiClientConnected()) {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(CustomApplication.getGoogleApiClient());
-            queryNearbyProducer();
+            LocationServices.getFusedLocationProviderClient(getActivity())
+                    .getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        mLastLocation = location;
+                        queryNearbyProducer();
+                    });
             return;
         } else {
             Log.e(LOG_TAG, "getCurrentLocation - googleApiClient not connected!, hashCode=" + this.hashCode() + ", " + "");
@@ -821,7 +818,8 @@ public class AddReviewFragment extends Fragment implements
 
     @Override
     public void onNearbyLocationsFound(LocationParcelable[] locations) {
-        Log.v(LOG_TAG, "onNearbyLocationsFound, hashCode=" + this.hashCode() + ", " + "locations = [" + locations + "]");
+        Log.v(LOG_TAG, "onNearbyLocationsFound, hashCode=" + this.hashCode() + ", " + "locations = ["
+                + Arrays.toString(locations) + "]");
 
         MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
         for (LocationParcelable location : locations) {
@@ -865,23 +863,6 @@ public class AddReviewFragment extends Fragment implements
             startGeocodeServiceByPosition();
         }
     }
-
-
-    // init-order:
-    // ) getCurrentLocation worked?
-    // .Y) isProducerLocationNearby?
-    //   .Y) use it and producerName as description
-    //   .N) getNearbyLocations?
-    //     .Y) use other location and show in map => on change behave ... different :-p
-    //     .N) store mLastLoc for saving
-    // .N) let empty
-
-    // onChange
-    // searchLocationFormattedAndDescriptionWithPattern
-    // found: list
-    //  selected: show in map
-    // not in list/not found:
-    // TODO: Find/AddLocationActivity... (not that often) - adds onSave like Drink
 
     // Geocoder
 
