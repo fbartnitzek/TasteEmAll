@@ -65,17 +65,16 @@ public class AddReviewActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 //        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_save:
-                AddReviewFragment fragment = getFragment();
-                if (fragment != null) {
-                    fragment.saveData();
-                }
-                return true;
-            default:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_save) {
+            AddReviewFragment fragment = getFragment();
+            if (fragment != null) {
+                fragment.saveData();
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
