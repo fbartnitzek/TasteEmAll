@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +25,8 @@ import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.tasks.DeleteEntryTask;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -46,27 +49,40 @@ public class ShowReviewActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "SHOw_REVIEW_TAG";
     private static final String LOG_TAG = ShowReviewActivity.class.getName();
     public static final String EXTRA_REVIEW_URI = "EXTRA_REVIEW_URI";
+    private static final String STATE_CONTENT_URI = "SRA_STATE_CONTENT_URI";
     private static final int EDIT_REVIEW_REQUEST = 65434;
     private Uri mContentUri;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+
+        if (getIntent() != null && getIntent().getData() != null) {
+            mContentUri = getIntent().getData();
+        } else if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+            mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+        }
+
         setContentView(R.layout.activity_show_review);
 
         // explicitly add fragment with pattern
         if (findViewById(R.id.container_show_review_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
-//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
-
             ShowReviewFragment fragment = new ShowReviewFragment();
 
-            mContentUri = getIntent().getData();
             if (mContentUri != null) {
                 Bundle args = new Bundle();
                 args.putParcelable(EXTRA_REVIEW_URI, mContentUri);
@@ -76,8 +92,6 @@ public class ShowReviewActivity extends AppCompatActivity {
             }
 
             getSupportFragmentManager().beginTransaction()
-                    // only for fragment transition within same activity!
-//                    .setCustomAnimations(android.R.anim.slide_in_left,android.R.anim.slide_out_right,android.R.anim.slide_in_left,android.R.anim.slide_out_right)
                     .add(R.id.container_show_review_fragment, fragment, FRAGMENT_TAG)
                     .commit();
         } else {

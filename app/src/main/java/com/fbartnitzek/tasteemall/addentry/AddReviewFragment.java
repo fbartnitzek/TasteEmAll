@@ -136,7 +136,6 @@ public class AddReviewFragment extends Fragment implements
 
     private int mRatingPosition;
     private Location mLastLocation;
-//    private AddressResultReceiver mResultReceiver;
     private boolean mEditValuesLoaded = false;
     private Marker mCurrentMarker = null;
     private LocationParcelable mLocationParcelable;
@@ -154,8 +153,36 @@ public class AddReviewFragment extends Fragment implements
         }
     };
 
-    public AddReviewFragment() {
-        // Required empty public constructor
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
+        outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
+        outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString().trim());
+        outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString().trim());
+        outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
+        outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
+
+        if (mDrinkId != null) {
+            outState.putString(STATE_DRINK_ID, mDrinkId);
+            outState.putString(STATE_DRINK_NAME, mDrinkName);
+            outState.putString(STATE_PRODUCER_NAME, mProducerName);
+        } else {
+            outState.putString(STATE_DRINK_NAME, mEditCompletionDrinkName.getText().toString().trim());
+        }
+
+        if (mUserId != null) {
+            outState.putString(STATE_USER_ID, mUserId);
+            outState.putString(STATE_USER_NAME, mUserName);
+        } else {
+            outState.putString(STATE_USER_NAME, mEditCompletionUserName.getText().toString().trim());
+        }
+
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -167,7 +194,6 @@ public class AddReviewFragment extends Fragment implements
         }
         setRetainInstance(true);
 
-//        mResultReceiver = new AddressResultReceiver(new Handler());
         super.onCreate(savedInstanceState);
         if (mContentUri == null) {
             getCurrentLocation();  //TODO: maybe in onCreateView better...
@@ -396,36 +422,6 @@ public class AddReviewFragment extends Fragment implements
         super.onResume();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
-        outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
-        outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString().trim());
-        outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString().trim());
-        outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
-        outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
-
-        if (mDrinkId != null) {
-            outState.putString(STATE_DRINK_ID, mDrinkId);
-            outState.putString(STATE_DRINK_NAME, mDrinkName);
-            outState.putString(STATE_PRODUCER_NAME, mProducerName);
-        } else {
-            outState.putString(STATE_DRINK_NAME, mEditCompletionDrinkName.getText().toString().trim());
-        }
-
-        if (mUserId != null) {
-            outState.putString(STATE_USER_ID, mUserId);
-            outState.putString(STATE_USER_NAME, mUserName);
-        } else {
-            outState.putString(STATE_USER_NAME, mEditCompletionUserName.getText().toString().trim());
-        }
-
-        if (mContentUri != null) {
-            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
-        }
-
-        super.onSaveInstanceState(outState);
-    }
 
     private void createToolbar() {
         Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
@@ -727,7 +723,6 @@ public class AddReviewFragment extends Fragment implements
         queryNearbyProducer();
     }
 
-    // location via fragment handling
 
     private void startAddLocation() {
         Log.v(LOG_TAG, "startAddLocation, hashCode=" + this.hashCode() + ", " + "");
@@ -750,8 +745,6 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-
-    // GoogleApi-lastLocation
 
     private void getCurrentLocation() {
         Log.v(LOG_TAG, "getCurrentLocation, hashCode=" + this.hashCode() + ", " + "");
@@ -820,7 +813,6 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-    // TODO: test no nearby found - add new (geocoder / gps / nothing)
 
     @Override
     public void onNearbyLocationsFound(LocationParcelable[] locations) {
@@ -955,117 +947,6 @@ public class AddReviewFragment extends Fragment implements
         updateAndMoveToMarker();
     }
 
-//    private void startGeocodeServiceByPosition() {    // should not be called with an address string - extra activity
-//        Log.v(LOG_TAG, "startGeocodeServiceByPosition, hashCode=" + this.hashCode() + ", " + "");
-//
-//        if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))) {
-//            if (mLastLocation != null) {
-//                Log.v(LOG_TAG, "startGeocodeServiceByPosition - TODO: call geocoder later..., hashCode=" + this.hashCode() + ", " + "");
-//                mLocationParcelable = Utils.getLocationStubFromLastLocation(
-//                        mLastLocation, mEditReviewLocationDescription.getText().toString());
-//                editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//            }
-//
-//            Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-//            return;
-//        }
-//
-//        if (mResultReceiver == null) {
-//            Log.e(LOG_TAG, "startGeocodeServiceByPosition - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
-//            return;
-//        }
-//        Intent intent = new Intent(this.getActivity(), GeocodeIntentService.class);
-//        intent.putExtra(GeocodeIntentService.RECEIVER, mResultReceiver);
-//        intent.putExtra(GeocodeIntentService.EXTRA_LOCATION_LATLNG, mLastLocation);
-//        getActivity().startService(intent);
-//    }
-
-
-//    @SuppressLint("ParcelCreator")
-//    class AddressResultReceiver extends ResultReceiver {
-//        public AddressResultReceiver(Handler handler) {
-//            super(handler);
-//        }
-//
-//        /**
-//         *  Receives data sent from GeocodeIntentService and updates the UI in MainActivity.
-//         */
-//        @Override
-//        protected void onReceiveResult(int resultCode, Bundle resultData) {
-//            Log.v(LOG_TAG, "onReceiveResult, hashCode=" + this.hashCode() + ", " + "resultCode = [" + resultCode + "], resultData = [" + resultData + "]");
-//            // Display the address string or an error message sent from the intent service.
-//            if (getActivity() == null) {    // if changes happen while saving - ignore them...
-//                return;
-//            }
-//            if (GeocodeIntentService.SUCCESS_RESULT == resultCode) {
-//                if (resultData.containsKey(GeocodeIntentService.RESULT_ADDRESS_KEY)) {
-//
-//
-//                    Address address = resultData.getParcelable(GeocodeIntentService.RESULT_ADDRESS_KEY);
-//                    if (address == null) {
-//                        Log.e(LOG_TAG, "onReceiveResult: address result = NULL!!!");
-//                    } else {
-//                        mLocationParcelable = Utils.getLocationFromAddress(address,
-//                                Utils.getLocationInput(address.getLatitude(), address.getLongitude()),
-//                                null);
-//                        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
-//                        dataCursor.addRow(new Object[]{
-//                                LocationParcelable.INVALID_ID,
-//                                mLocationParcelable.getLocationId(),
-//                                mLocationParcelable.getInput(),
-//                                mLocationParcelable.getFormattedAddress(),
-//                                mLocationParcelable.getCountry(),
-//                                mLocationParcelable.getLatitude(),
-//                                mLocationParcelable.getLongitude(),
-//                                ""} //?
-//                        );
-//
-//                        mLocationAdapter.swapCursor(dataCursor);
-//                        mLocationAdapter.notifyDataSetChanged();
-//                        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//                        if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null) {
-//                            mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
-//                        }
-//
-//                        showMap();
-//                        updateAndMoveToMarker();
-//                    }
-//
-//                } else {
-//                    Log.e(LOG_TAG, "onReceiveResult - SUCCESS without address - should never happen...");
-//                }
-//
-//            } else {  // somehow failed
-//
-//                if (Utils.isNetworkUnavailable(getActivity())) {
-//                    Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-//                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-//                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//                } else if (GeocodeIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
-//                    Toast.makeText(getActivity(), R.string.msg_service_not_available, Toast.LENGTH_LONG).show();
-//                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-//                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//                } else {
-//                    int toastRes;
-//                    switch (resultCode) {
-//                        // ignore that one - TODO: just show it for "complete search" - how to detect...?
-//                        case GeocodeIntentService.FAILURE_INVALID_LAT_LONG_USED:
-//                            toastRes = R.string.msg_invalid_lat_long;
-//                            break;
-//                        case GeocodeIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
-//                            toastRes = R.string.msg_no_location_provided;
-//                            break;
-//                        default:
-//                            toastRes = R.string.msg_no_location_generic;
-//                    }
-//
-//                    Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
-//                    mEditReviewLocation.setText("");
-//                }
-//            }
-//        }
-//    }
-
 
     // permissions
 
@@ -1110,22 +991,6 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-//    private void focusOnMap() {
-//        new Handler().post(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", " + "");
-//
-//                NestedScrollView scrollView = getActivity().findViewById(R.id.nested_scrollView);
-//                if (scrollView != null) {
-//                    Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", position=" + scrollView.getBottom() + "");
-//                    scrollView.smoothScrollTo(0, scrollView.getBottom());
-//                } else {
-//                    Log.v(LOG_TAG, "focusOnMap-run, scrollView == null");
-//                }
-//            }
-//        });
-//    }
 
     private void updateAndMoveToMarker() {
         if (mMap != null && mLocationParcelable != null) {
@@ -1145,9 +1010,6 @@ public class AddReviewFragment extends Fragment implements
                                     .zoom(9)
                                     .build()),
                     2000, null);
-//            mMap.moveCamera(
-//                    CameraUpdateFactory.newLatLng(latLng));
-//            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
     }
 
@@ -1245,7 +1107,6 @@ public class AddReviewFragment extends Fragment implements
 
         ((AddReviewActivity) Objects.requireNonNull(getActivity())).scheduleStartPostponedTransition(mEditReviewReadableDate);
     }
-
 
     // save for edit
 
