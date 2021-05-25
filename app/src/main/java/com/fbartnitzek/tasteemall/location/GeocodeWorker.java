@@ -28,6 +28,10 @@ public class GeocodeWorker extends Worker {
     public static final String INPUT_TEXT = "GEOCODE_INPUT_TEXT";
     public static final double ILLEGAL_LAT_LONG = 666.6;
     public static final String OUTPUT_ERROR = "GEOCODE_OUTPUT_ERROR";
+    public static final String OUTPUT_ERROR_ID = "GEOCODE_OUTPUT_ERROR_ID";
+    public static final int OUTPUT_ERROR_ID_SERVICE_NA = 503;
+    public static final int OUTPUT_ERROR_ID_INVALID_INPUT = 400;
+    public static final int OUTPUT_ERROR_ID_NOT_FOUND = 404;
     public static final String ORIG_INPUT = "GEOCODE_ORIG_INPUT";
     public static final String GEOCODE_TYPE_LAT_LONG = "GEOCODE_TYPE_LAT_LONG";
     public static final String FORMATTED = "_FORMATTED";
@@ -57,7 +61,8 @@ public class GeocodeWorker extends Worker {
     @Override
     public Result doWork() {
         if (text == null && (latitude == ILLEGAL_LAT_LONG || longitude == ILLEGAL_LAT_LONG)) {
-            return calcFailedResult(R.string.msg_no_location_provided, null);
+            return calcFailedResult(R.string.msg_no_location_provided,
+                    null, OUTPUT_ERROR_ID_INVALID_INPUT);
         }
 
         Geocoder geocoder = new Geocoder(this.getApplicationContext(), Locale.getDefault());
@@ -68,21 +73,21 @@ public class GeocodeWorker extends Worker {
                 // prevented IllegalArgException via null-check
                 addresses = geocoder.getFromLocationName(text, 10);
             } catch (IOException e) {
-                return calcFailedResult(R.string.service_not_available, e);
+                return calcFailedResult(R.string.service_not_available, e, OUTPUT_ERROR_ID_SERVICE_NA);
             }
         } else {
             try {
                 isLatLong = true;
                 addresses = geocoder.getFromLocation(latitude, longitude, 1);
             } catch (IOException e) {
-                return calcFailedResult(R.string.service_not_available, e);
+                return calcFailedResult(R.string.service_not_available, e, OUTPUT_ERROR_ID_SERVICE_NA);
             } catch (IllegalArgumentException e) {
-                return calcFailedResult(R.string.invalid_lat_long_used, e);
+                return calcFailedResult(R.string.invalid_lat_long_used, e, OUTPUT_ERROR_ID_INVALID_INPUT);
             }
         }
 
         if (addresses == null || addresses.isEmpty()) {
-            return calcFailedResult(R.string.no_address_found, null);
+            return calcFailedResult(R.string.no_address_found, null, OUTPUT_ERROR_ID_NOT_FOUND);
         }
         Map<String, Object> data = new LinkedHashMap<>();
         data.put(ORIG_INPUT, origInput);
@@ -101,7 +106,7 @@ public class GeocodeWorker extends Worker {
         data.put(i + LONGITUDE, address.getLongitude());
     }
 
-    private Result calcFailedResult(int stringId, Throwable t) {
+    private Result calcFailedResult(int stringId, Throwable t, int errorId) {
         String errorMessage = getApplicationContext().getString(stringId);
         if (t != null){
             Log.w(LOG_TAG, errorMessage, t);
@@ -109,6 +114,7 @@ public class GeocodeWorker extends Worker {
             Log.w(LOG_TAG, errorMessage);
         }
         return Result.failure(new Data.Builder()
+                .putInt(OUTPUT_ERROR_ID, errorId)
                 .putString(OUTPUT_ERROR, errorMessage)
                 .build());
     }

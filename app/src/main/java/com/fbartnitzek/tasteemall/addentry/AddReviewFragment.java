@@ -2,19 +2,15 @@ package com.fbartnitzek.tasteemall.addentry;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,6 +36,13 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import com.fbartnitzek.tasteemall.CustomApplication;
 import com.fbartnitzek.tasteemall.R;
@@ -47,7 +50,8 @@ import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
-import com.fbartnitzek.tasteemall.location.GeocodeIntentService;
+import com.fbartnitzek.tasteemall.location.AddressData;
+import com.fbartnitzek.tasteemall.location.GeocodeWorker;
 import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
 import com.fbartnitzek.tasteemall.tasks.InsertLocationTask;
@@ -66,6 +70,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -131,7 +136,7 @@ public class AddReviewFragment extends Fragment implements
 
     private int mRatingPosition;
     private Location mLastLocation;
-    private AddressResultReceiver mResultReceiver;
+//    private AddressResultReceiver mResultReceiver;
     private boolean mEditValuesLoaded = false;
     private Marker mCurrentMarker = null;
     private LocationParcelable mLocationParcelable;
@@ -161,7 +166,8 @@ public class AddReviewFragment extends Fragment implements
             mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
         }
         setRetainInstance(true);
-        mResultReceiver = new AddressResultReceiver(new Handler());
+
+//        mResultReceiver = new AddressResultReceiver(new Handler());
         super.onCreate(savedInstanceState);
         if (mContentUri == null) {
             getCurrentLocation();  //TODO: maybe in onCreateView better...
@@ -860,14 +866,15 @@ public class AddReviewFragment extends Fragment implements
     public void onNearbyLocationNotFound() {   // a.k.a. new location
         Log.v(LOG_TAG, "onNearbyLocationNotFound, mLastLocation=" + mLastLocation);
         if (mLastLocation != null) {
-            startGeocodeServiceByPosition();
+//            startGeocodeServiceByPosition();
+            startGeocodeWorker();
         }
     }
 
     // Geocoder
 
-    private void startGeocodeServiceByPosition() {    // should not be called with an address string - extra activity
-        Log.v(LOG_TAG, "startGeocodeServiceByPosition, hashCode=" + this.hashCode() + ", " + "");
+    private void startGeocodeWorker() {
+        Log.v(LOG_TAG, "startGeocodeWorker, hashCode=" + this.hashCode() + ", " + "");
 
         if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))) {
             if (mLastLocation != null) {
@@ -876,106 +883,188 @@ public class AddReviewFragment extends Fragment implements
                         mLastLocation, mEditReviewLocationDescription.getText().toString());
                 editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
             }
-
             Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-            return;
-        }
 
-        if (mResultReceiver == null) {
-            Log.e(LOG_TAG, "startGeocodeServiceByPosition - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
-            return;
-        }
-        Intent intent = new Intent(this.getActivity(), GeocodeIntentService.class);
-        intent.putExtra(GeocodeIntentService.RECEIVER, mResultReceiver);
-        intent.putExtra(GeocodeIntentService.EXTRA_LOCATION_LATLNG, mLastLocation);
-        getActivity().startService(intent);
-    }
+        } else {
 
-
-    @SuppressLint("ParcelCreator")
-    class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
-
-        /**
-         *  Receives data sent from GeocodeIntentService and updates the UI in MainActivity.
-         */
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            Log.v(LOG_TAG, "onReceiveResult, hashCode=" + this.hashCode() + ", " + "resultCode = [" + resultCode + "], resultData = [" + resultData + "]");
-            // Display the address string or an error message sent from the intent service.
-            if (getActivity() == null) {    // if changes happen while saving - ignore them...
-                return;
-            }
-            if (GeocodeIntentService.SUCCESS_RESULT == resultCode) {
-                if (resultData.containsKey(GeocodeIntentService.RESULT_ADDRESS_KEY)) {
-
-
-                    Address address = resultData.getParcelable(GeocodeIntentService.RESULT_ADDRESS_KEY);
-                    if (address == null) {
-                        Log.e(LOG_TAG, "onReceiveResult: address result = NULL!!!");
-                    } else {
-                        mLocationParcelable = Utils.getLocationFromAddress(address,
-                                Utils.getLocationInput(address.getLatitude(), address.getLongitude()),
-                                null);
-                        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
-                        dataCursor.addRow(new Object[]{
-                                LocationParcelable.INVALID_ID,
-                                mLocationParcelable.getLocationId(),
-                                mLocationParcelable.getInput(),
-                                mLocationParcelable.getFormattedAddress(),
-                                mLocationParcelable.getCountry(),
-                                mLocationParcelable.getLatitude(),
-                                mLocationParcelable.getLongitude(),
-                                ""} //?
-                        );
-
-                        mLocationAdapter.swapCursor(dataCursor);
-                        mLocationAdapter.notifyDataSetChanged();
-                        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-                        if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null) {
-                            mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
+            OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(GeocodeWorker.class)
+                    .setInputData(
+                            new Data.Builder()
+                                    .putDouble(GeocodeWorker.INPUT_LATITUDE, mLastLocation.getLatitude())
+                                    .putDouble(GeocodeWorker.INPUT_LONGITUDE, mLastLocation.getLongitude())
+                                    .build())
+                    .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .build();
+            WorkManager.getInstance(Objects.requireNonNull(getContext()))
+                    .enqueueUniqueWork("ARF_GW", ExistingWorkPolicy.REPLACE, workRequest);
+            WorkManager.getInstance(getContext())
+                    .getWorkInfoByIdLiveData(workRequest.getId())
+                    .observe(getViewLifecycleOwner(), info -> {
+                        if (info != null && info.getState().isFinished()) {
+                            if (info.getState() == WorkInfo.State.SUCCEEDED) {
+                                Data outData = info.getOutputData();
+                                Log.d(LOG_TAG, "worker finished with "
+                                        + outData.getKeyValueMap().size()
+                                        + " results");
+                                if (outData.getKeyValueMap().size() > 4) {
+                                    updateAddressFromWorkerOutput(outData);
+                                }
+                            } else {
+                                if (info.getOutputData().getInt(GeocodeWorker.OUTPUT_ERROR_ID, -1) == GeocodeWorker.OUTPUT_ERROR_ID_SERVICE_NA){
+                                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
+                                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+                                }
+                                Toast.makeText(getActivity(),
+                                        "GeocodeJob Failed: " + info.getOutputData().getString(GeocodeWorker.OUTPUT_ERROR),
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
-
-                        showMap();
-                        updateAndMoveToMarker();
-                    }
-
-                } else {
-                    Log.e(LOG_TAG, "onReceiveResult - SUCCESS without address - should never happen...");
-                }
-
-            } else {  // somehow failed
-
-                if (Utils.isNetworkUnavailable(getActivity())) {
-                    Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-                } else if (GeocodeIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
-                    Toast.makeText(getActivity(), R.string.msg_service_not_available, Toast.LENGTH_LONG).show();
-                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-                } else {
-                    int toastRes;
-                    switch (resultCode) {
-                        // ignore that one - TODO: just show it for "complete search" - how to detect...?
-                        case GeocodeIntentService.FAILURE_INVALID_LAT_LONG_USED:
-                            toastRes = R.string.msg_invalid_lat_long;
-                            break;
-                        case GeocodeIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
-                            toastRes = R.string.msg_no_location_provided;
-                            break;
-                        default:
-                            toastRes = R.string.msg_no_location_generic;
-                    }
-
-                    Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
-                    mEditReviewLocation.setText("");
-                }
-            }
+                    });
         }
     }
+
+    private void updateAddressFromWorkerOutput(Data outData) {
+        String origInput = outData.getString(GeocodeWorker.ORIG_INPUT);
+        String country = outData.getString("0" + GeocodeWorker.COUNTRY);
+        String countryCode = outData.getString("0" + GeocodeWorker.COUNTRY_CODE);
+        String formatted = outData.getString("0" + GeocodeWorker.FORMATTED);
+        double latitude = outData.getDouble("0" + GeocodeWorker.LATITUDE, GeocodeWorker.ILLEGAL_LAT_LONG);
+        double longitude = outData.getDouble("0" + GeocodeWorker.LONGITUDE, GeocodeWorker.ILLEGAL_LAT_LONG);
+
+        AddressData tmpAddress = new AddressData(latitude, longitude, countryCode, country, formatted, origInput);
+        mLocationParcelable = Utils.getLocationFromAddressData(tmpAddress, "");
+
+        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
+        dataCursor.addRow(new Object[]{
+                LocationParcelable.INVALID_ID,
+                mLocationParcelable.getLocationId(),
+                mLocationParcelable.getInput(),
+                mLocationParcelable.getFormattedAddress(),
+                mLocationParcelable.getCountry(),
+                mLocationParcelable.getLatitude(),
+                mLocationParcelable.getLongitude(),
+                null}
+        );
+
+        mLocationAdapter.swapCursor(dataCursor);
+        mLocationAdapter.notifyDataSetChanged();
+
+        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+
+        showMap();
+        updateAndMoveToMarker();
+    }
+
+//    private void startGeocodeServiceByPosition() {    // should not be called with an address string - extra activity
+//        Log.v(LOG_TAG, "startGeocodeServiceByPosition, hashCode=" + this.hashCode() + ", " + "");
+//
+//        if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))) {
+//            if (mLastLocation != null) {
+//                Log.v(LOG_TAG, "startGeocodeServiceByPosition - TODO: call geocoder later..., hashCode=" + this.hashCode() + ", " + "");
+//                mLocationParcelable = Utils.getLocationStubFromLastLocation(
+//                        mLastLocation, mEditReviewLocationDescription.getText().toString());
+//                editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+//            }
+//
+//            Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
+//            return;
+//        }
+//
+//        if (mResultReceiver == null) {
+//            Log.e(LOG_TAG, "startGeocodeServiceByPosition - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
+//            return;
+//        }
+//        Intent intent = new Intent(this.getActivity(), GeocodeIntentService.class);
+//        intent.putExtra(GeocodeIntentService.RECEIVER, mResultReceiver);
+//        intent.putExtra(GeocodeIntentService.EXTRA_LOCATION_LATLNG, mLastLocation);
+//        getActivity().startService(intent);
+//    }
+
+
+//    @SuppressLint("ParcelCreator")
+//    class AddressResultReceiver extends ResultReceiver {
+//        public AddressResultReceiver(Handler handler) {
+//            super(handler);
+//        }
+//
+//        /**
+//         *  Receives data sent from GeocodeIntentService and updates the UI in MainActivity.
+//         */
+//        @Override
+//        protected void onReceiveResult(int resultCode, Bundle resultData) {
+//            Log.v(LOG_TAG, "onReceiveResult, hashCode=" + this.hashCode() + ", " + "resultCode = [" + resultCode + "], resultData = [" + resultData + "]");
+//            // Display the address string or an error message sent from the intent service.
+//            if (getActivity() == null) {    // if changes happen while saving - ignore them...
+//                return;
+//            }
+//            if (GeocodeIntentService.SUCCESS_RESULT == resultCode) {
+//                if (resultData.containsKey(GeocodeIntentService.RESULT_ADDRESS_KEY)) {
+//
+//
+//                    Address address = resultData.getParcelable(GeocodeIntentService.RESULT_ADDRESS_KEY);
+//                    if (address == null) {
+//                        Log.e(LOG_TAG, "onReceiveResult: address result = NULL!!!");
+//                    } else {
+//                        mLocationParcelable = Utils.getLocationFromAddress(address,
+//                                Utils.getLocationInput(address.getLatitude(), address.getLongitude()),
+//                                null);
+//                        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
+//                        dataCursor.addRow(new Object[]{
+//                                LocationParcelable.INVALID_ID,
+//                                mLocationParcelable.getLocationId(),
+//                                mLocationParcelable.getInput(),
+//                                mLocationParcelable.getFormattedAddress(),
+//                                mLocationParcelable.getCountry(),
+//                                mLocationParcelable.getLatitude(),
+//                                mLocationParcelable.getLongitude(),
+//                                ""} //?
+//                        );
+//
+//                        mLocationAdapter.swapCursor(dataCursor);
+//                        mLocationAdapter.notifyDataSetChanged();
+//                        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+//                        if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null) {
+//                            mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
+//                        }
+//
+//                        showMap();
+//                        updateAndMoveToMarker();
+//                    }
+//
+//                } else {
+//                    Log.e(LOG_TAG, "onReceiveResult - SUCCESS without address - should never happen...");
+//                }
+//
+//            } else {  // somehow failed
+//
+//                if (Utils.isNetworkUnavailable(getActivity())) {
+//                    Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
+//                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
+//                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+//                } else if (GeocodeIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
+//                    Toast.makeText(getActivity(), R.string.msg_service_not_available, Toast.LENGTH_LONG).show();
+//                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
+//                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+//                } else {
+//                    int toastRes;
+//                    switch (resultCode) {
+//                        // ignore that one - TODO: just show it for "complete search" - how to detect...?
+//                        case GeocodeIntentService.FAILURE_INVALID_LAT_LONG_USED:
+//                            toastRes = R.string.msg_invalid_lat_long;
+//                            break;
+//                        case GeocodeIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
+//                            toastRes = R.string.msg_no_location_provided;
+//                            break;
+//                        default:
+//                            toastRes = R.string.msg_no_location_generic;
+//                    }
+//
+//                    Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
+//                    mEditReviewLocation.setText("");
+//                }
+//            }
+//        }
+//    }
 
 
     // permissions
@@ -1049,9 +1138,16 @@ public class AddReviewFragment extends Fragment implements
                     .title(mLocationParcelable.getCountry())
                     .snippet(mLocationParcelable.getFormattedAddress())
                     .draggable(false));
-            mMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            mMap.animateCamera(
+                    CameraUpdateFactory
+                            .newCameraPosition(new CameraPosition.Builder()
+                                    .target(latLng)
+                                    .zoom(9)
+                                    .build()),
+                    2000, null);
+//            mMap.moveCamera(
+//                    CameraUpdateFactory.newLatLng(latLng));
+//            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }
     }
 
