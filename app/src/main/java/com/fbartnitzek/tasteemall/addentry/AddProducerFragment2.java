@@ -32,8 +32,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 

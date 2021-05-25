@@ -3,6 +3,8 @@ package com.fbartnitzek.tasteemall.location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.NotNull;
+
 public class AddressData implements Parcelable {
     private double latitude;
     private double longitude;
@@ -29,6 +31,7 @@ public class AddressData implements Parcelable {
         origInput = in.readString();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "AddressData{" +

@@ -4,20 +4,20 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
@@ -30,10 +30,12 @@ import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static com.fbartnitzek.tasteemall.location.ShowMapActivity.REVIEW_URI;
 
@@ -64,7 +66,6 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
     private Uri mReviewsOfProducerUri;
 
     private String mProducerId;
-    private String mLocationName;
 
     private TextView mHeadingProducerLocations;
     private TextView mHeadingReviewsOfProducer;
@@ -85,44 +86,34 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 
             if (args.containsKey(REVIEW_URI)){
                 mBaseUri = args.getParcelable(REVIEW_URI);
-                getLoaderManager().restartLoader(PRODUCERS_LOADER_ID, null, this);
+                LoaderManager.getInstance(this).restartLoader(PRODUCERS_LOADER_ID, null, this);
             }
         }
 
-        mProducerLocationAdapter = new ProducerLocationAdapter(new ProducerLocationAdapter.ProducerLocationAdapterClickHandler() {
-            @Override
-            public void onClick(String producerId, ProducerLocationAdapter.ViewHolder viewHolder, LatLng latLng, String formatted, String name) {
-                addProducerLocationMarker(producerId, viewHolder, latLng, formatted, name);
-            }
-        });
+        mProducerLocationAdapter = new ProducerLocationAdapter(this::addProducerLocationMarker);
 
-        mHeadingProducerLocations = (TextView) mRootView.findViewById(R.id.heading_map_producers);
+        mHeadingProducerLocations = mRootView.findViewById(R.id.heading_map_producers);
         mHeadingProducerLocations.setText(R.string.label_list_map_producer_locations_preview);
-        RecyclerView locationRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_map_producer);
+        RecyclerView locationRecyclerView = mRootView.findViewById(R.id.recyclerview_map_producer);
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         locationRecyclerView.setAdapter(mProducerLocationAdapter);
 
 
-        mHeadingReviewsOfProducer = (TextView) mRootView.findViewById(R.id.heading_map_sub_list_reviews);
+        mHeadingReviewsOfProducer = mRootView.findViewById(R.id.heading_map_sub_list_reviews);
         mHeadingReviewsOfProducer.setText(R.string.label_list_map_reviews_of_producer_preview);
-        mReviewOfProducerAdapter = new ReviewOfLocationAdapter(new ReviewOfLocationAdapter.ReviewAdapterClickHandler() {
-            @Override
-            public void onClick(Uri contentUri, ReviewOfLocationAdapter.ViewHolder vh) {
-                Bundle bundle = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    bundle = ActivityOptions.makeSceneTransitionAnimation(
-                            getActivity(),
-                            new Pair<View, String>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
-                            new Pair<View, String>(vh.producerNameView, vh.producerNameView.getTransitionName())
-                    ).toBundle();
-                }
+        mReviewOfProducerAdapter = new ReviewOfLocationAdapter((contentUri, vh) -> {
+            Bundle bundle;
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    new Pair<>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
+                    new Pair<>(vh.producerNameView, vh.producerNameView.getTransitionName())
+            ).toBundle();
 
-                startActivity(
-                        new Intent(getActivity(), ShowReviewActivity.class).setData(contentUri),
-                        bundle);
-            }
+            startActivity(
+                    new Intent(getActivity(), ShowReviewActivity.class).setData(contentUri),
+                    bundle);
         }, getActivity());
-        RecyclerView reviewsRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_map_sub_list_reviews);
+        RecyclerView reviewsRecyclerView = mRootView.findViewById(R.id.recyclerview_map_sub_list_reviews);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         reviewsRecyclerView.setAdapter(mReviewOfProducerAdapter);
 
@@ -146,7 +137,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 //        Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", " + "");
 
         try {
-            JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(mBaseUri));
+            JSONObject jsonObject = new JSONObject(Objects.requireNonNull(DatabaseContract.getJson(mBaseUri)));
 //            Log.v(LOG_TAG, "updateReviews, hashCode=" + this.hashCode() + ", jsonObject" + jsonObject.toString());
             JSONObject reviewObject = jsonObject.getJSONObject(Review.ENTITY);
             JSONObject drinkObject = JsonHelper.getOrCreateJsonObject(reviewObject, Drink.ENTITY);
@@ -161,7 +152,7 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
             e.printStackTrace();
         }
 
-        getLoaderManager().restartLoader(REVIEWS_OF_PRODUCER_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(REVIEWS_OF_PRODUCER_LOADER_ID, null, this);
     }
 
     @Override
@@ -169,16 +160,17 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
         return R.layout.fragment_show_map_producer;
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 //        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         switch (id) {
             case PRODUCERS_LOADER_ID:
-                return new CursorLoader(getActivity(),
+                return new CursorLoader(Objects.requireNonNull(getActivity()),
                         mBaseUri, QueryColumns.MapFragment.ProducerLocations.COLUMNS,
                         null, null, null);
             case REVIEWS_OF_PRODUCER_LOADER_ID:
-                return new CursorLoader(getActivity(), mReviewsOfProducerUri,
+                return new CursorLoader(Objects.requireNonNull(getActivity()), mReviewsOfProducerUri,
                         QueryColumns.MapFragment.ReviewsSubQuery.COLUMNS, null, null, null);
             default:
                 throw new RuntimeException("wrong loaderId in " + ShowProducerMapFragment.class.getSimpleName() + ": " + id);
@@ -194,9 +186,8 @@ public class ShowProducerMapFragment extends ShowBaseMapFragment implements Load
 //                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Producers");
                 mProducerLocationAdapter.swapCursor(data);
                 mHeadingProducerLocations.setText(getString(R.string.label_list_map_producer_locations, count));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ((ShowMapActivity)getActivity()).scheduleStartPostponedTransition(mHeadingProducerLocations);
-                }
+                ((ShowMapActivity) Objects.requireNonNull(getActivity()))
+                        .scheduleStartPostponedTransition(mHeadingProducerLocations);
                 break;
             case REVIEWS_OF_PRODUCER_LOADER_ID:
 //                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Producer");

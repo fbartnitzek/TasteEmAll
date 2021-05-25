@@ -50,7 +50,7 @@ public class ShowLocationActivity extends AppCompatActivity {
                     .add(R.id.container_show_location_fragment, fragment, FRAGMENT_TAG)
                     .commit();
         } else {
-            Log.e(LOG_TAG, "onCreate - no rootView container found - should never happe! ");
+            Log.e(LOG_TAG, "onCreate - no rootView container found - should never happen! ");
         }
     }
 
@@ -62,16 +62,16 @@ public class ShowLocationActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_edit:
-                startEditActivity();
-                return true;
-            case R.id.action_delete:
-                startDelete();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            finish();
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            startEditActivity();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            startDelete();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

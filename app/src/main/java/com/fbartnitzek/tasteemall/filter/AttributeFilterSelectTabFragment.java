@@ -16,12 +16,14 @@ import android.view.ViewGroup;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Copyright 2017.  Frank Bartnitzek
@@ -43,7 +45,6 @@ public class AttributeFilterSelectTabFragment extends AttributeBaseFilterFragmen
 
     private static final int ATTRIBUTE_VALUES_LOADER_ID = 67549;
 
-    private RecyclerView mValuesRecycler;
     private AttributeValuesSelectAdapter mAttributeValuesSelectAdapter;
 
     @Nullable
@@ -51,9 +52,9 @@ public class AttributeFilterSelectTabFragment extends AttributeBaseFilterFragmen
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        getLoaderManager().restartLoader(ATTRIBUTE_VALUES_LOADER_ID, null, AttributeFilterSelectTabFragment.this);
+        LoaderManager.getInstance(this).restartLoader(ATTRIBUTE_VALUES_LOADER_ID, null, this);
 
-        mValuesRecycler = (RecyclerView) mRootView.findViewById(R.id.attribute_list);
+        RecyclerView mValuesRecycler = mRootView.findViewById(R.id.attribute_list);
         mValuesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAttributeValuesSelectAdapter = new AttributeValuesSelectAdapter();
@@ -78,44 +79,38 @@ public class AttributeFilterSelectTabFragment extends AttributeBaseFilterFragmen
         return new JSONObject().put(DatabaseContract.Operations.IS, array);
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-                String alias = DatabaseContract.ALIASES.get(mBaseEntity) + ".";
-                JSONObject json = new JSONObject();
-                Uri uri;
-                try {
-                    json.put(mBaseEntity, new JSONObject());
-                    uri = DatabaseContract.buildUriWithJson(json);
-                } catch (UnsupportedEncodingException | JSONException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("invalid json query " + json.toString());
-                }
-                return new CursorLoader(getActivity(), uri,
-                        new String[]{"DISTINCT " + alias + mAttributeName},
-                        null, null, alias + mAttributeName + " ASC");
-            default:
-                throw new RuntimeException("wrong loaderId in " + AttributeFilterSelectTabFragment.class.getSimpleName());
-
+        if (id == ATTRIBUTE_VALUES_LOADER_ID) {
+            String alias = DatabaseContract.ALIASES.get(mBaseEntity) + ".";
+            JSONObject json = new JSONObject();
+            Uri uri;
+            try {
+                json.put(mBaseEntity, new JSONObject());
+                uri = DatabaseContract.buildUriWithJson(json);
+            } catch (UnsupportedEncodingException | JSONException e) {
+                e.printStackTrace();
+                throw new RuntimeException("invalid json query " + json.toString());
+            }
+            return new CursorLoader(Objects.requireNonNull(getActivity()), uri,
+                    new String[]{"DISTINCT " + alias + mAttributeName},
+                    null, null, alias + mAttributeName + " ASC");
         }
+        throw new RuntimeException("wrong loaderId in " + AttributeFilterSelectTabFragment.class.getSimpleName());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-                mAttributeValuesSelectAdapter.swapCursor(data);
-                break;
+        if (loader.getId() == ATTRIBUTE_VALUES_LOADER_ID) {
+            mAttributeValuesSelectAdapter.swapCursor(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-                mAttributeValuesSelectAdapter.swapCursor(null);
-                break;
+        if (loader.getId() == ATTRIBUTE_VALUES_LOADER_ID) {
+            mAttributeValuesSelectAdapter.swapCursor(null);
         }
     }
 

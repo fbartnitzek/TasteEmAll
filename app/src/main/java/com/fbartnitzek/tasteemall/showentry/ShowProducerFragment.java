@@ -47,7 +47,6 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
     private TextView mProducerDescriptionView;
     private TextView mProducerWebsiteView;
     private static GoogleMap mMap;
-    private SupportMapFragment mMapFragment;
     private Uri mUri;
     private View mRootView;
     private LatLng mLatLng;
@@ -91,7 +90,7 @@ public class ShowProducerFragment extends ShowBaseFragment implements OnMapReady
         mProducerLocationCountryView = mRootView.findViewById(R.id.producer_location_country);
         mProducerLocationAddressView = mRootView.findViewById(R.id.producer_location_address);
 
-        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mMapFragment != null) {
             mMapFragment.getMapAsync(this);
         } else {

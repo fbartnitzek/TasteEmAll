@@ -1,17 +1,19 @@
 package com.fbartnitzek.tasteemall.mainpager;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -31,14 +33,11 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder>{
 
-    private final Context mContext;
-
     private Cursor mCursor;
     private final LocationAdapterClickHandler mClickHandler;
 
-    public LocationAdapter(LocationAdapterClickHandler ch, Context context) {
+    public LocationAdapter(LocationAdapterClickHandler ch) {
         mClickHandler = ch;
-        mContext = context;
     }
 
 
@@ -46,8 +45,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         void onClick(String formatted, Uri contentUri, ViewHolder viewHolder);
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_location_recycler, parent, false);
@@ -105,9 +105,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
         public ViewHolder(View view) {
             super(view);
-            this.descriptionView = (TextView) view.findViewById(R.id.list_item_location_description);
-            this.formattedView = (TextView) view.findViewById(R.id.list_item_location_formatted);
-            this.countryView = (TextView) view.findViewById(R.id.list_item_location_country);
+            this.descriptionView = view.findViewById(R.id.list_item_location_description);
+            this.formattedView = view.findViewById(R.id.list_item_location_formatted);
+            this.countryView = view.findViewById(R.id.list_item_location_country);
             view.setOnClickListener(this);
         }
 

@@ -17,6 +17,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Copyright 2017.  Frank Bartnitzek
  *
@@ -74,7 +76,7 @@ public abstract class ShowBaseMapFragment extends Fragment implements OnMapReady
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         Log.v(LOG_TAG, "onMapReady, hashCode=" + this.hashCode() + ", " + "googleMap = [" + googleMap + "]");
         mMap = googleMap;
         Log.v(LOG_TAG, "onMapReady, mapType: " + mMap.getMapType());
@@ -110,7 +112,7 @@ public abstract class ShowBaseMapFragment extends Fragment implements OnMapReady
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
             // scroll down
-            NestedScrollView nsv = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollView);
+            NestedScrollView nsv = mRootView.findViewById(R.id.nested_scrollView);
             nsv.fullScroll(View.FOCUS_DOWN);
         }
     }

@@ -76,7 +76,7 @@ public class AddLocationFragment extends GeocoderFragment implements
     private String mLocationId;
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         outState.putString(STATE_LOCATION_INPUT, editLocation.getText().toString());
         outState.putString(STATE_LOCATION_DESCRIPTION, mEditLocationDescription.getText().toString());
 
@@ -100,7 +100,7 @@ public class AddLocationFragment extends GeocoderFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         rootView = inflater.inflate(R.layout.fragment_add_location, container, false);
 

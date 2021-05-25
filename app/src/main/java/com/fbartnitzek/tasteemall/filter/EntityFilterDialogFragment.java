@@ -33,10 +33,12 @@ import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static com.fbartnitzek.tasteemall.filter.EntityFilterTabFragment.BASE_ENTITY;
 
@@ -65,9 +67,8 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
     public static final String EXTRA_ATTRIBUTE_NAME = "EXTRA_ATTRIBUTE_NAME";
     public static final String EXTRA_BASE_ENTITY = "BASE_ENTITY";
     public static final String EXTRA_JSON = "EXTRA_JSON";
-    public static final String ACTION_FILTER_UPDATES = EntityFilterDialogFragment.class.getPackage().getName() + ".EntityFilterUpdates";
-    private SectionsPagerAdapter mFilterEntityPagerAdapter;
-    private ViewPager mViewPager;
+    public static final String ACTION_FILTER_UPDATES = Objects.requireNonNull(
+            EntityFilterDialogFragment.class.getPackage()).getName() + ".EntityFilterUpdates";
     private String mBaseEntity;
     private JSONObject mFilterJson;
     private GenericFilterFinishListener finishListener;
@@ -138,10 +139,10 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
         View view = inflater.inflate(R.layout.fragment_filter_entity_dialog, container);
 
         // tab slider
-        mFilterEntityPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+        SectionsPagerAdapter mFilterEntityPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager)view.findViewById(R.id.pager);
+        ViewPager mViewPager = view.findViewById(R.id.pager);
         mViewPager.setAdapter(mFilterEntityPagerAdapter);
 
         view.findViewById(R.id.filter).setOnClickListener(this);
@@ -151,8 +152,9 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
 
     }
 
+    // todo: something different then Fragment.onAttach
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NotNull Activity activity) {
         super.onAttach(activity);
 
         // communication with the MainActivity to return filter uri
@@ -174,18 +176,15 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.filter:
-                // return filter baseEntity with collected json
-                try {
-                    Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", mFilterJson:" + mFilterJson);
-                    finishListener.onFinishEditDialog(DatabaseContract.buildUriWithJson(mFilterJson));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case R.id.cancel:
-                break;
+        int id = v.getId();
+        if (id == R.id.filter) {// return filter baseEntity with collected json
+            try {
+                Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", mFilterJson:" + mFilterJson);
+                finishListener.onFinishEditDialog(DatabaseContract.buildUriWithJson(mFilterJson));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+//        } else if (id == R.id.cancel) {
         }
         this.dismiss();
 
@@ -197,6 +196,7 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
             super(fm);
         }
 
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
@@ -207,29 +207,34 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
             } else if (Drink.ENTITY.equals(mBaseEntity) && position == 1) {
                 return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Producer.ENTITY)
-                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(getContext(), Producer.ENTITY, Drink.ENTITY))
+                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
+                                        Objects.requireNonNull(getContext()), Producer.ENTITY, Drink.ENTITY))
                                 .build());
             } else if (Review.ENTITY.equals(mBaseEntity)) {
                 switch (position) {
                     case 1:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                         .putString(BASE_ENTITY, User.ENTITY)
-                                        .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(getContext(), User.ENTITY, Review.ENTITY))
+                                        .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
+                                                Objects.requireNonNull(getContext()), User.ENTITY, Review.ENTITY))
                                         .build());
                     case 2:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Location.ENTITY)
-                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(getContext(), Location.ENTITY, Review.ENTITY))
+                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
+                                        Objects.requireNonNull(getContext()), Location.ENTITY, Review.ENTITY))
                                 .build());
                     case 3:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Drink.ENTITY)
-                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(getContext(), Drink.ENTITY, Review.ENTITY))
+                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
+                                        Objects.requireNonNull(getContext()), Drink.ENTITY, Review.ENTITY))
                                 .build());
                     case 4:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Producer.ENTITY)
-                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(getContext(), Producer.ENTITY, Review.ENTITY))
+                                .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
+                                        Objects.requireNonNull(getContext()), Producer.ENTITY, Review.ENTITY))
                                 .build());
                     default:
                         throw new RuntimeException("wrong position in FragmentAdapter");
@@ -293,17 +298,18 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(mMessageReceiver,
                 new IntentFilter(ACTION_FILTER_UPDATES));
     }
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity()))
+                .unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String attribute = intent.getStringExtra(EXTRA_ATTRIBUTE_NAME);
@@ -314,6 +320,7 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
 
             try {
 
+                // todo: confusing
                 JSONObject baseEntity = mFilterJson.getJSONObject(mBaseEntity);
                 if (mBaseEntity.equals(entity)) {
                     mFilterJson.put(entity, updateEntity(baseEntity, attribute, json));

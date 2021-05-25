@@ -4,7 +4,8 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.AutoCompleteTextView;
+
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -22,7 +23,7 @@ import android.widget.AutoCompleteTextView;
  * limitations under the License.
  */
 
-public class LocationAutoCompleteTextView extends AutoCompleteTextView{
+public class LocationAutoCompleteTextView extends AppCompatAutoCompleteTextView {
 
     private boolean mShowDropDown = false;
 

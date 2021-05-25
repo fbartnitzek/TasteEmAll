@@ -13,6 +13,8 @@ import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -45,8 +47,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         this.mContext = mContext;
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_user_completion, parent, false);
@@ -79,7 +82,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.userNameView = (TextView) itemView.findViewById(R.id.list_item_user_name);
+            this.userNameView = itemView.findViewById(R.id.list_item_user_name);
             itemView.setOnClickListener(this);
         }
 

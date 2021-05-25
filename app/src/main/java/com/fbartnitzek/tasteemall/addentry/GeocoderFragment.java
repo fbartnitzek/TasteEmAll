@@ -249,7 +249,7 @@ public abstract class GeocoderFragment extends Fragment implements
         position = 0;
         address = addresses[position];
 
-        // modify editlocation for latLong, but skip mod
+        // modify editLocation for latLong, but skip mod
         if (outData.getBoolean(GeocodeWorker.GEOCODE_TYPE_LAT_LONG, false)) {
             ignoreEdit = 1;
             editLocation.setText(address.getFormatted());

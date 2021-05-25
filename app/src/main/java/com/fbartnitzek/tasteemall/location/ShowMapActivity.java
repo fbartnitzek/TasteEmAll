@@ -30,10 +30,12 @@ import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 import com.google.android.gms.maps.GoogleMap;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -81,7 +83,7 @@ public class ShowMapActivity extends AppCompatActivity {
             throw new RuntimeException("wrong kind of call...");
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
@@ -91,8 +93,7 @@ public class ShowMapActivity extends AppCompatActivity {
             supportActionBar.setCustomView(R.layout.action_bar_title_layout);
             supportActionBar.setDisplayShowCustomEnabled(true);
 
-            // TODO
-            TextView titleView = (TextView) findViewById(R.id.action_bar_title);
+            TextView titleView = findViewById(R.id.action_bar_title);
             titleView.setText(getString(R.string.title_show_map));
 //            if (mLocationName != null) {
 //                titleView.setText(getString(R.string.title_show_map_location, mLocationName));
@@ -101,7 +102,7 @@ public class ShowMapActivity extends AppCompatActivity {
 //            }
         }
 
-        mViewPager = (ViewPager) findViewById(R.id.map_pager);
+        mViewPager = findViewById(R.id.map_pager);
         mPagerAdapter = new ShowMapPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
@@ -116,23 +117,22 @@ public class ShowMapActivity extends AppCompatActivity {
     }
 
     // TODO: called by fragments
-    protected void setHeading(String fragment, String location) {
-        TextView titleView = (TextView) findViewById(R.id.action_bar_title);
-        if (titleView != null) {
-            titleView.setText(getString(R.string.title_show_map));
-            if (location != null) {
-//                titleView.setText(getString(R.string.title_show_map_location, mLocationName));
-                titleView.setText(getString(R.string.title_show_map_reviews_of_entity_location, fragment, location));
-            } else {
-//                titleView.setText(getString(R.string.title_show_map));
-                titleView.setText(getString(R.string.title_show_map_all_entity, fragment));
-            }
-        }
-
-    }
+//    protected void setHeading(String fragment, String location) {
+//        TextView titleView = (TextView) findViewById(R.id.action_bar_title);
+//        if (titleView != null) {
+//            titleView.setText(getString(R.string.title_show_map));
+//            if (location != null) {
+////                titleView.setText(getString(R.string.title_show_map_location, mLocationName));
+//                titleView.setText(getString(R.string.title_show_map_reviews_of_entity_location, fragment, location));
+//            } else {
+////                titleView.setText(getString(R.string.title_show_map));
+//                titleView.setText(getString(R.string.title_show_map_all_entity, fragment));
+//            }
+//        }
+//    }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(BASE_ENTITY, mBaseEntity);
         outState.putParcelable(BASE_URI, mBaseUri);
@@ -169,26 +169,22 @@ public class ShowMapActivity extends AppCompatActivity {
         }
 
         ShowBaseMapFragment fragment = getFragment(mViewPager.getCurrentItem());
-        if (fragment != null) {
-            switch (item.getItemId()) {
-                case R.id.action_map_type_none:
-                    fragment.setMapType(GoogleMap.MAP_TYPE_NONE);
-                    return true;
-                case R.id.action_map_type_normal:
-                    fragment.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    return true;
-                case R.id.action_map_type_satellite:
-                    fragment.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                    return true;
-                case R.id.action_map_type_terrain:
-                    fragment.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                    return true;
-                case R.id.action_map_type_hybrid:
-                    fragment.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                    return true;
-                default:
-                    // nothing
-            }
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_map_type_none) {
+            fragment.setMapType(GoogleMap.MAP_TYPE_NONE);
+            return true;
+        } else if (itemId == R.id.action_map_type_normal) {
+            fragment.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            return true;
+        } else if (itemId == R.id.action_map_type_satellite) {
+            fragment.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+            return true;
+        } else if (itemId == R.id.action_map_type_terrain) {
+            fragment.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            return true;
+        } else if (itemId == R.id.action_map_type_hybrid) {
+            fragment.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -223,9 +219,7 @@ public class ShowMapActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });
@@ -235,7 +229,7 @@ public class ShowMapActivity extends AppCompatActivity {
     private Uri calcReviewUri(Uri origUri) {
 
         try {
-            JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(origUri));
+            JSONObject jsonObject = new JSONObject(Objects.requireNonNull(DatabaseContract.getJson(origUri)));
             String rootEntity = jsonObject.keys().next();   // just 1 rootElement
             if (Review.ENTITY.equals(rootEntity)) {
 //                Log.v(LOG_TAG, "calcReviewUri, json already reviewEntity =" + jsonObject.toString());
@@ -290,6 +284,7 @@ public class ShowMapActivity extends AppCompatActivity {
             super(fm);
         }
 
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             switch (position) {

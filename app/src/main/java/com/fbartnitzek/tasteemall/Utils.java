@@ -22,7 +22,6 @@ import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -151,6 +150,7 @@ public class Utils {
     }
 
     static public boolean isNetworkUnavailable(Context context) {
+        // todo: https://github.com/android/connectivity-samples/tree/main/NetworkConnect
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork == null || !activeNetwork.isConnectedOrConnecting();
@@ -163,27 +163,27 @@ public class Utils {
     }
 
 
-    public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
-        StringBuilder sb = new StringBuilder();
-        boolean firstTime = true;
-        int i = 0;
-        for (Object token: tokens) {
-            if (i > max) {
-                sb.append(delimiter);
-                sb.append("...");
-                return sb.toString();
-            } else {
-                if (firstTime) {
-                    firstTime = false;
-                } else {
-                    sb.append(delimiter);
-                }
-                sb.append(token);
-                ++i;
-            }
-        }
-        return sb.toString();
-    }
+//    public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
+//        StringBuilder sb = new StringBuilder();
+//        boolean firstTime = true;
+//        int i = 0;
+//        for (Object token: tokens) {
+//            if (i > max) {
+//                sb.append(delimiter);
+//                sb.append("...");
+//                return sb.toString();
+//            } else {
+//                if (firstTime) {
+//                    firstTime = false;
+//                } else {
+//                    sb.append(delimiter);
+//                }
+//                sb.append(token);
+//                ++i;
+//            }
+//        }
+//        return sb.toString();
+//    }
 
     public static String getCurrentLocalIso8601Time() {
         return iso8601Format.format(new java.util.Date());
@@ -197,34 +197,34 @@ public class Utils {
         return filePrefixFormat.format(new java.util.Date());
     }
 
-    public static String formatDateTime(Context context, String timeToFormat) {
-
-        String finalDateTime = "";
-
-//        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        Date date;
-        if (timeToFormat != null) {
-            try {
-                date = iso8601Format.parse(timeToFormat);
-            } catch (ParseException e) {
-                date = null;
-            }
-
-            if (date != null) {
-                long when = date.getTime();
-                int flags = 0;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
-                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
-
-                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
-                        when + TimeZone.getDefault().getOffset(when), flags);
-            }
-        }
-        return finalDateTime;
-    }
+//    public static String formatDateTime(Context context, String timeToFormat) {
+//
+//        String finalDateTime = "";
+//
+////        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        Date date;
+//        if (timeToFormat != null) {
+//            try {
+//                date = iso8601Format.parse(timeToFormat);
+//            } catch (ParseException e) {
+//                date = null;
+//            }
+//
+//            if (date != null) {
+//                long when = date.getTime();
+//                int flags = 0;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
+//                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
+//
+//                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
+//                        when + TimeZone.getDefault().getOffset(when), flags);
+//            }
+//        }
+//        return finalDateTime;
+//    }
 
     public static String getFormattedDate(Date date, String formatString) {
         if (date != null) {
