@@ -73,6 +73,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -107,14 +109,14 @@ public class AddReviewFragment extends Fragment implements
     private static final int LOCATION_ACTIVITY_REQUEST_CODE = 2356;
     private View mRootView;
 
-    private static AutoCompleteTextView mEditCompletionDrinkName;
-    private static AutoCompleteTextView mEditCompletionUserName;
-    private static LocationAutoCompleteTextView mEditReviewLocation;
-    private static Spinner mSpinnerRating;
-    private static EditText mEditReviewDescription;
-    private static EditText mEditReviewRecommendedSides;
-    private static EditText mEditReviewReadableDate;
-    private static EditText mEditReviewLocationDescription;
+    private AutoCompleteTextView mEditCompletionDrinkName;
+    private AutoCompleteTextView mEditCompletionUserName;
+    private LocationAutoCompleteTextView mEditReviewLocation;
+    private Spinner mSpinnerRating;
+    private EditText mEditReviewDescription;
+    private EditText mEditReviewRecommendedSides;
+    private EditText mEditReviewReadableDate;
+    private EditText mEditReviewLocationDescription;
 
     private String mDrinkName;
     private String mProducerName;
@@ -128,7 +130,6 @@ public class AddReviewFragment extends Fragment implements
     private CompletionLocationAdapter mLocationAdapter;
 
     private int mRatingPosition;
-    private int mReview_Id;
     private Location mLastLocation;
     private AddressResultReceiver mResultReceiver;
     private boolean mEditValuesLoaded = false;
@@ -198,7 +199,6 @@ public class AddReviewFragment extends Fragment implements
             if (savedInstanceState.containsKey(STATE_DRINK_NAME)) {   //just typed some letters
                 mDrinkName = savedInstanceState.getString(STATE_DRINK_NAME);
                 mEditCompletionDrinkName.setText(mDrinkName);
-//                mEditCompletionDrinkName.dismissDropDown();   //TODO: needed?
             }
             if (savedInstanceState.containsKey(STATE_DRINK_ID)) {    //found drink
                 mDrinkId = savedInstanceState.getString(STATE_DRINK_ID);
@@ -257,7 +257,8 @@ public class AddReviewFragment extends Fragment implements
 
 
         // try later: http://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
-        String[] reviewRatings = getActivity().getResources().getStringArray(R.array.pref_rating_values);
+        String[] reviewRatings = Objects.requireNonNull(getActivity()).getResources()
+                .getStringArray(R.array.pref_rating_values);
         mRatingAdapter = new CustomSpinnerAdapter(getActivity(),
                 new ArrayList<>(Arrays.asList(reviewRatings)), R.layout.spinner_small_row,
                 R.string.a11y_review_rating);
@@ -277,7 +278,6 @@ public class AddReviewFragment extends Fragment implements
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
@@ -363,10 +363,7 @@ public class AddReviewFragment extends Fragment implements
                     mEditReviewLocationDescription.setEnabled(false);
                 }
             }
-
         });
-
-
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_LOCATION)) {
             editReviewLocationIgnoreTextChange(savedInstanceState.getString(STATE_REVIEW_LOCATION));
@@ -435,7 +432,7 @@ public class AddReviewFragment extends Fragment implements
         Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
+            Objects.requireNonNull(activity).setSupportActionBar(toolbar);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar == null) {
                 Log.e(LOG_TAG, "createToolbar - no actionbar found..., hashCode=" + this.hashCode() + ", " + "");
@@ -467,7 +464,7 @@ public class AddReviewFragment extends Fragment implements
     private void updateToolbar() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
-        if (activity.getSupportActionBar() != null) {
+        if (Objects.requireNonNull(activity).getSupportActionBar() != null) {
             if (mContentUri != null) {  // edit
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_review_activity,
@@ -509,13 +506,10 @@ public class AddReviewFragment extends Fragment implements
 
         if (mDrinkId == null || mDrinkName == null) {
             Snackbar.make(mRootView, R.string.msg_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
-            return;
         } else if (getString(R.string.pre_filled_rating).equals(mSpinnerRating.getSelectedItem().toString())) {
             Snackbar.make(mRootView, R.string.msg_rate_drink, Snackbar.LENGTH_SHORT).show();
-            return;
         } else if (!Utils.checkTimeFormat(mEditReviewReadableDate.getText().toString().trim())) {
             Snackbar.make(mRootView, R.string.msg_invalid_review_date, Snackbar.LENGTH_SHORT).show();
-            return;
         } else {    //opt. async user check
             mUserName = mEditCompletionUserName.getText().toString();
             if (mUserName.length() < 1){
@@ -539,7 +533,6 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
         mUserId = userId;
-
         validateLocation();
     }
 
@@ -554,8 +547,6 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
         // 2) new location with valid latLng and no location nearby, geocoded or not -> fine
-        // TODO: still buggy? location with empty locationString was added in bayreuth => workaround added
-
         if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
             Log.v(LOG_TAG, "validateLocation with mLocationParcelable - geocode & new, hashCode=" + this.hashCode() + ", " + "");
 
@@ -575,7 +566,7 @@ public class AddReviewFragment extends Fragment implements
         // b) negative: add location-input and geocode later
         // c) neutral:  ignore location and choose to not enter it for review (not recommended)
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         // TODO: message from strings and 2 cases w/o add... (if ever happens...)
         builder.setTitle("location unclear")
                 .setMessage("Do you want to SEARCH for the review-location, " +
@@ -685,7 +676,7 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setMessage(getString(R.string.msg_add_new_user, userName))
                 .setCancelable(true)
                 .setPositiveButton(R.string.add_user_button,
@@ -719,14 +710,12 @@ public class AddReviewFragment extends Fragment implements
     private void createDrink() {
         Log.v(LOG_TAG, "createDrink, hashCode=" + this.hashCode() + ", " + "");
         Bundle bundle = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // with shared element transition every transition is working ...
-            bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    getActivity(),
-                    mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
-            ).toBundle();
+        // with shared element transition every transition is working ...
+        bundle = ActivityOptions.makeSceneTransitionAnimation(
+                getActivity(),
+                mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
+        ).toBundle();
 
-        }
         Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
         intent.putExtra(AddDrinkActivity.PATTERN_EXTRA, mEditCompletionDrinkName.getText().toString().trim());
         startActivityForResult(intent, DRINK_ACTIVITY_REQUEST_CODE, bundle);
@@ -778,7 +767,7 @@ public class AddReviewFragment extends Fragment implements
 
     private void getCurrentLocation() {
         Log.v(LOG_TAG, "getCurrentLocation, hashCode=" + this.hashCode() + ", " + "");
-        if (ActivityCompat.checkSelfPermission(getActivity(),
+        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -838,19 +827,6 @@ public class AddReviewFragment extends Fragment implements
             Log.v(LOG_TAG, "queryNearbyProducer without drinkId - do nothing");
         }
     }
-
-    // successfully tested:
-    //      - states: inputText | inputLocation | geocoded (T|L|G)
-    //      producer    review  result
-    //         T            T
-    //         T            L
-    //         T            G   works
-    //         L            T
-    //         L            L
-    //         L            G
-    //         G            T
-    //         G            L
-    //         G            G
 
     // TODO: test no nearby found - add new (geocoder / gps / nothing)
 
@@ -915,15 +891,15 @@ public class AddReviewFragment extends Fragment implements
     // searchLocationFormattedAndDescriptionWithPattern
     // found: list
     //  selected: show in map
-    // not in list/not found: TODO: Find/AddLocationActivity... (not that often) - adds onSave like Drink
-
+    // not in list/not found:
+    // TODO: Find/AddLocationActivity... (not that often) - adds onSave like Drink
 
     // Geocoder
 
     private void startGeocodeServiceByPosition() {    // should not be called with an address string - extra activity
         Log.v(LOG_TAG, "startGeocodeServiceByPosition, hashCode=" + this.hashCode() + ", " + "");
 
-        if (Utils.isNetworkUnavailable(getActivity())) {
+        if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))) {
             if (mLastLocation != null) {
                 Log.v(LOG_TAG, "startGeocodeServiceByPosition - TODO: call geocoder later..., hashCode=" + this.hashCode() + ", " + "");
                 mLocationParcelable = Utils.getLocationStubFromLastLocation(
@@ -1057,7 +1033,7 @@ public class AddReviewFragment extends Fragment implements
     // map parts
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         updateAndMoveToMarker();
     }
@@ -1075,22 +1051,22 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-    private void focusOnMap() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", " + "");
-
-                NestedScrollView scrollView = getActivity().findViewById(R.id.nested_scrollView);
-                if (scrollView != null) {
-                    Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", position=" + scrollView.getBottom() + "");
-                    scrollView.smoothScrollTo(0, scrollView.getBottom());
-                } else {
-                    Log.v(LOG_TAG, "focusOnMap-run, scrollView == null");
-                }
-            }
-        });
-    }
+//    private void focusOnMap() {
+//        new Handler().post(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", " + "");
+//
+//                NestedScrollView scrollView = getActivity().findViewById(R.id.nested_scrollView);
+//                if (scrollView != null) {
+//                    Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", position=" + scrollView.getBottom() + "");
+//                    scrollView.smoothScrollTo(0, scrollView.getBottom());
+//                } else {
+//                    Log.v(LOG_TAG, "focusOnMap-run, scrollView == null");
+//                }
+//            }
+//        });
+//    }
 
     private void updateAndMoveToMarker() {
         if (mMap != null && mLocationParcelable != null) {
@@ -1112,80 +1088,78 @@ public class AddReviewFragment extends Fragment implements
 
     // edit - use loaders
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
-        switch (id) {
-            case EDIT_REVIEW_LOADER_ID:
-                if (mContentUri != null) {
-                    return new CursorLoader(
-                            getActivity(),
-                            mContentUri,
-                            QueryColumns.ReviewFragment.EditQuery.COLUMNS,
-                            null,
-                            null,
-                            null
-                    );
-                }
+        if (id == EDIT_REVIEW_LOADER_ID) {
+            if (mContentUri != null) {
+                return new CursorLoader(
+                        Objects.requireNonNull(getActivity()),
+                        mContentUri,
+                        QueryColumns.ReviewFragment.EditQuery.COLUMNS,
+                        null,
+                        null,
+                        null
+                );
+            }
         }
         return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case EDIT_REVIEW_LOADER_ID:
-                if (data != null && data.moveToFirst()) {
+        if (loader.getId() == EDIT_REVIEW_LOADER_ID) {
+            if (data != null && data.moveToFirst()) {
 
-                    mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
-                    mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
-                    // animation might work with separate textView in toolbar...
-                    mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
+                int mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
+                mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
+                // animation might work with separate textView in toolbar...
+                mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
 
-                    mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
-                    mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
+                mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
+                mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
 
-                    mUserName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_NAME);
-                    mUserId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_ID);
+                mUserName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_NAME);
+                mUserId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_ID);
 
-                    mLocationId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_ID);
+                mLocationId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_ID);
 
-                    String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
+                String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
 
-                    String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
-                    String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
+                String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
+                String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
 
-                    String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
+                String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
 
-                    String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_FORMATTED);
-                    String locationDescription = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_DESCRIPTION);
+                String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_FORMATTED);
+                String locationDescription = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_DESCRIPTION);
 
-                    mEditCompletionDrinkName.setText(mDrinkName);
-                    mEditCompletionDrinkName.dismissDropDown();
-                    mEditCompletionDrinkName.setTransitionName(
-                            getString(R.string.shared_transition_review_drink) + mReview_Id);
+                mEditCompletionDrinkName.setText(mDrinkName);
+                mEditCompletionDrinkName.dismissDropDown();
+                mEditCompletionDrinkName.setTransitionName(
+                        getString(R.string.shared_transition_review_drink) + mReview_Id);
 
-                    mEditCompletionUserName.setText(mUserName);
-                    mEditCompletionUserName.dismissDropDown();
+                mEditCompletionUserName.setText(mUserName);
+                mEditCompletionUserName.dismissDropDown();
 
-                    mRatingPosition = mRatingAdapter.getPosition(rating);
-                    setSpinner();
-                    mEditReviewDescription.setText(reviewDesc);
-                    mEditReviewRecommendedSides.setText(recommendedSides);
+                mRatingPosition = mRatingAdapter.getPosition(rating);
+                setSpinner();
+                mEditReviewDescription.setText(reviewDesc);
+                mEditReviewRecommendedSides.setText(recommendedSides);
 
-                    mEditReviewReadableDate.setText(readableDate);
-                    editReviewLocationIgnoreTextChange(location);
+                mEditReviewReadableDate.setText(readableDate);
+                editReviewLocationIgnoreTextChange(location);
 
-                    mEditReviewLocation.dismissDropDown();
-                    mEditReviewLocationDescription.setText(locationDescription);
-                    mEditValuesLoaded = true;
-                    updateToolbar();
+                mEditReviewLocation.dismissDropDown();
+                mEditReviewLocationDescription.setText(locationDescription);
+                mEditValuesLoaded = true;
+                updateToolbar();
 
-                    resumeActivityEnterTransition();    // from edit
-                }
-                break;
-            default:
-                Log.w(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+                resumeActivityEnterTransition();    // from edit
+            }
+        } else {
+            Log.w(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         }
     }
 
@@ -1195,7 +1169,7 @@ public class AddReviewFragment extends Fragment implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
         // nothing
     }
 
