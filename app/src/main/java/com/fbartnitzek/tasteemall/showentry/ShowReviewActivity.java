@@ -3,13 +3,10 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -17,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
@@ -99,16 +99,16 @@ public class ShowReviewActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_edit:
-                startEditActivity();
-                return true;
-            case R.id.action_delete:
-                startDelete();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            startEditActivity();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            startDelete();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -122,25 +122,17 @@ public class ShowReviewActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 R.string.delete_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleReviewUri(mContentUri);
-                        new DeleteEntryTask(
-                                ShowReviewActivity.this,
-                                DatabaseContract.ReviewEntry.TABLE_NAME + "." + Review.READABLE_DATE)
-                                .execute(deleteUri);
-                    }
+                (dialog, which) -> {
+                    Uri deleteUri = Utils.calcSingleReviewUri(mContentUri);
+                    new DeleteEntryTask(
+                            ShowReviewActivity.this,
+                            DatabaseContract.ReviewEntry.TABLE_NAME + "." + Review.READABLE_DATE)
+                            .execute(deleteUri);
                 }
         );
         builder.setNegativeButton(
                 R.string.keep_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ShowReviewActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                (dialog, which) -> Toast.makeText(ShowReviewActivity.this, "keeping entry", Toast.LENGTH_SHORT).show()
         );
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -149,20 +141,16 @@ public class ShowReviewActivity extends AppCompatActivity {
     private void startEditActivity() {
         Intent intent = new Intent(this, AddReviewActivity.class);
         intent.setData(mContentUri);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            View drinkName = findViewById(R.id.drink_name);
-            int review_Id = DatabaseContract.getIdFromUri(mContentUri);
+        View drinkName = findViewById(R.id.drink_name);
+        int review_Id = DatabaseContract.getIdFromUri(mContentUri);
 
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    this,
-                    new Pair<>(drinkName, //drinkName.getTransitionName())
-                            getString(R.string.shared_transition_review_drink) + review_Id)
-            ).toBundle();
-            startActivityForResult(intent, EDIT_REVIEW_REQUEST, bundle);
-        } else {
-            startActivityForResult(intent, EDIT_REVIEW_REQUEST);
-        }
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                this,
+                new Pair<>(drinkName, //drinkName.getTransitionName())
+                        getString(R.string.shared_transition_review_drink) + review_Id)
+        ).toBundle();
+        startActivityForResult(intent, EDIT_REVIEW_REQUEST, bundle);
     }
 
     @Override
@@ -210,9 +198,7 @@ public class ShowReviewActivity extends AppCompatActivity {
                             @Override
                             public boolean onPreDraw() {
                                 view.getViewTreeObserver().removeOnPreDrawListener(this);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    supportStartPostponedEnterTransition();
-                                }
+                                supportStartPostponedEnterTransition();
                                 return true;
                             }
                         });
