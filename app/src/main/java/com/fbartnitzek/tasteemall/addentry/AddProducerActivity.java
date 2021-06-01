@@ -35,7 +35,6 @@ public class AddProducerActivity extends AppCompatActivity {
 
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
-//            AddProducerFragment fragment = getFragment();
             AddProducerFragment2 fragment = getFragment();
 
             // use name from calling activity or contentUri for edit
