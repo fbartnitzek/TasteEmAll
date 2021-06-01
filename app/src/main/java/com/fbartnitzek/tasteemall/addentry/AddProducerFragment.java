@@ -37,7 +37,7 @@ import java.util.Optional;
 
 import static com.fbartnitzek.tasteemall.data.QueryColumns.ProducerFragment.ShowQuery;
 
-public class AddProducerFragment2 extends GeocoderFragment implements
+public class AddProducerFragment extends GeocoderFragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int EDIT_PRODUCER_LOADER_ID = 12345;
@@ -48,7 +48,7 @@ public class AddProducerFragment2 extends GeocoderFragment implements
     private static final String STATE_PRODUCER_DESCRIPTION = "STATE_PRODUCER_DESCRIPTION";
     private static final String STATE_LOCATION = "STATE_LOCATION";
 
-    private static final String LOG_TAG = AddProducerFragment2.class.getName();
+    private static final String LOG_TAG = AddProducerFragment.class.getName();
 
     private EditText editProducerName;
     private EditText editProducerWebsite;
