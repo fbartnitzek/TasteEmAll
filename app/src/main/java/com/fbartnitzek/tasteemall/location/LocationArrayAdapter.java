@@ -54,8 +54,8 @@ public class LocationArrayAdapter extends ArrayAdapter<Address> {
             Log.v(LOG_TAG, "guess rowView by id: " + rowView);
 
             ViewHolder viewHolder = new ViewHolder();
-            viewHolder.countryView = (TextView) rowView.findViewById(R.id.list_item_location_country);
-            viewHolder.formattedAddressView = (TextView) rowView.findViewById(R.id.list_item_location_formatted);
+            viewHolder.countryView = rowView.findViewById(R.id.list_item_location_country);
+            viewHolder.formattedAddressView = rowView.findViewById(R.id.list_item_location_formatted);
             rowView.setTag(viewHolder);
         }
 

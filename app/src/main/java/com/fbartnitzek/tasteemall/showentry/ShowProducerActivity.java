@@ -3,13 +3,10 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -18,6 +15,10 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
@@ -25,13 +26,24 @@ import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Producer;
 import com.fbartnitzek.tasteemall.tasks.DeleteEntryTask;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ShowProducerActivity extends AppCompatActivity {
 
     private static final String FRAGMENT_TAG = "SHOW_PRODUCER_TAG";
     private static final String LOG_TAG = ShowProducerActivity.class.getName();
     public static final String EXTRA_PRODUCER_URI = "EXTRA_PRODUCER_URI";
+    private static final String STATE_CONTENT_URI = "SPA_STATE_CONTENT_URI"; 
     private static final int EDIT_PRODUCER_REQUEST = 444;
     private Uri mContentUri;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,31 +51,35 @@ public class ShowProducerActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "onCreate, " + "savedInstanceState = [" + savedInstanceState + "]");
         setContentView(R.layout.activity_show_producer);
 
-
         if (findViewById(R.id.container_show_producer_fragment) != null) {
-            if (savedInstanceState != null) {
-//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
-                return;
-            }
-
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
-            ShowProducerFragment fragment = new ShowProducerFragment();
 
-            mContentUri = getIntent().getData();
-            if (mContentUri != null) {
-                Bundle args = new Bundle();
-                args.putParcelable(EXTRA_PRODUCER_URI, mContentUri);
-                fragment.setArguments(args);
+            if (getIntent().getData() != null) {
+                mContentUri = getIntent().getData();
+            } else if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+                mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+            } else {
+                Log.wtf(LOG_TAG, "contentUri missing!");
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_show_producer_fragment, fragment, FRAGMENT_TAG)
-                    .commit();
+            addShowProducerFragment();
 
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         }
+    }
 
+    private void addShowProducerFragment() {
+        ShowProducerFragment fragment = new ShowProducerFragment();
+
+        if (mContentUri != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(EXTRA_PRODUCER_URI, mContentUri);
+            fragment.setArguments(args);
+        }
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container_show_producer_fragment, fragment, FRAGMENT_TAG)
+                .commit();
     }
 
     @Override
@@ -78,16 +94,16 @@ public class ShowProducerActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_edit:
-                startEditActivity();
-                return true;
-            case R.id.action_delete:
-                startDelete();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            startEditActivity();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            startDelete();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -100,48 +116,37 @@ public class ShowProducerActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 R.string.delete_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);   //TODO: joined error
-                        // TODO: check for foreign keys ... generic seems unlikely...?
-//                        int id = DatabaseContract.getIdFromUri(deleteUri);
-//                        Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
-                        new DeleteEntryTask(
-                                ShowProducerActivity.this,
-                                DatabaseContract.ProducerEntry.TABLE_NAME + "." + Producer.NAME)
-                                .execute(deleteUri);
-                    }
+                (dialog, which) -> {
+                    Uri deleteUri = Utils.calcSingleProducerUri(mContentUri);//TODO: joined error
+                    // TODO: check for foreign keys ... generic seems unlikely...?
+                    // int id = DatabaseContract.getIdFromUri(deleteUri);
+                    // Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
+                    new DeleteEntryTask(
+                            ShowProducerActivity.this,
+                            DatabaseContract.ProducerEntry.TABLE_NAME + "." + Producer.NAME)
+                            .execute(deleteUri);
                 }
         );
         builder.setNegativeButton(
                 R.string.keep_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ShowProducerActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                (dialog, which) -> Toast.makeText(ShowProducerActivity.this, "keeping entry", Toast.LENGTH_SHORT).show()
         );
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
     private void startEditActivity() {
+        Log.v(LOG_TAG, "edit producer via AddProducerActivity with ContentUri: " + mContentUri);
         Intent intent = new Intent(this, AddProducerActivity.class);
         intent.setData(mContentUri);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            View view = findViewById(R.id.producer_name);
-            int producer_Id = DatabaseContract.getIdFromUri(mContentUri);
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    this,
-                    new Pair<>(view, //view.getTransitionName())
-                            getString(R.string.shared_transition_producer_producer) + producer_Id)
-            ).toBundle();
-            startActivityForResult(intent, EDIT_PRODUCER_REQUEST, bundle);
-        } else {
-            startActivityForResult(intent, EDIT_PRODUCER_REQUEST);
-        }
+        View view = findViewById(R.id.producer_name);
+        int producer_Id = DatabaseContract.getIdFromUri(mContentUri);
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                this,
+                new Pair<>(view, //view.getTransitionName())
+                        getString(R.string.shared_transition_producer_producer) + producer_Id)
+        ).toBundle();
+        startActivityForResult(intent, EDIT_PRODUCER_REQUEST, bundle);
     }
 
 
@@ -190,9 +195,7 @@ public class ShowProducerActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

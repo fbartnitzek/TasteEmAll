@@ -48,7 +48,7 @@ public class AddDrinkActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container_add_drink_fragment, fragment, ADD_DRINK_FRAGMENT_TAG)
                         .commit();
-            } else {
+//            } else {
 //                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
@@ -72,17 +72,16 @@ public class AddDrinkActivity extends AppCompatActivity {
     // TODO: might be better directly in fragment...
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_save:
-                AddDrinkFragment fragment = getFragment();
-                if (fragment != null) {
-                    fragment.saveData();
-                }
-                return true;
-            default:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_save) {
+            AddDrinkFragment fragment = getFragment();
+            if (fragment != null) {
+                fragment.saveData();
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -117,9 +116,7 @@ public class AddDrinkActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

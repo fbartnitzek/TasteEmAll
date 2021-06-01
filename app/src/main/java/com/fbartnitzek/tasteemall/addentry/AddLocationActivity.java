@@ -48,7 +48,6 @@ public class AddLocationActivity extends AppCompatActivity {
         } else {
             Log.e(LOG_TAG, "onCreate - no rootView container found, ...!");
         }
-
     }
 
 
@@ -65,20 +64,19 @@ public class AddLocationActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-//                supportFinishAfterTransition();
-                finish();
-                return true;
-            case R.id.action_save:
-                AddLocationFragment fragment = getFragment();
-                if (fragment != null) {
-                    Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-                    fragment.saveData();
-                }
-                return true;
-            default:
-                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {//                supportFinishAfterTransition();
+            finish();
+            return true;
+        } else if (itemId == R.id.action_save) {
+            AddLocationFragment fragment = getFragment();
+            if (fragment != null) {
+                Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                fragment.saveData();
+            }
+            return true;
+        } else {
+            Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);

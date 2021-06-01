@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,12 +34,12 @@ import java.util.List;
 
 public class AttributeValuesSelectAdapter extends RecyclerView.Adapter<AttributeValuesSelectAdapter.ViewHolder> {
 
-
     private Cursor mCursor;
 
     public AttributeValuesSelectAdapter() {
     }
 
+    @NotNull
     @Override
     public AttributeValuesSelectAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -64,25 +66,16 @@ public class AttributeValuesSelectAdapter extends RecyclerView.Adapter<Attribute
     }
 
     // src: http://www.grokkingandroid.com/statelistdrawables-for-recyclerview-selection/
-    private SparseBooleanArray selectedItems = new SparseBooleanArray();
+    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
 
-    public void toggleSelection(int pos) {
-        if (selectedItems.get(pos, false)) {
-            selectedItems.delete(pos);
-        }
-        else {
-            selectedItems.put(pos, true);
-        }
-        notifyItemChanged(pos);
-    }
-
-//    public void clearSelections() {
-//        selectedItems.clear();
-//        notifyDataSetChanged();
-//    }
-
-//    public int getSelectedItemCount() {
-//        return selectedItems.size();
+//    public void toggleSelection(int pos) {
+//        if (selectedItems.get(pos, false)) {
+//            selectedItems.delete(pos);
+//        }
+//        else {
+//            selectedItems.put(pos, true);
+//        }
+//        notifyItemChanged(pos);
 //    }
 
     public List<String> getSelectedItems() {
@@ -103,21 +96,18 @@ public class AttributeValuesSelectAdapter extends RecyclerView.Adapter<Attribute
 
         ViewHolder(View itemView) {
             super(itemView);
-            this.value = (TextView) itemView.findViewById(R.id.list_item_value);
-            this.select = (CheckBox) itemView.findViewById(R.id.list_item_select);
+            this.value = itemView.findViewById(R.id.list_item_value);
+            this.select = itemView.findViewById(R.id.list_item_select);
             // select from selectedItems
             this.select.setSelected(selectedItems.get(getAdapterPosition(), false));
 
-            this.select.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedItems.get(getAdapterPosition(), false)) { //previously true
-                        selectedItems.delete(getAdapterPosition());
-                        select.setSelected(false);
-                    } else {
-                        selectedItems.put(getAdapterPosition(), true);
-                        select.setSelected(true);
-                    }
+            this.select.setOnClickListener(v -> {
+                if (selectedItems.get(getAdapterPosition(), false)) { //previously true
+                    selectedItems.delete(getAdapterPosition());
+                    select.setSelected(false);
+                } else {
+                    selectedItems.put(getAdapterPosition(), true);
+                    select.setSelected(true);
                 }
             });
         }

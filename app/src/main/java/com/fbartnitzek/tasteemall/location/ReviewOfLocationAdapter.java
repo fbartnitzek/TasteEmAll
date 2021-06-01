@@ -3,17 +3,19 @@ package com.fbartnitzek.tasteemall.location;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -46,8 +48,9 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
         this.mContext = context;
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_review_recycler, parent, false);
@@ -59,16 +62,14 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
         String drinkName = mCursor.getString(QueryColumns.MapFragment.ReviewsSubQuery.COL_DRINK_NAME);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int id = mCursor.getInt(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW__ID);
-            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_producer) + id);
-            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_drink) + id);
-        }
+        int id = mCursor.getInt(QueryColumns.MapFragment.ReviewsSubQuery.COL_REVIEW__ID);
+        holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_producer) + id);
+        holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_review_drink) + id);
 
         holder.drinkNameView.setText(drinkName);
         holder.drinkNameView.setContentDescription(mContext.getString(R.string.a11y_drink_name, drinkName));
@@ -111,11 +112,11 @@ public class ReviewOfLocationAdapter extends RecyclerView.Adapter<ReviewOfLocati
 
         public ViewHolder(View view) {
             super(view);
-            this.drinkNameView = (TextView) view.findViewById(R.id.list_item_drink_name);
-            this.producerNameView = (TextView) view.findViewById(R.id.list_item_producer_name);
-            this.drinkTypeView = (TextView) view.findViewById(R.id.list_item_drink_type);
-            this.reviewRatingView = (TextView) view.findViewById(R.id.list_item_review_rating);
-            this.reviewDateView = (TextView) view.findViewById(R.id.list_item_review_date);
+            this.drinkNameView = view.findViewById(R.id.list_item_drink_name);
+            this.producerNameView = view.findViewById(R.id.list_item_producer_name);
+            this.drinkTypeView = view.findViewById(R.id.list_item_drink_type);
+            this.reviewRatingView = view.findViewById(R.id.list_item_review_rating);
+            this.reviewDateView = view.findViewById(R.id.list_item_review_date);
             view.setOnClickListener(this);
         }
 

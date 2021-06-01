@@ -3,13 +3,10 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -18,12 +15,18 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.addentry.AddReviewActivity;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Review;
 import com.fbartnitzek.tasteemall.tasks.DeleteEntryTask;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -46,27 +49,40 @@ public class ShowReviewActivity extends AppCompatActivity {
     private static final String FRAGMENT_TAG = "SHOw_REVIEW_TAG";
     private static final String LOG_TAG = ShowReviewActivity.class.getName();
     public static final String EXTRA_REVIEW_URI = "EXTRA_REVIEW_URI";
+    private static final String STATE_CONTENT_URI = "SRA_STATE_CONTENT_URI";
     private static final int EDIT_REVIEW_REQUEST = 65434;
     private Uri mContentUri;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
+
+        if (getIntent() != null && getIntent().getData() != null) {
+            mContentUri = getIntent().getData();
+        } else if (savedInstanceState.containsKey(STATE_CONTENT_URI)) {
+            mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
+        }
+
         setContentView(R.layout.activity_show_review);
 
         // explicitly add fragment with pattern
         if (findViewById(R.id.container_show_review_fragment) != null) {
             if (savedInstanceState != null) {   // no overlapping fragments on return
-//                Log.v(LOG_TAG, "onCreate - saved state = do nothing..., hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
                 return;
             }
 
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
-
             ShowReviewFragment fragment = new ShowReviewFragment();
 
-            mContentUri = getIntent().getData();
             if (mContentUri != null) {
                 Bundle args = new Bundle();
                 args.putParcelable(EXTRA_REVIEW_URI, mContentUri);
@@ -76,8 +92,6 @@ public class ShowReviewActivity extends AppCompatActivity {
             }
 
             getSupportFragmentManager().beginTransaction()
-                    // only for fragment transition within same activity!
-//                    .setCustomAnimations(android.R.anim.slide_in_left,android.R.anim.slide_out_right,android.R.anim.slide_in_left,android.R.anim.slide_out_right)
                     .add(R.id.container_show_review_fragment, fragment, FRAGMENT_TAG)
                     .commit();
         } else {
@@ -99,16 +113,16 @@ public class ShowReviewActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_edit:
-                startEditActivity();
-                return true;
-            case R.id.action_delete:
-                startDelete();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            startEditActivity();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            startDelete();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -122,25 +136,17 @@ public class ShowReviewActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 R.string.delete_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleReviewUri(mContentUri);
-                        new DeleteEntryTask(
-                                ShowReviewActivity.this,
-                                DatabaseContract.ReviewEntry.TABLE_NAME + "." + Review.READABLE_DATE)
-                                .execute(deleteUri);
-                    }
+                (dialog, which) -> {
+                    Uri deleteUri = Utils.calcSingleReviewUri(mContentUri);
+                    new DeleteEntryTask(
+                            ShowReviewActivity.this,
+                            DatabaseContract.ReviewEntry.TABLE_NAME + "." + Review.READABLE_DATE)
+                            .execute(deleteUri);
                 }
         );
         builder.setNegativeButton(
                 R.string.keep_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ShowReviewActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                (dialog, which) -> Toast.makeText(ShowReviewActivity.this, "keeping entry", Toast.LENGTH_SHORT).show()
         );
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -149,20 +155,16 @@ public class ShowReviewActivity extends AppCompatActivity {
     private void startEditActivity() {
         Intent intent = new Intent(this, AddReviewActivity.class);
         intent.setData(mContentUri);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            View drinkName = findViewById(R.id.drink_name);
-            int review_Id = DatabaseContract.getIdFromUri(mContentUri);
+        View drinkName = findViewById(R.id.drink_name);
+        int review_Id = DatabaseContract.getIdFromUri(mContentUri);
 
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    this,
-                    new Pair<>(drinkName, //drinkName.getTransitionName())
-                            getString(R.string.shared_transition_review_drink) + review_Id)
-            ).toBundle();
-            startActivityForResult(intent, EDIT_REVIEW_REQUEST, bundle);
-        } else {
-            startActivityForResult(intent, EDIT_REVIEW_REQUEST);
-        }
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                this,
+                new Pair<>(drinkName, //drinkName.getTransitionName())
+                        getString(R.string.shared_transition_review_drink) + review_Id)
+        ).toBundle();
+        startActivityForResult(intent, EDIT_REVIEW_REQUEST, bundle);
     }
 
     @Override
@@ -210,9 +212,7 @@ public class ShowReviewActivity extends AppCompatActivity {
                             @Override
                             public boolean onPreDraw() {
                                 view.getViewTreeObserver().removeOnPreDrawListener(this);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    supportStartPostponedEnterTransition();
-                                }
+                                supportStartPostponedEnterTransition();
                                 return true;
                             }
                         });

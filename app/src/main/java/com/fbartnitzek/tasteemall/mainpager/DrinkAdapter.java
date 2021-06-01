@@ -3,17 +3,19 @@ package com.fbartnitzek.tasteemall.mainpager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -49,8 +51,9 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
         mContext = context;
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_drink_recycler, parent, false);
@@ -62,15 +65,13 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int id = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
-            holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink) + id);
-            holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer) + id);
-        }
+        int id = mCursor.getInt(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_DRINK__ID);
+        holder.drinkNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_drink) + id);
+        holder.producerNameView.setTransitionName(mContext.getString(R.string.shared_transition_drink_producer) + id);
 
         String producerName = mCursor.getString(QueryColumns.MainFragment.DrinkWithProducerQuery.COL_PRODUCER_NAME);
         holder.producerNameView.setText(producerName);
@@ -113,10 +114,10 @@ public class DrinkAdapter extends RecyclerView.Adapter<DrinkAdapter.ViewHolder> 
 
         public ViewHolder(View view) {
             super(view);
-            this.producerNameView = (TextView) view.findViewById(R.id.list_item_producer_name);
-            this.drinkNameView = (TextView) view.findViewById(R.id.list_item_drink_name);
-            this.drinkTypeView = (TextView) view.findViewById(R.id.list_item_drink_type);
-            this.drinkStyleView = (TextView) view.findViewById(R.id.list_item_drink_style);
+            this.producerNameView = view.findViewById(R.id.list_item_producer_name);
+            this.drinkNameView = view.findViewById(R.id.list_item_drink_name);
+            this.drinkTypeView = view.findViewById(R.id.list_item_drink_type);
+            this.drinkStyleView = view.findViewById(R.id.list_item_drink_style);
             view.setOnClickListener(this);
         }
 

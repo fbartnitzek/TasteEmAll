@@ -226,6 +226,7 @@
     <string name="msg_invalid_lat_long">invalid position detected, please enter the location manually</string>
     <string name="msg_no_location_provided">no location data provided, please enter the location manually</string>
     <string name="msg_no_location_access">no location access provided, please enter the location manually</string>
+    <string name="msg_last_location_not_found">last location not found...</string>
     <string name="msg_service_not_available">Geocoder unreachable - geocoder can be called later from menu</string>
     <string name="msg_geocoder_already_running">Geocoder already running...</string>
     <string name="msg_service_network_not_available">no network is available - geocoder can be called later from menu</string>

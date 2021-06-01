@@ -109,10 +109,6 @@
             <!-- </intent-filter> -->
         </activity>
 
-        <service
-            android:name=".location.GeocodeIntentService"
-            android:exported="false"/>
-
         <receiver
             android:name=".widget.StatsWidgetProvider"
             android:label="@string/widget_heading_statistics">

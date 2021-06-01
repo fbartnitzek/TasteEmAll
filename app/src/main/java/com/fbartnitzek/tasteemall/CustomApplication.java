@@ -31,6 +31,8 @@ import com.google.android.gms.location.LocationServices;
 public class CustomApplication extends Application implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    // todo: use other googleApiClient
+
     private static GoogleApiClient mGoogleApiClient;
     private static final String LOG_TAG = CustomApplication.class.getName();
 

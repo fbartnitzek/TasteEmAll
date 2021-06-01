@@ -60,7 +60,7 @@ public abstract class AttributeBaseFilterFragment extends Fragment {
         mBaseEntity = bundle.getString(BASE_ENTITY);
         mAttributeName = bundle.getString(ATTRIBUTE_NAME);
 
-        mNameView = (TextView) mRootView.findViewById((R.id.name));
+        mNameView = mRootView.findViewById((R.id.name));
         mNameView.setText(getAttributeTitle(getContext(), -1));
 
         return mRootView;

@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Copyright 2017.  Frank Bartnitzek
@@ -39,11 +40,11 @@ import java.util.Date;
 
 public class DateFilterDialogFragment extends AttributeFilterBaseDialogFragment{
 
-    private static final String LOG_TAG = DateFilterDialogFragment.class.getName();
+//    private static final String LOG_TAG = DateFilterDialogFragment.class.getName();
 
     private EditText mToDate;
     private EditText mFromDate;
-    private SlideDateTimeListener toListener = new SlideDateTimeListener() {
+    private final SlideDateTimeListener toListener = new SlideDateTimeListener() {
         @Override
         public void onDateTimeSet(Date date) {
             if (mToDate != null) {
@@ -51,7 +52,7 @@ public class DateFilterDialogFragment extends AttributeFilterBaseDialogFragment{
             }
         }
     };
-    private SlideDateTimeListener fromListener = new SlideDateTimeListener() {
+    private final SlideDateTimeListener fromListener = new SlideDateTimeListener() {
         @Override
         public void onDateTimeSet(Date date) {
             if (mFromDate != null) {
@@ -65,23 +66,13 @@ public class DateFilterDialogFragment extends AttributeFilterBaseDialogFragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filter_date_dialog, container);
 
-        mFromDate = (EditText) view.findViewById(R.id.filter_from_date);
+        mFromDate = view.findViewById(R.id.filter_from_date);
         mFromDate.setText(R.string.filter_date_unlimited);
-        mFromDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startDatePicker(fromListener, 0, 0, 0);
-            }
-        });
+        mFromDate.setOnClickListener(view1 -> startDatePicker(fromListener, 0, 0, 0));
 
-        mToDate = (EditText) view.findViewById(R.id.filter_to_date);
+        mToDate = view.findViewById(R.id.filter_to_date);
         mToDate.setText(R.string.filter_date_unlimited);
-        mToDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startDatePicker(toListener, 23, 59, 59);
-            }
-        });
+        mToDate.setOnClickListener(view12 -> startDatePicker(toListener, 23, 59, 59));
 
         setButtonListeners(view);
         return view;
@@ -97,7 +88,7 @@ public class DateFilterDialogFragment extends AttributeFilterBaseDialogFragment{
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, second);
 
-        new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
+        new SlideDateTimePicker.Builder(Objects.requireNonNull(getActivity()).getSupportFragmentManager())
                 .setListener(listener)
                 .setInitialDate(calendar.getTime())
                 .setIs24HourTime(true)

@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -27,7 +29,7 @@ import static org.junit.Assert.fail;
 public class TestHelper {
 
     @Test
-    public void testAddressHelper() throws Exception {
+    public void testAddressHelper() {
         String address = "geocode_me_lat_49.9922412_long_8.660975";
 
         assertTrue(Utils.checkGeocodeAddressFormat(address));
@@ -48,10 +50,10 @@ public class TestHelper {
         String iso= "2016-05-12 22:05:59";
 
         Date date = Utils.getDate(iso);
-        assertTrue(date != null);
-        assertTrue("12.05.2016".equals(Utils.getFormattedDate(date, "dd.MM.yyyy")));
-        assertTrue("22:05:59".equals(Utils.getFormattedDate(date, "HH:mm:ss")));
-        assertTrue("12.05.16 22:05".equals(Utils.getFormattedDate(date, "dd.MM.yy HH:mm")));
+        assertNotNull(date);
+        assertEquals("12.05.2016", Utils.getFormattedDate(date, "dd.MM.yyyy"));
+        assertEquals("22:05:59", Utils.getFormattedDate(date, "HH:mm:ss"));
+        assertEquals("12.05.16 22:05", Utils.getFormattedDate(date, "dd.MM.yy HH:mm"));
 
     }
 }

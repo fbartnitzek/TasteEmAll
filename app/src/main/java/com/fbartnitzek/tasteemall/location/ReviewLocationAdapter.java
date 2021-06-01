@@ -1,16 +1,18 @@
 package com.fbartnitzek.tasteemall.location;
 
-import android.content.Context;
 import android.database.Cursor;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -31,9 +33,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAdapter.ViewHolder>{
 
-    private final Context mContext;
     private Cursor mCursor;
-    private static final String LOG_TAG = ReviewLocationAdapter.class.getName();
+//    private static final String LOG_TAG = ReviewLocationAdapter.class.getName();
 
     private final ReviewLocationAdapterClickHandler mClickHandler;
 
@@ -41,13 +42,13 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
         void onClick(String reviewLocationId, ViewHolder viewHolder, LatLng latLng, String formatted, String description);
     }
 
-    public ReviewLocationAdapter(Context mContext, ReviewLocationAdapterClickHandler mClickHandler) {
-        this.mContext = mContext;
+    public ReviewLocationAdapter(ReviewLocationAdapterClickHandler mClickHandler) {
         this.mClickHandler = mClickHandler;
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_location_recycler, parent, false);
@@ -59,7 +60,7 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String country = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_COUNTRY);
         String formatted = mCursor.getString(QueryColumns.MapFragment.ReviewLocations.COL_FORMATTED);
@@ -93,9 +94,9 @@ public class ReviewLocationAdapter extends RecyclerView.Adapter<ReviewLocationAd
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.countryView = (TextView) itemView.findViewById(R.id.list_item_location_country);
-            this.formattedView = (TextView) itemView.findViewById(R.id.list_item_location_formatted);
-            this.descriptionView = (TextView) itemView.findViewById(R.id.list_item_location_description);
+            this.countryView = itemView.findViewById(R.id.list_item_location_country);
+            this.formattedView = itemView.findViewById(R.id.list_item_location_formatted);
+            this.descriptionView = itemView.findViewById(R.id.list_item_location_description);
             itemView.setOnClickListener(this);
         }
 

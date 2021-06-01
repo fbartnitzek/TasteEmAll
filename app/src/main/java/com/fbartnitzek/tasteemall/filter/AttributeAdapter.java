@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class AttributeAdapter extends RecyclerView.Adapter<AttributeAdapter.View
         this.mSelected = mSelected;
     }
 
+    @NotNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
@@ -65,9 +68,6 @@ public class AttributeAdapter extends RecyclerView.Adapter<AttributeAdapter.View
         if (mSelected.contains(position)) {
             holder.attributeNameView.setBackgroundColor(Color.GREEN);
         }
-//        if (mAttributeList.size() == position + 1) {
-//            mClickHandler.onAllLoaded();
-//        }
     }
 
     @Override
@@ -80,7 +80,7 @@ public class AttributeAdapter extends RecyclerView.Adapter<AttributeAdapter.View
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.attributeNameView = (TextView) itemView.findViewById(R.id.list_item_attribute_name);
+            this.attributeNameView = itemView.findViewById(R.id.list_item_attribute_name);
             itemView.setOnClickListener(this);
         }
 

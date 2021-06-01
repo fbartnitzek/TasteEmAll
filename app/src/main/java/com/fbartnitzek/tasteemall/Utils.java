@@ -15,13 +15,13 @@ import android.util.Log;
 
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.pojo.Drink;
+import com.fbartnitzek.tasteemall.location.AddressData;
 import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Copyright 2015.  Frank Bartnitzek
@@ -150,33 +150,40 @@ public class Utils {
     }
 
     static public boolean isNetworkUnavailable(Context context) {
+        // todo: https://github.com/android/connectivity-samples/tree/main/NetworkConnect
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork == null || !activeNetwork.isConnectedOrConnecting();
     }
 
-
-    public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
-        StringBuilder sb = new StringBuilder();
-        boolean firstTime = true;
-        int i = 0;
-        for (Object token: tokens) {
-            if (i > max) {
-                sb.append(delimiter);
-                sb.append("...");
-                return sb.toString();
-            } else {
-                if (firstTime) {
-                    firstTime = false;
-                } else {
-                    sb.append(delimiter);
-                }
-                sb.append(token);
-                ++i;
-            }
-        }
-        return sb.toString();
+    public static boolean isGeocodeMeLatLong(AddressData address) {
+        return address != null
+                && DatabaseContract.LocationEntry.GEOCODE_ME.equals(address.getFormatted())
+                && Utils.isValidLatLong(address.getLatitude(), address.getLongitude());
     }
+
+
+//    public static String joinMax(CharSequence delimiter, Iterable tokens, int max) {
+//        StringBuilder sb = new StringBuilder();
+//        boolean firstTime = true;
+//        int i = 0;
+//        for (Object token: tokens) {
+//            if (i > max) {
+//                sb.append(delimiter);
+//                sb.append("...");
+//                return sb.toString();
+//            } else {
+//                if (firstTime) {
+//                    firstTime = false;
+//                } else {
+//                    sb.append(delimiter);
+//                }
+//                sb.append(token);
+//                ++i;
+//            }
+//        }
+//        return sb.toString();
+//    }
 
     public static String getCurrentLocalIso8601Time() {
         return iso8601Format.format(new java.util.Date());
@@ -190,34 +197,34 @@ public class Utils {
         return filePrefixFormat.format(new java.util.Date());
     }
 
-    public static String formatDateTime(Context context, String timeToFormat) {
-
-        String finalDateTime = "";
-
-//        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        Date date;
-        if (timeToFormat != null) {
-            try {
-                date = iso8601Format.parse(timeToFormat);
-            } catch (ParseException e) {
-                date = null;
-            }
-
-            if (date != null) {
-                long when = date.getTime();
-                int flags = 0;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
-                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
-                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
-
-                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
-                        when + TimeZone.getDefault().getOffset(when), flags);
-            }
-        }
-        return finalDateTime;
-    }
+//    public static String formatDateTime(Context context, String timeToFormat) {
+//
+//        String finalDateTime = "";
+//
+////        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        Date date;
+//        if (timeToFormat != null) {
+//            try {
+//                date = iso8601Format.parse(timeToFormat);
+//            } catch (ParseException e) {
+//                date = null;
+//            }
+//
+//            if (date != null) {
+//                long when = date.getTime();
+//                int flags = 0;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_TIME;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_DATE;
+//                flags |= android.text.format.DateUtils.FORMAT_ABBREV_MONTH;
+//                flags |= android.text.format.DateUtils.FORMAT_SHOW_YEAR;
+//
+//                finalDateTime = android.text.format.DateUtils.formatDateTime(context,
+//                        when + TimeZone.getDefault().getOffset(when), flags);
+//            }
+//        }
+//        return finalDateTime;
+//    }
 
     public static String getFormattedDate(Date date, String formatString) {
         if (date != null) {
@@ -397,6 +404,19 @@ public class Utils {
                 description);
     }
 
+    public static LocationParcelable getLocationFromAddressData(AddressData address, String description) {
+        Log.v(LOG_TAG, "getLocationFromAddress, address: " + address);
+        return new LocationParcelable(
+                LocationParcelable.INVALID_ID,
+                address.getCountryName(),
+                calcLocationId(address.getOrigInput()),
+                address.getLatitude(),
+                address.getLongitude(),
+                address.getOrigInput(),
+                address.getFormatted(),
+                description);
+    }
+
     public static LocationParcelable getLocationStubFromLastLocation(Location mLastLocation, String description) {
         String locationInput = getLocationInput(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         return new LocationParcelable(
@@ -490,5 +510,4 @@ public class Utils {
         }
         return customClasses;
     }
-
 }

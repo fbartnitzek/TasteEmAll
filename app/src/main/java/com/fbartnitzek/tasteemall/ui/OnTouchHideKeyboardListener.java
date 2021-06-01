@@ -6,6 +6,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.util.Objects;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -34,7 +36,7 @@ public class OnTouchHideKeyboardListener implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        InputMethodManager imm = (InputMethodManager) fragment.getActivity()
+        InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(fragment.getActivity())
                 .getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         View currentFocus = fragment.getActivity().getCurrentFocus();

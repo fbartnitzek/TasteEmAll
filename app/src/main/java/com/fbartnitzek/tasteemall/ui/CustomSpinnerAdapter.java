@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 /**
@@ -48,7 +50,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     }
 
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NotNull ViewGroup parent) {
         return getCustomView(position, convertView, parent);
     }
 
@@ -61,14 +63,13 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private View getCustomView(int position, View convertView, ViewGroup parent) {
         View row;
         // reuse view
-//        View row = inflater.inflate(spinnerLayout, parent, false);
         if (convertView == null) {
             row = inflater.inflate(spinnerLayout, parent, false);
         } else {
             row = convertView;
         }
 
-        TextView tvType = (TextView) row.findViewById(R.id.tvEntry);
+        TextView tvType = row.findViewById(R.id.tvEntry);
         String text = data.get(position);
         tvType.setText(text);
         tvType.setContentDescription(context.getString(a11yStringId, text));

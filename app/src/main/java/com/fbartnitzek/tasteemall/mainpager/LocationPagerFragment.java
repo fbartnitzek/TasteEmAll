@@ -2,19 +2,19 @@ package com.fbartnitzek.tasteemall.mainpager;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.MainActivity;
 import com.fbartnitzek.tasteemall.R;
@@ -23,10 +23,12 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.Location;
 import com.fbartnitzek.tasteemall.showentry.ShowLocationActivity;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -64,20 +66,17 @@ public class LocationPagerFragment extends BasePagerFragment implements LoaderMa
         super.onCreateView(inflater, container, savedInstanceState);
 
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-        mLocationAdapter = new LocationAdapter(new LocationAdapter.LocationAdapterClickHandler() {
-            @Override
-            public void onClick(String formatted, Uri contentUri, LocationAdapter.ViewHolder viewHolder) {
-                Intent intent = new Intent(getActivity(), ShowLocationActivity.class)
-                        .setData(contentUri);
-                startActivity(intent);
-            }
-        }, getActivity());
+        mLocationAdapter = new LocationAdapter((formatted, contentUri, viewHolder) -> {
+            Intent intent = new Intent(getActivity(), ShowLocationActivity.class)
+                    .setData(contentUri);
+            startActivity(intent);
+        });
 
-        mLocationHeading = (TextView) mRootView.findViewById(R.id.heading_entities);
+        mLocationHeading = mRootView.findViewById(R.id.heading_entities);
         mLocationHeading.setText(
                 getString(R.string.label_list_entries_preview,
                         getString(R.string.label_locations)));
-        RecyclerView reviewRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_entities);
+        RecyclerView reviewRecyclerView = mRootView.findViewById(R.id.recyclerview_entities);
         reviewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         reviewRecyclerView.setAdapter(mLocationAdapter);
 
@@ -88,86 +87,80 @@ public class LocationPagerFragment extends BasePagerFragment implements LoaderMa
     @Override
     public void restartLoader() {
 //        Log.v(LOG_TAG, "restartLoader, hashCode=" + this.hashCode() + ", " + "");
-        getLoaderManager().restartLoader(LOCATION_LOADER_ID, null, this);
-
+        LoaderManager.getInstance(this).restartLoader(LOCATION_LOADER_ID, null, this);
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case LOCATION_LOADER_ID:
-                if (this.jsonUri == null) {
-                    Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+        if (id == LOCATION_LOADER_ID) {
+            if (this.jsonUri == null) {
+                Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
 
-                    String pattern = ((MainActivity) getActivity()).getSearchPattern();
+                String pattern = ((MainActivity) Objects.requireNonNull(getActivity())).getSearchPattern();
 
-                    // Location.FORMATTED_ADDRESS + " LIKE ? OR " + Location.INPUT + " LIKE ? OR "
-                    // + Location.COUNTRY + " LIKE ? OR " + Location.DESCRIPTION + " LIKE ?",
-                    try {
-                        String encodedValue = DatabaseContract.encodeValue(pattern);
-                        if (jsonTextFilter == null) {
-                            jsonTextFilter = new JSONObject().put(Location.ENTITY, new JSONObject()
-                                    .put(DatabaseContract.OR, new JSONObject()
-                                            .put(Location.ENTITY, new JSONObject()
-                                                    .put(Location.FORMATTED_ADDRESS, new JSONObject())
-                                                    .put(Location.INPUT, new JSONObject())
-                                                    .put(Location.COUNTRY, new JSONObject())
-                                                    .put(Location.DESCRIPTION, new JSONObject())
-                                            )
-                                    )
-                            );
-                        }
-
-                        JSONObject location = jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).getJSONObject(Location.ENTITY);
-                        location.getJSONObject(Location.FORMATTED_ADDRESS).put(DatabaseContract.Operations.CONTAINS, encodedValue);
-                        location.getJSONObject(Location.INPUT).put(DatabaseContract.Operations.CONTAINS, encodedValue);
-                        location.getJSONObject(Location.COUNTRY).put(DatabaseContract.Operations.CONTAINS, encodedValue);
-                        location.getJSONObject(Location.DESCRIPTION).put(DatabaseContract.Operations.CONTAINS, encodedValue);
-                        jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).put(Location.ENTITY, location);
-
-                        jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
-                    } catch (JSONException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                        Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
-                        throw new RuntimeException("building jsonUri failed");
+                // Location.FORMATTED_ADDRESS + " LIKE ? OR " + Location.INPUT + " LIKE ? OR "
+                // + Location.COUNTRY + " LIKE ? OR " + Location.DESCRIPTION + " LIKE ?",
+                try {
+                    String encodedValue = DatabaseContract.encodeValue(pattern);
+                    if (jsonTextFilter == null) {
+                        jsonTextFilter = new JSONObject().put(Location.ENTITY, new JSONObject()
+                                .put(DatabaseContract.OR, new JSONObject()
+                                        .put(Location.ENTITY, new JSONObject()
+                                                .put(Location.FORMATTED_ADDRESS, new JSONObject())
+                                                .put(Location.INPUT, new JSONObject())
+                                                .put(Location.COUNTRY, new JSONObject())
+                                                .put(Location.DESCRIPTION, new JSONObject())
+                                        )
+                                )
+                        );
                     }
-                    Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
 
+                    JSONObject location = jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).getJSONObject(Location.ENTITY);
+                    location.getJSONObject(Location.FORMATTED_ADDRESS).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                    location.getJSONObject(Location.INPUT).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                    location.getJSONObject(Location.COUNTRY).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                    location.getJSONObject(Location.DESCRIPTION).put(DatabaseContract.Operations.CONTAINS, encodedValue);
+                    jsonTextFilter.getJSONObject(Location.ENTITY).getJSONObject(DatabaseContract.OR).put(Location.ENTITY, location);
+
+                    jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
+                } catch (JSONException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
+                    throw new RuntimeException("building jsonUri failed");
                 }
+                Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+
+            }
 
 
-                return new CursorLoader(getActivity(),
-                        jsonUri != null ? jsonUri :
-                                DatabaseContract.LocationEntry.buildUriWithPatternOrDescription(
-                                ((MainActivity)getActivity()).getSearchPattern()),
-                        QueryColumns.MainFragment.LocationQuery.COLUMNS,
-                        null, null,
-                        Location.COUNTRY + ", " + Location.FORMATTED_ADDRESS);
-            default:
-                throw new RuntimeException("wrong loader_id in " + this.getClass().getSimpleName() + "...");
+            return new CursorLoader(Objects.requireNonNull(getActivity()),
+                    jsonUri != null ? jsonUri :
+                            DatabaseContract.LocationEntry.buildUriWithPatternOrDescription(
+                                    ((MainActivity) getActivity()).getSearchPattern()),
+                    QueryColumns.MainFragment.LocationQuery.COLUMNS,
+                    null, null,
+                    Location.COUNTRY + ", " + Location.FORMATTED_ADDRESS);
         }
+        throw new RuntimeException("wrong loader_id in " + this.getClass().getSimpleName() + "...");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         String numberAppendix = data == null ? "" : getString(R.string.label_numberAppendix, data.getCount());
-        switch (loader.getId()) {
-            case LOCATION_LOADER_ID:
-                mLocationAdapter.swapCursor(data);
-                mLocationHeading.setText(
-                        getString(R.string.label_list_entries,
-                                getString(R.string.label_locations),
-                                numberAppendix));
-                break;
+        if (loader.getId() == LOCATION_LOADER_ID) {
+            mLocationAdapter.swapCursor(data);
+            mLocationHeading.setText(
+                    getString(R.string.label_list_entries,
+                            getString(R.string.label_locations),
+                            numberAppendix));
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case LOCATION_LOADER_ID:
-                mLocationAdapter.swapCursor(null);
-                break;
+        if (loader.getId() == LOCATION_LOADER_ID) {
+            mLocationAdapter.swapCursor(null);
         }
     }
 

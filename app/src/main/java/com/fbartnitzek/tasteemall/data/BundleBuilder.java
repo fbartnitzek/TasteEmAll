@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class BundleBuilder {
 
-    private Bundle mBundle;
+    private final Bundle mBundle;
 
     public BundleBuilder() {
         mBundle = new Bundle();

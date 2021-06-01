@@ -11,6 +11,7 @@ import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -45,8 +46,9 @@ public class ProducerLocationAdapter extends RecyclerView.Adapter<ProducerLocati
     }
 
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_producer_location_recycler, parent, false);
@@ -86,9 +88,9 @@ public class ProducerLocationAdapter extends RecyclerView.Adapter<ProducerLocati
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.producerName = (TextView) itemView.findViewById(R.id.list_item_producer_name);
-            this.country = (TextView) itemView.findViewById(R.id.list_item_producer_country);
-            this.formatted = (TextView) itemView.findViewById(R.id.list_item_producer_location);
+            this.producerName = itemView.findViewById(R.id.list_item_producer_name);
+            this.country = itemView.findViewById(R.id.list_item_producer_country);
+            this.formatted = itemView.findViewById(R.id.list_item_producer_location);
             itemView.setOnClickListener(this);
         }
 
