@@ -351,8 +351,6 @@ public abstract class GeocoderFragment extends Fragment implements
     }
 
     private void handlePermission() {
-        // src: FilePickerFragment
-        // https://developer.android.com/training/permissions/requesting.html
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION_CODE);
     }

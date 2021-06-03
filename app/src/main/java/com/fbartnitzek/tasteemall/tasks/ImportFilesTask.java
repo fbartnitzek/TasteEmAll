@@ -3,14 +3,17 @@ package com.fbartnitzek.tasteemall.tasks;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.util.Log;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.csv.CsvFileReader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,9 +34,9 @@ import java.util.List;
  * limitations under the License.
  */
 
-public class ImportFilesTask extends AsyncTask<File, Void, String> {
+public class ImportFilesTask extends ImportFileBaseTask {
 
-    private final Activity mActivity;
+
     private final ImportHandler mImportHandler;
 
     private static final String LOG_TAG = ImportFilesTask.class.getName();
@@ -44,34 +47,44 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
     }
 
     public ImportFilesTask(Activity mActivity, ImportHandler mImportHandler) {
-        this.mActivity = mActivity;
+        super(mActivity);
         this.mImportHandler = mImportHandler;
     }
 
     @Override
-    protected String doInBackground(File... params) {
-        if (params.length == 0 || params[0] == null) {
+    protected String doInBackground(Uri... uris) {
+        if (uris.length == 0 || uris[0] == null) {
             return mActivity.getString(R.string.msg_on_import_files_chosen);
         }
+        Log.v(LOG_TAG, uris.length + " uris: " + Arrays.toString(uris));
+
+        // select via Downloads/TasteEmAll, not via recent or:
+        // FileNotFoundException: /data/user/0/com.fbartnitzek.tasteemall/cache/
+        // temp_import_raw_/storage/emulated/0/Download/TasteEmAll/export_20210603_212145_Drinks.csv:
+        // open failed: ENOENT (No such file or directory)
+
+        List<File> files = new ArrayList<>();
+        for (Uri uri : uris) {
+            File file = createTempFile(uri);
+            if (file != null) {
+                files.add(file);
+            } else {
+                Log.w(LOG_TAG, "temp file could not be created from uri: " + uri);
+            }
+        }
+
+        // TODO: later multiple files might be allowed - but not for now...
+        List<File> locationFiles = getEntryFile(files, "location_id;");
+        List<File> producerFiles = getEntryFile(files, "producer_id;");
+        List<File> drinkFiles = getEntryFile(files, "drink_id;");
+        List<File> userFiles = getEntryFile(files, "user_id;");
+        List<File> reviewFiles = getEntryFile(files, "review_id;");
 
         String locations = mActivity.getString(R.string.label_locations);
         String producers = mActivity.getString(R.string.label_producers);
         String drinks = mActivity.getString(R.string.label_drinks);
         String users = mActivity.getString(R.string.label_users);
         String reviews = mActivity.getString(R.string.label_reviews);
-        String extension = mActivity.getString(R.string.file_extension);
-
-        // TODO: later multiple files might be allowed - but not for now...
-        List<File> locationFiles = getEntryFile(params,
-                mActivity.getString(R.string.file_locations), extension);
-        List<File> producerFiles = getEntryFile(params,
-                mActivity.getString(R.string.file_producers), extension);
-        List<File> drinkFiles = getEntryFile(params,
-                mActivity.getString(R.string.file_drinks),extension);
-        List<File> userFiles = getEntryFile(params,
-                mActivity.getString(R.string.file_users), extension);
-        List<File> reviewFiles = getEntryFile(params,
-                mActivity.getString(R.string.file_reviews), extension);
 
         String message;
         if (locationFiles.size() == 1) {
@@ -109,6 +122,8 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
         } else {
             message += "\n" + mActivity.getString(R.string.msg_wrong_number_files, reviews, reviewFiles.size());
         }
+
+        deleteTempFiles();
         
         return message;
     }
@@ -171,12 +186,19 @@ public class ImportFilesTask extends AsyncTask<File, Void, String> {
         return mActivity.getString(R.string.msg_entries_imported, number, entries, appendix);
     }
 
-    private List<File> getEntryFile(File[] files, String entryName, String extension) {
+    private List<File> getEntryFile(List<File> files, String startingEntityId) {
         List<File> matchingFiles = new ArrayList<>();
         for (File file : files) {
-            String name = file.getName();
-            if (name.startsWith(ExportToDirTask.EXPORT_PREFIX) && name.contains(entryName) && name.endsWith(extension)) {
-                matchingFiles.add(file);
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String firstLine = reader.readLine();
+                if (firstLine.startsWith(startingEntityId)) {
+                    Log.v(LOG_TAG, "matching file: " + file.getName());
+                    matchingFiles.add(file);
+                } else {
+                    Log.v(LOG_TAG, "not matching file: " + file.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return matchingFiles;

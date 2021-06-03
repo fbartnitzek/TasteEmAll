@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.util.Log;
 
 import com.fbartnitzek.tasteemall.R;
@@ -43,9 +43,8 @@ import java.util.Set;
  * limitations under the License.
  */
 
-public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
+public class ImportAllInOneFileTask extends ImportFileBaseTask {
 
-    private final Activity mActivity;
     private final ImportAllInOneHandler mImportHandler;
     private boolean mErrorHappened = false;
     private static final String LOG_TAG = ImportAllInOneFileTask.class.getName();
@@ -56,17 +55,24 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
     }
 
     public ImportAllInOneFileTask(Activity activity, ImportAllInOneHandler mImportHandler) {
-        this.mActivity = activity;
+        super(activity);
         this.mImportHandler = mImportHandler;
     }
 
     @Override
-    protected String doInBackground(File... files) {
-        if (files.length == 0 || files[0] == null) {
+    protected String doInBackground(Uri... uris) {
+        if (uris.length == 0 || uris[0] == null) {
             return mActivity.getString(R.string.msg_on_import_files_chosen);
         }
 
-        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "files = [" + files + "]");
+        File file = createTempFile(uris[0]);
+        if (file == null) {
+            String msg = "temp file could not be created from uri: " + uris[0];
+            Log.w(LOG_TAG, msg);
+            mErrorHappened = true;
+            return msg;
+        }
+
         DatabaseHelper dbHelper = new DatabaseHelper(mActivity);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -78,7 +84,7 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
         try {
 
             List<String> dataColumns = new ArrayList<>();
-            List<List<String>> dataEntries = CsvFileReader.readCsvFileHeadingAndData(files[0], dataColumns);
+            List<List<String>> dataEntries = CsvFileReader.readCsvFileHeadingAndData(file, dataColumns);
 
             validateHeaders(dataColumns);
             int producerIdCol = dataColumns.indexOf(Producer.PRODUCER_ID);
@@ -525,6 +531,8 @@ public class ImportAllInOneFileTask extends AsyncTask<File, Void, String> {
                 cursor.close();
             }
         }
+
+        deleteTempFiles();
 
         return message;
     }
