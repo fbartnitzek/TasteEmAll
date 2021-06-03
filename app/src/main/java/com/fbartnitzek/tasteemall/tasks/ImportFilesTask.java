@@ -58,6 +58,11 @@ public class ImportFilesTask extends ImportFileBaseTask {
         }
         Log.v(LOG_TAG, uris.length + " uris: " + Arrays.toString(uris));
 
+        // select via Downloads/TasteEmAll, not via recent or:
+        // FileNotFoundException: /data/user/0/com.fbartnitzek.tasteemall/cache/
+        // temp_import_raw_/storage/emulated/0/Download/TasteEmAll/export_20210603_212145_Drinks.csv:
+        // open failed: ENOENT (No such file or directory)
+
         List<File> files = new ArrayList<>();
         for (Uri uri : uris) {
             File file = createTempFile(uri);

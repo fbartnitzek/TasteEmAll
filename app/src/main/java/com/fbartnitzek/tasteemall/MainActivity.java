@@ -48,7 +48,6 @@ import com.fbartnitzek.tasteemall.tasks.ImportFilesOldFormatTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -524,20 +523,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void startExport() {
-//        Log.v(LOG_TAG, "startExport, hashCode=" + this.hashCode() + ", " + "");
-        Intent intent = new Intent(this, FilePickerActivity.class);
-
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-
-        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                Environment.getExternalStorageDirectory().getPath());
-        startActivityForResult(intent, REQUEST_EXPORT_DIR_CODE);
-    }
-
-
     private void startGeocoding() { //all geocoding seems to work :-)
         if (Utils.isNetworkUnavailable(this)) {
             Toast.makeText(this, R.string.msg_mass_geocoder_no_network, Toast.LENGTH_SHORT).show();
@@ -586,6 +571,12 @@ public class MainActivity extends AppCompatActivity implements
         startActivityForResult(Intent.createChooser(intent, "Open CSV"), REQUEST_IMPORT_FILES_CODE);
     }
 
+    private void startExport() {
+        Log.v(LOG_TAG, "try to write files to Downloads/TasteEmAll/");
+        new ExportToDirTask(this, this)
+                .execute(Environment.DIRECTORY_DOWNLOADS + "/TasteEmAll");
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
@@ -625,16 +616,6 @@ public class MainActivity extends AppCompatActivity implements
                 builder.show();
             } else {
                 Toast.makeText(this, "no import files", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == REQUEST_EXPORT_DIR_CODE) {
-
-            if (resultCode == Activity.RESULT_OK) {
-                Uri uri = data.getData();
-                if (uri != null) {
-                    new ExportToDirTask(this, this).execute(new File(uri.getPath()));
-                }
-            } else {
-                Toast.makeText(this, "no export dir", Toast.LENGTH_SHORT).show();
             }
 
         } else if (requestCode == REQUEST_EDIT_PRODUCER_GEOCODE && resultCode == AppCompatActivity.RESULT_OK) {
