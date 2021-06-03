@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -538,18 +537,6 @@ public class MainActivity extends AppCompatActivity implements
         startActivityForResult(intent, REQUEST_EXPORT_DIR_CODE);
     }
 
-    private void startImport() {
-//        Log.v(LOG_TAG, "startImport, hashCode=" + this.hashCode() + ", " + "");
-        Intent intent = new Intent(this, FilePickerActivity.class);
-
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                Environment.getExternalStorageDirectory().getPath());
-        startActivityForResult(intent, REQUEST_IMPORT_FILES_CODE);
-    }
-
 
     private void startGeocoding() { //all geocoding seems to work :-)
         if (Utils.isNetworkUnavailable(this)) {
@@ -591,65 +578,63 @@ public class MainActivity extends AppCompatActivity implements
         builder.show();
     }
 
+    private void startImport() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(intent, "Open CSV"), REQUEST_IMPORT_FILES_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
 
-        if (requestCode == REQUEST_EXPORT_DIR_CODE || requestCode == REQUEST_IMPORT_FILES_CODE
-                && resultCode == AppCompatActivity.RESULT_OK) {
-            Uri uri;
-            if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
-
-                List<File> files = new ArrayList<>();
-                // For JellyBean and above
+        if (requestCode == REQUEST_IMPORT_FILES_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                List<Uri> uris = new ArrayList<>();
                 ClipData clip = data.getClipData();
-
                 if (clip != null) {
                     for (int i = 0; i < clip.getItemCount(); i++) {
-                        uri = clip.getItemAt(i).getUri();
-//                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                        files.add(new File(uri.getPath()));
-                        // Do something with the URI
+                        Uri uri = clip.getItemAt(i).getUri();
+                        uris.add(uri);
                     }
                 }
 
-                if (!files.isEmpty() && requestCode == REQUEST_IMPORT_FILES_CODE) {
+                // now pass uris through and create new temporary files from them - wtf...
 
-                    // TODO: refactor afterwards without mFiles
-                    // new ImportFilesTask(MPA.this, MPA.this).execute(files.toArray(new File[files.size()]));
-
-                    mFiles = files;
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("which import shall be used?")
-                            .setPositiveButton("class-based", (dialog, which) -> {
-                                new ImportFilesTask(MainActivity.this, MainActivity.this)
-                                        .execute(mFiles.toArray(new File[0]));
-                                mFiles = null;
-                            })
-                            .setNegativeButton("all-in-1", (dialog, which) -> {
-
-                                // multiple all-in-1-files
-                                new ImportAllInOneFileTask(MainActivity.this, MainActivity.this)
-                                        .execute(mFiles.get(0));
-                                mFiles = null;
-                                // to get all easier:
-                                    // either all ids are known or lots of parallel stuff...
-                                    // dialog with warning!
-                                // task won't help => needs Dialog everywhere... => Task
-                                // merge is to complicated for now :-p
-                            });
-                    builder.show();
+                if (uris.isEmpty()) {
+                    Toast.makeText(this, "no files selected", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("which import shall be used?")
+                        .setCancelable(true)
+                        .setPositiveButton("class-based", (dialog, which) -> {
+                            new ImportFilesTask(MainActivity.this, MainActivity.this)
+                                    .execute(uris.toArray(new Uri[0]));
+                        })
+                        .setNegativeButton("cancel", (dialog, which) -> { });
+                if (uris.size() == 1) {
+                    builder.setNeutralButton("all-in-1", (dialog, which) -> {
+                        new ImportAllInOneFileTask(MainActivity.this, MainActivity.this)
+                                .execute(uris.get(0));
+                    });
+                }
+                builder.show();
             } else {
-//                Log.v(LOG_TAG, "onActivityResult - single file, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                uri = data.getData();
-                // Do something with the URI
-                if (uri != null && requestCode == REQUEST_EXPORT_DIR_CODE) {
-                    //somehow it returned a filepath (confusing use of multiple flag...
+                Toast.makeText(this, "no import files", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_EXPORT_DIR_CODE) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                if (uri != null) {
                     new ExportToDirTask(this, this).execute(new File(uri.getPath()));
                 }
-
+            } else {
+                Toast.makeText(this, "no export dir", Toast.LENGTH_SHORT).show();
             }
 
         } else if (requestCode == REQUEST_EDIT_PRODUCER_GEOCODE && resultCode == AppCompatActivity.RESULT_OK) {

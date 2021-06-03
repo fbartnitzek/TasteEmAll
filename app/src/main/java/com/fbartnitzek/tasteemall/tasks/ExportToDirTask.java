@@ -52,7 +52,7 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
 
     @Override
     protected String doInBackground(File... params) {
-//        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
+        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
         if (params.length == 0) {
             return mActivity.getString(R.string.msg_no_export_directory);
         }
