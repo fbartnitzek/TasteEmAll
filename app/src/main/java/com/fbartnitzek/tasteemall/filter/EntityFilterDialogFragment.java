@@ -208,7 +208,7 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
                 return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Producer.ENTITY)
                                 .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
-                                        Objects.requireNonNull(getContext()), Producer.ENTITY, Drink.ENTITY))
+                                        requireContext(), Producer.ENTITY, Drink.ENTITY))
                                 .build());
             } else if (Review.ENTITY.equals(mBaseEntity)) {
                 switch (position) {
@@ -216,25 +216,25 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                         .putString(BASE_ENTITY, User.ENTITY)
                                         .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
-                                                Objects.requireNonNull(getContext()), User.ENTITY, Review.ENTITY))
+                                                requireContext(), User.ENTITY, Review.ENTITY))
                                         .build());
                     case 2:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Location.ENTITY)
                                 .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
-                                        Objects.requireNonNull(getContext()), Location.ENTITY, Review.ENTITY))
+                                        requireContext(), Location.ENTITY, Review.ENTITY))
                                 .build());
                     case 3:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Drink.ENTITY)
                                 .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
-                                        Objects.requireNonNull(getContext()), Drink.ENTITY, Review.ENTITY))
+                                        requireContext(), Drink.ENTITY, Review.ENTITY))
                                 .build());
                     case 4:
                         return new EntityFilterTabFragment().setArguments2(new BundleBuilder()
                                 .putString(BASE_ENTITY, Producer.ENTITY)
                                 .putString(EntityFilterTabFragment.NAME, getEntityOfEntityName(
-                                        Objects.requireNonNull(getContext()), Producer.ENTITY, Review.ENTITY))
+                                        requireContext(), Producer.ENTITY, Review.ENTITY))
                                 .build());
                     default:
                         throw new RuntimeException("wrong position in FragmentAdapter");
@@ -298,13 +298,13 @@ public class EntityFilterDialogFragment extends DialogFragment implements View.O
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity())).registerReceiver(mMessageReceiver,
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(mMessageReceiver,
                 new IntentFilter(ACTION_FILTER_UPDATES));
     }
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(Objects.requireNonNull(getActivity()))
+        LocalBroadcastManager.getInstance(requireActivity())
                 .unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }

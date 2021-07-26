@@ -4,16 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
@@ -22,7 +23,6 @@ import com.fbartnitzek.tasteemall.data.pojo.Review;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Copyright 2017.  Frank Bartnitzek
@@ -35,7 +35,7 @@ import java.util.Objects;
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, eitherLog.v(LOG_TAG, "getItem - Review, position == 1"); express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -117,7 +117,7 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
         // open textfilterdialog
 //        Toast.makeText(getActivity(), attributeName + " was clicked", Toast.LENGTH_SHORT).show();
 
-        FragmentManager fm = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
+        FragmentManager fm = getParentFragmentManager();
 
         // special fragments
         if (Review.ENTITY.equals(mBaseEntity) && Review.READABLE_DATE.equals(attributeName)) {
