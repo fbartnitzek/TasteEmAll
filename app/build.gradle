@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "com.fbartnitzek.tasteemall"
     // temporarily disabled signingConfigs
 //    signingConfigs {
 //        config {
@@ -36,7 +37,7 @@ android {
 //    buildTypes.each {
 //        it.buildConfigField 'String', 'GOOGLE_MAPS_GEOCODE_KEY', TasteEmAllGoogleMapsGeocodeApiKey
 //    }
-    packagingOptions {
+    packaging {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE.txt'
