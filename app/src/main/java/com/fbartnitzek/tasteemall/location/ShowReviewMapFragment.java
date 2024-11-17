@@ -4,20 +4,20 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
@@ -32,10 +32,12 @@ import com.fbartnitzek.tasteemall.showentry.ShowReviewActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static com.fbartnitzek.tasteemall.data.DatabaseContract.LocationEntry.ALIAS_REVIEW;
 import static com.fbartnitzek.tasteemall.location.ShowMapActivity.REVIEW_URI;
@@ -67,7 +69,6 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
     private ReviewLocationAdapter mReviewLocationAdapter;
     private ReviewOfLocationAdapter mReviewOfLocationAdapter;
     private TextView mHeadingLocations;
-    private String mLocationName;
     private TextView mHeadingReviewsOfLocation;
     private Uri mReviewsOfLocationUri;
     private Uri mBaseUri;
@@ -87,7 +88,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // TODO: srollable below map... - done...?
+        // TODO: scrollable below map... - done...?
 
         Bundle args = getArguments();
         if (args == null) {
@@ -97,44 +98,33 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 
             if (args.containsKey(REVIEW_URI)) {
                 mBaseUri = args.getParcelable(REVIEW_URI);
-                getLoaderManager().restartLoader(REVIEW_LOCATIONS_LOADER_ID, null, this);
+                LoaderManager.getInstance(this).restartLoader(REVIEW_LOCATIONS_LOADER_ID, null, this);
             }
         }
 
-        mReviewLocationAdapter = new ReviewLocationAdapter(getActivity(),
-                new ReviewLocationAdapter.ReviewLocationAdapterClickHandler() {
-                    @Override
-                    public void onClick(String reviewLocationId, ReviewLocationAdapter.ViewHolder viewHolder, LatLng latLng, String formatted, String description) {
-                        addReviewLocationMarker(reviewLocationId, latLng, formatted, description);
-                    }
-        });
-        mHeadingLocations = (TextView) mRootView.findViewById(R.id.heading_map_locations);
+        mReviewLocationAdapter = new ReviewLocationAdapter(this::addReviewLocationMarker);
+        mHeadingLocations = mRootView.findViewById(R.id.heading_map_locations);
         mHeadingLocations.setText(R.string.label_list_map_locations_preview);
-        RecyclerView locationRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_map_locations);
+        RecyclerView locationRecyclerView = mRootView.findViewById(R.id.recyclerview_map_locations);
         locationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         locationRecyclerView.setAdapter(mReviewLocationAdapter);
 
 
-        mHeadingReviewsOfLocation = (TextView) mRootView.findViewById(R.id.heading_map_sub_list);
+        mHeadingReviewsOfLocation = mRootView.findViewById(R.id.heading_map_sub_list);
         mHeadingReviewsOfLocation.setText(R.string.label_list_map_reviews_of_location_preview);
-        mReviewOfLocationAdapter = new ReviewOfLocationAdapter(new ReviewOfLocationAdapter.ReviewAdapterClickHandler() {
-            @Override
-            public void onClick(Uri contentUri, ReviewOfLocationAdapter.ViewHolder vh) {
-                Bundle bundle = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    bundle = ActivityOptions.makeSceneTransitionAnimation(
-                            getActivity(),
-                            new Pair<View, String>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
-                            new Pair<View, String>(vh.producerNameView, vh.producerNameView.getTransitionName())
-                    ).toBundle();
-                }
+        mReviewOfLocationAdapter = new ReviewOfLocationAdapter((contentUri, vh) -> {
+            Bundle bundle;
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    new Pair<>(vh.drinkNameView, vh.drinkNameView.getTransitionName()),
+                    new Pair<>(vh.producerNameView, vh.producerNameView.getTransitionName())
+            ).toBundle();
 
-                startActivity(
-                        new Intent(getActivity(), ShowReviewActivity.class).setData(contentUri),
-                        bundle);
-            }
+            startActivity(
+                    new Intent(getActivity(), ShowReviewActivity.class).setData(contentUri),
+                    bundle);
         }, getActivity());
-        RecyclerView reviewsRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_map_sub_list);
+        RecyclerView reviewsRecyclerView = mRootView.findViewById(R.id.recyclerview_map_sub_list);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         reviewsRecyclerView.setAdapter(mReviewOfLocationAdapter);
 
@@ -143,12 +133,14 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
         return mRootView;
     }
 
+
+
     @Override
     protected int getTabLayout() {
         return R.layout.fragment_show_map_review_location;
     }
 
-    private void addReviewLocationMarker(String reviewLocationId, LatLng latLng, String formatted, String description) {
+    private void addReviewLocationMarker(String reviewLocationId, ReviewLocationAdapter.ViewHolder viewHolder, LatLng latLng, String formatted, String description) {
         Log.v(LOG_TAG, "addReviewLocationMarker, hashCode=" + this.hashCode() + ", " + "reviewLocationId = [" + reviewLocationId + "], latLng = [" + latLng + "], formatted = [" + formatted + "], description = [" + description + "]");
         mReviewLocationId = reviewLocationId;
 
@@ -157,7 +149,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
         } else {
             showMap();
             if (latLng != null && Utils.isValidLatLong(latLng.latitude, latLng.longitude)) {
-                mLocationName = description == null || description.isEmpty() ? formatted : description;
+                String mLocationName = description == null || description.isEmpty() ? formatted : description;
                 mMarkerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(mLocationName)
@@ -174,7 +166,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 //        Log.v(LOG_TAG, "updateReviews, mReviewLocationId=" + mReviewLocationId);
 
         try {
-            JSONObject jsonObject = new JSONObject(DatabaseContract.getJson(mBaseUri));
+            JSONObject jsonObject = new JSONObject(Objects.requireNonNull(DatabaseContract.getJson(mBaseUri)));
             JSONObject reviewObject = jsonObject.getJSONObject(Review.ENTITY);
             JSONObject locationObject = JsonHelper.getOrCreateJsonObject(reviewObject, Location.ENTITY);
             if (mReviewLocationId == null) {
@@ -191,26 +183,21 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
             e.printStackTrace();
         }
 
-        getLoaderManager().restartLoader(REVIEWS_OF_LOCATION_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(REVIEWS_OF_LOCATION_LOADER_ID, null, this);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        // TODO!
-        super.onSaveInstanceState(outState);
-    }
-
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 //        Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         switch (id) {
             case REVIEW_LOCATIONS_LOADER_ID:
-                return new CursorLoader(getActivity(),
+                return new CursorLoader(Objects.requireNonNull(getActivity()),
                         mBaseUri, QueryColumns.MapFragment.ReviewLocations.COLUMNS,
                         null, null,
                         ALIAS_REVIEW + "." + Location.COUNTRY + " ASC, " + ALIAS_REVIEW + "." + Location.FORMATTED_ADDRESS + " ASC");
             case REVIEWS_OF_LOCATION_LOADER_ID:
-                return new CursorLoader(getActivity(), mReviewsOfLocationUri,
+                return new CursorLoader(Objects.requireNonNull(getActivity()), mReviewsOfLocationUri,
                         QueryColumns.MapFragment.ReviewsSubQuery.COLUMNS, null, null,
                         DatabaseContract.ReviewEntry.ALIAS + "." + Review.READABLE_DATE + " DESC, " +
                         DatabaseContract.ProducerEntry.ALIAS + "." + Producer.NAME + " ASC, " +
@@ -229,9 +216,7 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
 //                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " ReviewLocation");
                 mReviewLocationAdapter.swapCursor(data);
                 mHeadingLocations.setText(getString(R.string.label_list_map_locations, count));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ((ShowMapActivity)getActivity()).scheduleStartPostponedTransition(mHeadingLocations);
-                }
+                ((ShowMapActivity) Objects.requireNonNull(getActivity())).scheduleStartPostponedTransition(mHeadingLocations);
                 break;
             case REVIEWS_OF_LOCATION_LOADER_ID:
 //                Log.v(LOG_TAG, "onLoadFinished - swapping " + count + " Reviews of Location");
@@ -253,7 +238,4 @@ public class ShowReviewMapFragment extends ShowBaseMapFragment implements Loader
                 break;
         }
     }
-
 }
-
-

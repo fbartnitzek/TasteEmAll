@@ -1,9 +1,11 @@
 package com.fbartnitzek.tasteemall.tasks;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.fbartnitzek.tasteemall.R;
@@ -13,6 +15,9 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.csv.CsvFileWriter;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +38,7 @@ import java.util.List;
  * limitations under the License.
  */
 
-public class ExportToDirTask extends AsyncTask<File, Void, String>{
+public class ExportToDirTask extends AsyncTask<String, Void, String>{
 
     public static final String EXPORT_PREFIX = "export_";
     private final Activity mActivity;
@@ -50,38 +55,66 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         this.mExportHandler = mExportHandler;
     }
 
+    private void insertFileViaMediaStore(String displayName, File file, String path) {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "application/csv");
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, path);
+        Uri myUri = mActivity.getContentResolver().insert(
+                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                values);
+        try (OutputStream outStream = mActivity.getContentResolver().openOutputStream(myUri)) {
+            outStream.write(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.v(LOG_TAG, "written file via MediaStore");
+    }
+
+    void deleteTempFiles() {
+        final File[] files = mActivity.getCacheDir().listFiles();
+        if (files != null) {
+            for (final File file : files) {
+                if (file.getName().contains(EXPORT_PREFIX)) {
+                    Log.v(LOG_TAG, "deleteTempFiles - file:" + file.getName());
+                    file.delete();
+                }
+            }
+        }
+    }
+
     @Override
-    protected String doInBackground(File... params) {
-//        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "params = [" + params + "]");
-        if (params.length == 0) {
+    protected String doInBackground(String... paths) {
+        Log.v(LOG_TAG, "doInBackground, hashCode=" + this.hashCode() + ", " + "paths = [" +
+                Arrays.toString(paths) + "]");
+        if (paths.length == 0) {
             return mActivity.getString(R.string.msg_no_export_directory);
         }
-        File dir = params[0];
-        if (dir == null || !dir.isDirectory() || !dir.canWrite()) {
-            return mActivity.getString(R.string.msg_export_files_no_write,
-                    dir == null ? "" : dir.getAbsolutePath());
-        }
+
+        String path = paths[0];
 
         String message;
         message = exportEntries(DatabaseContract.LocationEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.LocationColumns.COLUMNS, dir,
+                QueryColumns.ExportAndImport.LocationColumns.COLUMNS, path,
                 mActivity.getString(R.string.file_locations), mActivity.getString(R.string.label_locations));
 
         message += exportEntries(DatabaseContract.ProducerEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.ProducerColumns.COLUMNS, dir,
+                QueryColumns.ExportAndImport.ProducerColumns.COLUMNS, path,
                 mActivity.getString(R.string.file_producers), mActivity.getString(R.string.label_producers));
 
         message += "\n" + exportEntries(DatabaseContract.DrinkEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.DrinkColumns.COLUMNS, dir,
+                QueryColumns.ExportAndImport.DrinkColumns.COLUMNS, path,
                 mActivity.getString(R.string.file_drinks), mActivity.getString(R.string.label_drinks));
 
         message += "\n" + exportEntries(DatabaseContract.UserEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.UserColumns.COLUMNS, dir,
+                QueryColumns.ExportAndImport.UserColumns.COLUMNS, path,
                 mActivity.getString(R.string.file_users), mActivity.getString(R.string.label_users));
 
         message += "\n" + exportEntries(DatabaseContract.ReviewEntry.CONTENT_URI,
-                QueryColumns.ExportAndImport.ReviewColumns.COLUMNS, dir,
+                QueryColumns.ExportAndImport.ReviewColumns.COLUMNS, path,
                 mActivity.getString(R.string.file_reviews), mActivity.getString(R.string.label_reviews));
+
+        deleteTempFiles();
 
         return message;
     }
@@ -91,11 +124,12 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
         mExportHandler.onExportFinished(s);
     }
 
-    private String exportEntries(Uri contentUri, String[] columns, File dir, String fileEntries,
+    private String exportEntries(Uri contentUri, String[] columns, String path, String fileEntries,
                                  String msgEntries) {
 
         String fileName = EXPORT_PREFIX + Utils.getCurrentLocalTimePrefix() + "_" + fileEntries +  mActivity.getString(R.string.file_extension);
-        File file = new File(dir, fileName);
+
+        final File file = new File(mActivity.getCacheDir(), fileName);
 
         Cursor cursor = mActivity.getContentResolver().query(
                 contentUri, columns, null, null, null);
@@ -119,11 +153,14 @@ public class ExportToDirTask extends AsyncTask<File, Void, String>{
                 message = mActivity.getString(R.string.msg_entries_exported_success_shorter,
                         msgEntries, cursor.getCount());
             } else {
-                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], dir = [" + dir + "], fileEntries = [" + fileEntries+ "]");
+                Log.e(LOG_TAG, "exportEntries - CSVException: " + error + ", hashCode=" + this.hashCode() + ", " + "contentUri = [" + contentUri + "], columns = [" + Arrays.toString(columns) + "], fileEntries = [" + fileEntries+ "]");
                 message = mActivity.getString(R.string.msg_writing_entries_failed, msgEntries);
             }
 
             cursor.close();
+
+            Log.v(LOG_TAG, "written temp file");
+            insertFileViaMediaStore(fileName, file, path);
         } else {
             message = mActivity.getString(R.string.msg_export_entries_failed_no_cursor, msgEntries);
         }

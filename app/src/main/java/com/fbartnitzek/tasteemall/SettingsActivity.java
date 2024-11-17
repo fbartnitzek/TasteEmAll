@@ -11,6 +11,8 @@ import android.util.Log;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    // TODO: change SettingsActivity, all deprecated
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

@@ -16,9 +16,11 @@ import android.view.inputmethod.InputMethodManager;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static com.fbartnitzek.tasteemall.filter.EntityFilterTabFragment.BASE_ENTITY;
 
@@ -54,7 +56,7 @@ public class AttributeFilterDialogFragment extends AttributeFilterBaseDialogFrag
         mSelectionPagerAdapter = new SelectionsPagerAdapter(getChildFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager)view.findViewById(R.id.pager);
+        mViewPager = view.findViewById(R.id.pager);
         mViewPager.setAdapter(mSelectionPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -70,7 +72,7 @@ public class AttributeFilterDialogFragment extends AttributeFilterBaseDialogFrag
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
                     Log.v(LOG_TAG, "onPageScrollStateChanged, currentItem=" + mViewPager.getCurrentItem() + "]");
                     if (mViewPager.getCurrentItem() == 1) {
-                        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                        ((InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE))
                                 .hideSoftInputFromWindow(mViewPager.getWindowToken(), 0);
 //                    } else if (mViewPager.getCurrentItem() == 0) {
 //                        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
@@ -98,12 +100,14 @@ public class AttributeFilterDialogFragment extends AttributeFilterBaseDialogFrag
         }
     }
 
+    // TODO: use FragmentPagerAdapter(FragmentManager, int) with BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
     public class SelectionsPagerAdapter extends FragmentPagerAdapter{
 
         public SelectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             switch (position) {

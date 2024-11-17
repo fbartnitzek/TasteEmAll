@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.fbartnitzek.tasteemall.R;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Copyright 2017.  Frank Bartnitzek
  *
@@ -39,6 +41,7 @@ public class AttributeValuesAdapter extends RecyclerView.Adapter<AttributeValues
         void onAttributeClick(String s, int adapterPosition);
     }
 
+    @NotNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -71,7 +74,7 @@ public class AttributeValuesAdapter extends RecyclerView.Adapter<AttributeValues
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            this.value = (TextView) itemView.findViewById(R.id.list_item_value);
+            this.value = itemView.findViewById(R.id.list_item_value);
         }
 
         @Override

@@ -6,21 +6,8 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.core.view.MenuItemCompat;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +16,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.fbartnitzek.tasteemall.addentry.AddLocationActivity;
 import com.fbartnitzek.tasteemall.addentry.AddProducerActivity;
@@ -49,7 +47,9 @@ import com.fbartnitzek.tasteemall.tasks.ImportAllInOneFileTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesOldFormatTask;
 import com.fbartnitzek.tasteemall.tasks.ImportFilesTask;
 import com.fbartnitzek.tasteemall.ui.CustomSpinnerAdapter;
-import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.v(LOG_TAG, "onCreate, hashCode=" + this.hashCode() + ", " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
@@ -148,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pager);
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
-        mViewPager.setCurrentItem(mPagerPosition < 0 ? 0 : mPagerPosition);
+        mViewPager.setCurrentItem(Math.max(mPagerPosition, 0));
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
 
         createSpinner();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        FloatingActionButton fab = findViewById(R.id.fab_add);
         fab.setOnClickListener(this);
 
     }
@@ -198,11 +198,8 @@ public class MainActivity extends AppCompatActivity implements
 //        Log.v(LOG_TAG, "restartCurrentFragmentLoader, hashCode=" + this.hashCode() + ", " + "");
         if (mViewPager != null && mPagerAdapter != null) {
             BasePagerFragment fragment = (BasePagerFragment) mPagerAdapter.instantiateItem(mViewPager, mViewPager.getCurrentItem());
-            if (fragment != null) {
-                fragment.restartLoader();
-            }
+            fragment.restartLoader();
         }
-
     }
 
     @Override
@@ -216,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NotNull Bundle outState) {
 //        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
         super.onSaveInstanceState(outState);
         outState.putString(STATE_SEARCH_PATTERN, mSearchPattern);
@@ -245,9 +242,7 @@ public class MainActivity extends AppCompatActivity implements
     private void setJsonUriInCurrentFragment(Uri uri) {
         if (mViewPager != null && mViewPager.getCurrentItem() > -1) {
             BasePagerFragment fragment = getFragment(mViewPager.getCurrentItem());
-            if (fragment != null) {
-                fragment.setJsonUri(uri);
-            }
+            fragment.setJsonUri(uri);
         }
     }
 
@@ -269,18 +264,13 @@ public class MainActivity extends AppCompatActivity implements
         if (v.getId() == R.id.fab_add) {
             Intent intent = new Intent(this, AddReviewActivity.class);
 
-            Bundle bundle = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // no really useful element name transition possible...
-                BasePagerFragment fragment = getFragment(mViewPager.getCurrentItem());
-                if (fragment != null) {
-                    bundle = ActivityOptions.makeSceneTransitionAnimation(this,
-                            v, getString(fragment.getSharedTransitionId())
-                    ).toBundle();
-                }
-            }
+            // no really useful element name transition possible...
+            BasePagerFragment fragment = getFragment(mViewPager.getCurrentItem());
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this,
+                    v, getString(fragment.getSharedTransitionId())
+            ).toBundle();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && bundle != null) {
+            if (bundle != null) {
                 startActivityForResult(intent, ADD_REVIEW_REQUEST, bundle);
             } else {
                 startActivityForResult(intent, ADD_REVIEW_REQUEST);
@@ -291,10 +281,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private class MainPagerAdapter extends FragmentStatePagerAdapter {
 
+        // todo: use FragmentStatePagerAdapter(FragmentManager, int) with BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
         public MainPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             Log.v(LOG_TAG, "getItem, hashCode=" + this.hashCode() + ", " + "position = [" + position + "]");
@@ -326,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements
     private void createSpinner() {
 //        Log.v(LOG_TAG, "createSpinner, hashCode=" + this.hashCode() + ", " + "");
 
-        mDrinkTypeSpinner = (Spinner) findViewById(R.id.spinner_type);
+        mDrinkTypeSpinner = findViewById(R.id.spinner_type);
 
         String[] typesArray = getResources().getStringArray(R.array.pref_type_filter_values);
         ArrayList<String> typesList = new ArrayList<>(Arrays.asList(typesArray));
@@ -378,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.v(LOG_TAG, "onCreateOptionsMenu, hashCode=" + this.hashCode() + ", " + "menu = [" + menu + "], searchPattern=" + mSearchPattern);
         getMenuInflater().inflate(R.menu.menu_main, menu);
         final MenuItem item = menu.findItem(R.id.search_all);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(this);
 
         // todo: restore the right way...   - still not working - should work!...?
@@ -398,31 +390,28 @@ public class MainActivity extends AppCompatActivity implements
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case R.id.action_geocode:
-                startGeocoding();
-                return true;
-            case R.id.action_export:    // TODO: class-based- and all-in-1-export
-                startExport();
-                return true;
-            case R.id.action_import:    // TODO: restore and class-based-import
-                startImport();
-                return true;
-            case R.id.action_show_map:
-                startShowMap2();
-                return true;
-//            case R.id.action_demo_search:   // TODO: remove after MultiSelect is working...
-//                startGenericDemoSearch();
-//                return true;
-            case R.id.action_delete_all:
-                startDeleteAll();
-                return true;
-            case R.id.search_generic:
-                startGenericSearchDialog();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (itemId == R.id.action_geocode) {
+            startGeocoding();
+            return true;
+        } else if (itemId == R.id.action_export) {    // TODO: class-based- and all-in-1-export
+            startExport();
+            return true;
+        } else if (itemId == R.id.action_import) {    // TODO: restore and class-based-import
+            startImport();
+            return true;
+        } else if (itemId == R.id.action_show_map) {
+            startShowMap2();
+            return true;
+        } else if (itemId == R.id.action_delete_all) {
+            startDeleteAll();
+            return true;
+        } else if (itemId == R.id.search_generic) {
+            startGenericSearchDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);   //may call fragment for others
@@ -504,85 +493,39 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra(ShowMapActivity.BASE_URI, baseFragment.getJsonUri());
         intent.putExtra(ShowMapActivity.BASE_ENTITY, baseFragment.getEntity());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ) {
-            View rootView = findViewById(R.id.pager);
+        View rootView = findViewById(R.id.pager);
 
-            // no useful element name transition possible
+        // no useful element name transition possible
 //            menuView.setTransitionName(getString(R.string.shared_transition_show_map));
 
-            // workaround: start usual activity with wrong element transition ...
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this,
-                    rootView, getString(R.string.no_shared_element_transition)).toBundle();
+        // workaround: start usual activity with wrong element transition ...
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this,
+                rootView, getString(R.string.no_shared_element_transition)).toBundle();
 
-            startActivity(intent, bundle);
-        } else {
-            startActivity(intent);
-        }
-
+        startActivity(intent, bundle);
     }
 
     private void startDeleteAll() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you really want to delete all? Do you want to export first?")
-                .setNeutralButton("export", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startExport();
-                        // TODO: state CALL_DELETE_AFTERWARDS
-                    }
+                .setNeutralButton("export", (dialogInterface, i) -> {
+                    startExport();
+                    // TODO: state CALL_DELETE_AFTERWARDS
                 })
-                .setPositiveButton("delete", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "TODO - deleteAllTask", Toast.LENGTH_SHORT).show();
+                .setPositiveButton("delete", (dialog, which) -> {
+                    Toast.makeText(MainActivity.this, "TODO - deleteAllTask", Toast.LENGTH_SHORT).show();
 //                        Intent intent = new Intent(MainActivity.this, AddProducerActivity.class);
 //                        MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_PRODUCER_GEOCODE);
-                    }
                 })
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
+                .setNegativeButton(R.string.cancel_button, (dialog, which) -> {
                 });
         builder.show();
 
     }
 
-    private void startExport() {
-//        Log.v(LOG_TAG, "startExport, hashCode=" + this.hashCode() + ", " + "");
-        Intent intent = new Intent(this, FilePickerActivity.class);
-
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-
-        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                Environment.getExternalStorageDirectory().getPath());
-        startActivityForResult(intent, REQUEST_EXPORT_DIR_CODE);
-    }
-
-    private void startImport() {
-//        Log.v(LOG_TAG, "startImport, hashCode=" + this.hashCode() + ", " + "");
-        Intent intent = new Intent(this, FilePickerActivity.class);
-
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
-        intent.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-        intent.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-        intent.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                Environment.getExternalStorageDirectory().getPath());
-        startActivityForResult(intent, REQUEST_IMPORT_FILES_CODE);
-    }
-
-
     private void startGeocoding() { //all geocoding seems to work :-)
         if (Utils.isNetworkUnavailable(this)) {
             Toast.makeText(this, R.string.msg_mass_geocoder_no_network, Toast.LENGTH_SHORT).show();
-//            View view = findViewById(R.id.fragment_detail_layout);
-//            if (view != null) {
-//                Snackbar.make(view, R.string.msg_mass_geocoder_no_network, Snackbar.LENGTH_LONG).show();
-//            }
             return;
         }
 
@@ -608,111 +551,71 @@ public class MainActivity extends AppCompatActivity implements
                 + (reviewLocationMsg == null ? "" : reviewLocationMsg + "\n");
         builder.setTitle(R.string.msg_title_gps_geocoding)
                 .setMessage(msg)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (producerUris != null && !producerUris.isEmpty()){
-                            showProducerGeocodeDialog(false);
-                        } else if (reviewUris != null && !reviewUris.isEmpty()) {
-                            showReviewLocationGeocodeDialog(false);
-                        } else {
-                            restartCurrentFragmentLoader();
-                        }
+                .setPositiveButton("OK", (dialog, which) -> {
+                    if (producerUris != null && !producerUris.isEmpty()){
+                        showProducerGeocodeDialog(false);
+                    } else if (reviewUris != null && !reviewUris.isEmpty()) {
+                        showReviewLocationGeocodeDialog(false);
+                    } else {
+                        restartCurrentFragmentLoader();
                     }
                 });
         builder.show();
+    }
+
+    private void startImport() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(intent, "Open CSV"), REQUEST_IMPORT_FILES_CODE);
+    }
+
+    private void startExport() {
+        Log.v(LOG_TAG, "try to write files to Downloads/TasteEmAll/");
+        new ExportToDirTask(this, this)
+                .execute(Environment.DIRECTORY_DOWNLOADS + "/TasteEmAll");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(LOG_TAG, "onActivityResult, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
 
-        if (requestCode == REQUEST_EXPORT_DIR_CODE || requestCode == REQUEST_IMPORT_FILES_CODE
-                && resultCode == AppCompatActivity.RESULT_OK) {
-            Uri uri;
-            if (data.getBooleanExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false)) {
-
-                List<File> files = new ArrayList<>();
-                // For JellyBean and above
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    ClipData clip = data.getClipData();
-
-                    if (clip != null) {
-                        for (int i = 0; i < clip.getItemCount(); i++) {
-                            uri = clip.getItemAt(i).getUri();
-//                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                            files.add(new File(uri.getPath()));
-                            // Do something with the URI
-                        }
-                    }
-                    // For Ice Cream Sandwich
-                } else {
-                    ArrayList<String> paths = data.getStringArrayListExtra
-                            (FilePickerActivity.EXTRA_PATHS);
-
-                    if (paths != null) {
-                        for (String path : paths) {
-                            uri = Uri.parse(path);  // TODO: might be useless conversion...
-//                            Log.v(LOG_TAG, "onActivityResult, uri=" + uri + ", hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                            files.add(new File(uri.getPath()));
-                        }
+        if (requestCode == REQUEST_IMPORT_FILES_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                List<Uri> uris = new ArrayList<>();
+                ClipData clip = data.getClipData();
+                if (clip != null) {
+                    for (int i = 0; i < clip.getItemCount(); i++) {
+                        Uri uri = clip.getItemAt(i).getUri();
+                        uris.add(uri);
                     }
                 }
 
-                if (!files.isEmpty() && requestCode == REQUEST_IMPORT_FILES_CODE) {
+                // now pass uris through and create new temporary files from them - wtf...
 
-                    // TODO: refactor afterwards without mFiles
-                    // new ImportFilesTask(MPA.this, MPA.this).execute(files.toArray(new File[files.size()]));
-
-                    mFiles = files;
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("which import shall be used?")
-                            .setPositiveButton("class-based", new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    new ImportFilesTask(MainActivity.this, MainActivity.this)
-                                            .execute(mFiles.toArray(new File[mFiles.size()]));
-                                    mFiles = null;
-                                }
-                            })
-//                            .setNegativeButton("old", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    new ImportFilesOldFormatTask(MainActivity.this, MainActivity.this)
-//                                            .execute(mFiles.toArray(new File[mFiles.size()]));
-//                                    mFiles = null;
-//                                }
-//                            });
-                            .setNegativeButton("all-in-1", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    // multiple all-in-1-files?
-                                    new ImportAllInOneFileTask(MainActivity.this, MainActivity.this)
-                                            .execute(mFiles.get(0));
-                                    mFiles = null;
-                                    // to get all easier:
-                                        // either all ids are known or lots of parallel stuff...
-                                        // dialog with warning!
-                                    // task won't help => needs Dialog everywhere... => Task
-                                    // merge is to complicated for now :-p
-
-                                }
-                            });
-                    builder.show();
+                if (uris.isEmpty()) {
+                    Toast.makeText(this, "no files selected", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("which import shall be used?")
+                        .setCancelable(true)
+                        .setPositiveButton("class-based", (dialog, which) -> {
+                            new ImportFilesTask(MainActivity.this, MainActivity.this)
+                                    .execute(uris.toArray(new Uri[0]));
+                        })
+                        .setNegativeButton("cancel", (dialog, which) -> { });
+                if (uris.size() == 1) {
+                    builder.setNeutralButton("all-in-1", (dialog, which) -> {
+                        new ImportAllInOneFileTask(MainActivity.this, MainActivity.this)
+                                .execute(uris.get(0));
+                    });
+                }
+                builder.show();
             } else {
-//                Log.v(LOG_TAG, "onActivityResult - single file, hashCode=" + this.hashCode() + ", " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                uri = data.getData();
-                // Do something with the URI
-                if (uri != null && requestCode == REQUEST_EXPORT_DIR_CODE) {
-                    //somehow it returned a filepath (confusing use of multiple flag...
-                    new ExportToDirTask(this, this).execute(new File(uri.getPath()));
-                }
-
+                Toast.makeText(this, "no import files", Toast.LENGTH_SHORT).show();
             }
 
         } else if (requestCode == REQUEST_EDIT_PRODUCER_GEOCODE && resultCode == AppCompatActivity.RESULT_OK) {
@@ -746,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements
                 showReviewLocationGeocodeDialog(true);
             }
         } else if (requestCode == ADD_REVIEW_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-// TODO bugfix: refresh current pager
+            // TODO bugfix: refresh current pager
             startActivity(new Intent(this, ShowReviewActivity.class).setData(data.getData()));
         }
 
@@ -758,7 +661,6 @@ public class MainActivity extends AppCompatActivity implements
         if (mProducerLocationUris == null || mProducerLocationUris.isEmpty()) {
             return;
         }
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(cont ?
@@ -775,19 +677,11 @@ public class MainActivity extends AppCompatActivity implements
                         mProducerLocationUris.remove(mProducerLocationUris.size() - 1);
                         Intent intent = new Intent(MainActivity.this, AddProducerActivity.class);
                         intent.setData(lastUri);
-                        // geocoding implicitly or explicitly? - implicit seems better:
-                        //  resolve "geocode me" whenever possible on the fly - less non-geocoded-entries
 
-                        // TODO: bundle for transition
                         MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_PRODUCER_GEOCODE);
                     }
                 })
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mProducerLocationUris = null;
-                    }
-                });
+                .setNegativeButton(R.string.cancel_button, (dialog, which) -> mProducerLocationUris = null);
         builder.show();
     }
 
@@ -796,7 +690,6 @@ public class MainActivity extends AppCompatActivity implements
         if (mReviewLocationUris == null || mReviewLocationUris.isEmpty()) {
             return;
         }
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(cont ?
@@ -811,42 +704,25 @@ public class MainActivity extends AppCompatActivity implements
                         Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "dialog = [" + dialog + "], which = [" + which + "]");
                         Uri lastUri = mReviewLocationUris.get(mReviewLocationUris.size() - 1);
                         mReviewLocationUris.remove(mReviewLocationUris.size() - 1);
-
-
                         Intent intent = new Intent(MainActivity.this, AddLocationActivity.class);
                         intent.setData(lastUri);
-                        // geocoding implicitly or explicitly? - implicit seems better:
-                        //  resolve "geocode me" whenever possible on the fly - less non-geocoded-entries
 
-                        // TODO: bundle for transition
                         MainActivity.this.startActivityForResult(intent, REQUEST_EDIT_REVIEW_LOCATION_GEOCODE);
                     }
                 })
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mReviewLocationUris = null;
-                    }
-                });
+                .setNegativeButton(R.string.cancel_button, (dialog, which) -> mReviewLocationUris = null);
         builder.show();
-
     }
 
     // TODO: show Msg Activity/Dialog/Fragment (LONG is to short ...) with ok button OR Notification
 
     @Override
     public void onExportFinished(String message) {
-
-        // need at least 3 lines => toast
-//        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onImportFinished(String message) {
-
-        // need at least 3 lines => toast
-//        Snackbar.make(findViewById(R.id.fragment_detail_layout), message, Snackbar.LENGTH_LONG).show();
         restartCurrentFragmentLoader();
         Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
@@ -855,22 +731,14 @@ public class MainActivity extends AppCompatActivity implements
     public void onImportAllInOneFinished(String message) {
         restartCurrentFragmentLoader();
         new AlertDialog.Builder(this).setMessage(message)
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {}
-                })
+                .setPositiveButton("ok", (dialogInterface, i) -> {})
                 .show();
     }
 
     @Override
     public void onImportAllInOneFailed(String message) {
         new AlertDialog.Builder(this).setMessage(message)
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                })
+                .setNegativeButton(R.string.cancel_button, (dialogInterface, i) -> { })
         .show();
     }
 

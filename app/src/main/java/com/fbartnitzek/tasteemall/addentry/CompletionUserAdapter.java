@@ -42,13 +42,11 @@ public class CompletionUserAdapter extends SimpleCursorAdapter {
 
     @Override
     public void setViewText(TextView v, String text) {
-        switch (v.getId()) {
-            case R.id.list_item_user_name:
-                v.setText(text);
-                v.setContentDescription(mActivity.getString(R.string.a11y_user_name, text));
-                break;
-            default:
-                super.setViewText(v, text);
+        if (v.getId() == R.id.list_item_user_name) {
+            v.setText(text);
+            v.setContentDescription(mActivity.getString(R.string.a11y_user_name, text));
+        } else {
+            super.setViewText(v, text);
         }
     }
 

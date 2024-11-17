@@ -3,16 +3,18 @@ package com.fbartnitzek.tasteemall.mainpager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
+
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -33,7 +35,7 @@ import com.fbartnitzek.tasteemall.data.QueryColumns;
 
 public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHolder>{
 
-    private static final String LOG_TAG = ProducerAdapter.class.getName();
+//    private static final String LOG_TAG = ProducerAdapter.class.getName();
     private final Context mContext;
 
     private Cursor mCursor;
@@ -49,8 +51,9 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
         void onClick(String producerName, Uri contentUri, ViewHolder viewHolder);
     }
 
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (parent instanceof RecyclerView) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.list_item_producer_recycler, parent, false);
@@ -62,15 +65,13 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NotNull ViewHolder viewHolder, int position) {
         mCursor.moveToPosition(position);
 
         String producerName = mCursor.getString(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER_NAME);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            int id = mCursor.getInt(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER__ID);
-            viewHolder.nameView.setTransitionName(mContext.getString(R.string.shared_transition_producer_producer) + id);
-        }
+        int id = mCursor.getInt(QueryColumns.MainFragment.ProducerQuery.COL_QUERY_PRODUCER__ID);
+        viewHolder.nameView.setTransitionName(mContext.getString(R.string.shared_transition_producer_producer) + id);
 
         viewHolder.nameView.setText(producerName);
         viewHolder.nameView.setContentDescription(mContext.getString(R.string.a11y_producer_name, producerName));
@@ -104,10 +105,10 @@ public class ProducerAdapter extends RecyclerView.Adapter<ProducerAdapter.ViewHo
 
         public ViewHolder(View view) {
             super(view);
-            this.nameView = (TextView) view.findViewById(R.id.list_item_producer_name);
-            this.descriptionView = (TextView) view.findViewById(R.id.list_item_producer_description);
+            this.nameView = view.findViewById(R.id.list_item_producer_name);
+            this.descriptionView = view.findViewById(R.id.list_item_producer_description);
 //            this.websiteView = (TextView) view.findViewById(R.id.list_item_producer_website);;
-            this.locationView = (TextView) view.findViewById(R.id.list_item_location_name);
+            this.locationView = view.findViewById(R.id.list_item_location_name);
 
             // as a start - just click for whole producer
             view.setOnClickListener(this);

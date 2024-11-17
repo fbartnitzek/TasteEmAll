@@ -4,30 +4,31 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 /**
  * Copyright 2017.  Frank Bartnitzek
@@ -49,11 +50,10 @@ public class AttributeFilterTextTabFragment extends AttributeBaseFilterFragment 
 
     private static final int ATTRIBUTE_VALUES_LOADER_ID = 67548;
     private EditText mEditFilter;
-    private RecyclerView mValuesRecycler;
     private AttributeValuesAdapter mAttributeValuesAdapter;
     private String mAttributeFilter;
 
-    private static final String LOG_TAG = AttributeFilterTextTabFragment.class.getName();
+//    private static final String LOG_TAG = AttributeFilterTextTabFragment.class.getName();
 
     @Nullable
     @Override
@@ -61,45 +61,41 @@ public class AttributeFilterTextTabFragment extends AttributeBaseFilterFragment 
 
         super.onCreateView(inflater, container, savedInstanceState);
 
-        mEditFilter= (EditText) mRootView.findViewById(R.id.attribute_filter);
+        mEditFilter= mRootView.findViewById(R.id.attribute_filter);
         mEditFilter.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
             @Override
             public void afterTextChanged(Editable s) {
                 mAttributeFilter = s.toString();
 //                Log.v(LOG_TAG, "afterTextChanged, hashCode=" + this.hashCode() + ", " + "s = [" + s + "]");
-                getLoaderManager().restartLoader(ATTRIBUTE_VALUES_LOADER_ID, null, AttributeFilterTextTabFragment.this);
+                LoaderManager.getInstance(AttributeFilterTextTabFragment.this)
+                        .restartLoader(ATTRIBUTE_VALUES_LOADER_ID, null, AttributeFilterTextTabFragment.this);
             }
         });
 
-        mEditFilter.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        mEditFilter.setOnEditorActionListener((v, actionId, event) -> {
 //                Log.v(LOG_TAG, "onEditorAction, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], actionId = [" + actionId + "], event = [" + event + "]");
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(mEditFilter.getWindowToken(), 0);
-                    return true;
-                }
-                return false;
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getContext())
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mEditFilter.getWindowToken(), 0);
+                return true;
             }
+            return false;
         });
 
         // focus editFilter - thx for: http://stackoverflow.com/a/26012003/5477716
         mEditFilter.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getContext())
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-        mValuesRecycler = (RecyclerView) mRootView.findViewById(R.id.attribute_filter_list);
+        RecyclerView mValuesRecycler = mRootView.findViewById(R.id.attribute_filter_list);
         mValuesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAttributeValuesAdapter = new AttributeValuesAdapter(this);
@@ -121,49 +117,42 @@ public class AttributeFilterTextTabFragment extends AttributeBaseFilterFragment 
     }
 
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-
-                String alias = DatabaseContract.ALIASES.get(mBaseEntity) + ".";
-                JSONObject json = new JSONObject();
-                Uri uri;
-                try {
-                    json.put(mBaseEntity, new JSONObject().put(mAttributeName,
-                            new JSONObject().put(DatabaseContract.Operations.CONTAINS,
-                                    DatabaseContract.encodeValue(mAttributeFilter))));
-                    uri = DatabaseContract.buildUriWithJson(json);
-                } catch (UnsupportedEncodingException | JSONException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("invalid json query " + json.toString());
-                }
+        if (id == ATTRIBUTE_VALUES_LOADER_ID) {
+            String alias = DatabaseContract.ALIASES.get(mBaseEntity) + ".";
+            JSONObject json = new JSONObject();
+            Uri uri;
+            try {
+                json.put(mBaseEntity, new JSONObject().put(mAttributeName,
+                        new JSONObject().put(DatabaseContract.Operations.CONTAINS,
+                                DatabaseContract.encodeValue(mAttributeFilter))));
+                uri = DatabaseContract.buildUriWithJson(json);
+            } catch (UnsupportedEncodingException | JSONException e) {
+                e.printStackTrace();
+                throw new RuntimeException("invalid json query " + json.toString());
+            }
 //                Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", uri=" + uri +"]");
-                return new CursorLoader(getActivity(), uri,
-                        new String[]{"DISTINCT " + alias + mAttributeName},
-                        null, null, alias + mAttributeName + " ASC");
-            default:
-                throw new RuntimeException("wrong loaderId in " + AttributeFilterTextTabFragment.class.getSimpleName());
+            return new CursorLoader(Objects.requireNonNull(getActivity()), uri,
+                    new String[]{"DISTINCT " + alias + mAttributeName},
+                    null, null, alias + mAttributeName + " ASC");
         }
+        throw new RuntimeException("wrong loaderId in " + AttributeFilterTextTabFragment.class.getSimpleName());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-//                Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
-                mAttributeValuesAdapter.swapCursor(data);
-                mNameView.setText(getAttributeTitle(getContext(), data.getCount()));
-                break;
+        if (loader.getId() == ATTRIBUTE_VALUES_LOADER_ID) {//                Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+            mAttributeValuesAdapter.swapCursor(data);
+            mNameView.setText(getAttributeTitle(getContext(), data.getCount()));
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case ATTRIBUTE_VALUES_LOADER_ID:
-                mAttributeValuesAdapter.swapCursor(null);
-                break;
+        if (loader.getId() == ATTRIBUTE_VALUES_LOADER_ID) {
+            mAttributeValuesAdapter.swapCursor(null);
         }
     }
 

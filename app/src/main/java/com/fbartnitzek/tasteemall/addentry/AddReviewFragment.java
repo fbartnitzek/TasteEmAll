@@ -2,34 +2,15 @@ package com.fbartnitzek.tasteemall.addentry;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.core.widget.NestedScrollView;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -44,13 +25,33 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import com.fbartnitzek.tasteemall.CustomApplication;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.DatabaseHelper;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
-import com.fbartnitzek.tasteemall.location.GeocodeIntentService;
+import com.fbartnitzek.tasteemall.location.AddressData;
+import com.fbartnitzek.tasteemall.location.GeocodeWorker;
 import com.fbartnitzek.tasteemall.parcelable.LocationParcelable;
 import com.fbartnitzek.tasteemall.tasks.InsertEntryTask;
 import com.fbartnitzek.tasteemall.tasks.InsertLocationTask;
@@ -69,13 +70,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,7 +90,8 @@ public class AddReviewFragment extends Fragment implements
         View.OnClickListener, QueryDrinkTask.QueryDrinkFoundHandler,
         LoaderManager.LoaderCallbacks<Cursor>,
         QueryAndInsertUserTask.UserCreatedHandler, ValidateUserTask.ValidateUserHandler,
-        OnMapReadyCallback, QueryNearbyLocationsTask.QueryNearbyLocationHandler, InsertLocationTask.InsertLocationHandler, QueryLocationTask.QueryLocationFoundHandler {
+        OnMapReadyCallback, QueryNearbyLocationsTask.QueryNearbyLocationHandler,
+        InsertLocationTask.InsertLocationHandler, QueryLocationTask.QueryLocationFoundHandler {
 
     private static final String LOG_TAG = AddReviewFragment.class.getName();
     private static final String STATE_CONTENT_URI = "STATE_ADD_REVIEW_CONTENT_URI";
@@ -98,23 +105,23 @@ public class AddReviewFragment extends Fragment implements
     private static final String STATE_USER_ID = "STATE_ADD_REVIEW_USER_ID";
     private static final String STATE_REVIEW_READABLE_DATE = "STATE_ADD_REVIEW_READABLE_DATE";
     private static final String STATE_REVIEW_LOCATION = "STATE_ADD_REVIEW_LOCATION";
-    private static final String STATE_GEOCODING_DONE = "STATE_GEOCODING_DONE";
-    private static final String STATE_GEOCODING_RUNNING = "STATE_GEOCODING_RUNNING";
 
     private static final int DRINK_ACTIVITY_REQUEST_CODE = 999;
     private static final int EDIT_REVIEW_LOADER_ID = 57892;
     private static final int REQUEST_LOCATION_PERMISSION_CODE = 43923;
     private static final int LOCATION_ACTIVITY_REQUEST_CODE = 2356;
-    private View mRootView;
 
-    private static AutoCompleteTextView mEditCompletionDrinkName;
-    private static AutoCompleteTextView mEditCompletionUserName;
-    private static LocationAutoCompleteTextView mEditReviewLocation;
-    private static Spinner mSpinnerRating;
-    private static EditText mEditReviewDescription;
-    private static EditText mEditReviewRecommendedSides;
-    private static EditText mEditReviewReadableDate;
-    private static EditText mEditReviewLocationDescription;
+    private View mRootView;
+    private AutoCompleteTextView mEditCompletionDrinkName;
+    private AutoCompleteTextView mEditCompletionUserName;
+    private LocationAutoCompleteTextView mEditReviewLocation;
+    private Spinner mSpinnerRating;
+    private EditText mEditReviewDescription;
+    private EditText mEditReviewRecommendedSides;
+    private EditText mEditReviewReadableDate;
+    private EditText mEditReviewLocationDescription;
+    private static GoogleMap mMap;
+    private SupportMapFragment mMapFragment;
 
     private String mDrinkName;
     private String mProducerName;
@@ -128,24 +135,15 @@ public class AddReviewFragment extends Fragment implements
     private CompletionLocationAdapter mLocationAdapter;
 
     private int mRatingPosition;
-    private int mReview_Id;
-//    private String mCurrentLocation;
     private Location mLastLocation;
-    private AddressResultReceiver mResultReceiver;
-//    private boolean mGeocodingDone = false;
-//    private boolean mGeocodingRunning = false;
     private boolean mEditValuesLoaded = false;
-    private static GoogleMap mMap;
-    private SupportMapFragment mMapFragment;
     private Marker mCurrentMarker = null;
     private LocationParcelable mLocationParcelable;
     private String mLocationInput;
     private LocationParcelable mProducerLocationParcelable;
     private boolean mEditReviewLocationIgnoreTextChange = false;
 
-    // TODO: pagify whole add sequence!
-
-    private SlideDateTimeListener listener = new SlideDateTimeListener() {
+    private final SlideDateTimeListener listener = new SlideDateTimeListener() {
         @Override
         public void onDateTimeSet(Date date) {
             Log.v(LOG_TAG, "onDateTimeSet, hashCode=" + this.hashCode() + ", " + "date = [" + date + "]");
@@ -155,8 +153,36 @@ public class AddReviewFragment extends Fragment implements
         }
     };
 
-    public AddReviewFragment() {
-        // Required empty public constructor
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
+        outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
+        outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString().trim());
+        outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString().trim());
+        outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
+        outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
+
+        if (mDrinkId != null) {
+            outState.putString(STATE_DRINK_ID, mDrinkId);
+            outState.putString(STATE_DRINK_NAME, mDrinkName);
+            outState.putString(STATE_PRODUCER_NAME, mProducerName);
+        } else {
+            outState.putString(STATE_DRINK_NAME, mEditCompletionDrinkName.getText().toString().trim());
+        }
+
+        if (mUserId != null) {
+            outState.putString(STATE_USER_ID, mUserId);
+            outState.putString(STATE_USER_NAME, mUserName);
+        } else {
+            outState.putString(STATE_USER_NAME, mEditCompletionUserName.getText().toString().trim());
+        }
+
+        if (mContentUri != null) {
+            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -165,12 +191,9 @@ public class AddReviewFragment extends Fragment implements
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_CONTENT_URI)) {
             mContentUri = savedInstanceState.getParcelable(STATE_CONTENT_URI);
-            // TODO: next 2 lines correct?
-//            mGeocodingDone = savedInstanceState.getBoolean(STATE_GEOCODING_DONE, false);
-//            mGeocodingRunning = savedInstanceState.getBoolean(STATE_GEOCODING_RUNNING, false);
         }
         setRetainInstance(true);
-        mResultReceiver = new AddressResultReceiver(new Handler());
+
         super.onCreate(savedInstanceState);
         if (mContentUri == null) {
             getCurrentLocation();  //TODO: maybe in onCreateView better...
@@ -195,8 +218,8 @@ public class AddReviewFragment extends Fragment implements
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         mRootView = inflater.inflate(R.layout.fragment_add_review, container, false);
 
-        mEditCompletionDrinkName = (AutoCompleteTextView) mRootView.findViewById(R.id.drink_name);
-        mEditCompletionUserName = (AutoCompleteTextView) mRootView.findViewById(R.id.review_user_name);
+        mEditCompletionDrinkName = mRootView.findViewById(R.id.drink_name);
+        mEditCompletionUserName = mRootView.findViewById(R.id.review_user_name);
 
         createToolbar();
 
@@ -204,7 +227,6 @@ public class AddReviewFragment extends Fragment implements
             if (savedInstanceState.containsKey(STATE_DRINK_NAME)) {   //just typed some letters
                 mDrinkName = savedInstanceState.getString(STATE_DRINK_NAME);
                 mEditCompletionDrinkName.setText(mDrinkName);
-//                mEditCompletionDrinkName.dismissDropDown();   //TODO: needed?
             }
             if (savedInstanceState.containsKey(STATE_DRINK_ID)) {    //found drink
                 mDrinkId = savedInstanceState.getString(STATE_DRINK_ID);
@@ -240,23 +262,18 @@ public class AddReviewFragment extends Fragment implements
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mEditCompletionDrinkName.setTransitionName(getString(R.string.shared_transition_add_drink_name));
-        }
+        mEditCompletionDrinkName.setTransitionName(getString(R.string.shared_transition_add_drink_name));
 
         if (savedInstanceState == null || !savedInstanceState.containsKey(STATE_USER_NAME)) {
             mEditCompletionUserName.setText(Utils.getUserNameFromSharedPrefs(getActivity()));
         }
         CompletionUserAdapter completionUserAdapter = new CompletionUserAdapter(getActivity());
         mEditCompletionUserName.setAdapter(completionUserAdapter);
-        mEditCompletionUserName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor c = (Cursor) parent.getItemAtPosition(position);
+        mEditCompletionUserName.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor c = (Cursor) parent.getItemAtPosition(position);
 
-                mUserName = c.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_NAME);
-                mUserId = c.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_ID);
-            }
+            mUserName = c.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_NAME);
+            mUserId = c.getString(QueryColumns.ReviewFragment.UserQuery.COL_USER_ID);
         });
 
         mRootView.findViewById(R.id.add_drink_button).setOnClickListener(this);
@@ -264,11 +281,11 @@ public class AddReviewFragment extends Fragment implements
         mRootView.findViewById(R.id.search_review_location_button).setOnClickListener(this);
         mRootView.findViewById(R.id.help_review_rating_button).setOnClickListener(this);
 
-        mSpinnerRating = (Spinner) mRootView.findViewById(R.id.review_rating);
-
+        mSpinnerRating = mRootView.findViewById(R.id.review_rating);
 
         // try later: http://stackoverflow.com/questions/867518/how-to-make-an-android-spinner-with-initial-text-select-one
-        String[] reviewRatings = getActivity().getResources().getStringArray(R.array.pref_rating_values);
+        String[] reviewRatings = Objects.requireNonNull(getActivity()).getResources()
+                .getStringArray(R.array.pref_rating_values);
         mRatingAdapter = new CustomSpinnerAdapter(getActivity(),
                 new ArrayList<>(Arrays.asList(reviewRatings)), R.layout.spinner_small_row,
                 R.string.a11y_review_rating);
@@ -288,50 +305,40 @@ public class AddReviewFragment extends Fragment implements
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
         // might be buggy...
         mSpinnerRating.setOnTouchListener(new OnTouchHideKeyboardListener(this));
 
-
         // restore usual fields
-        mEditReviewDescription = (EditText) mRootView.findViewById(R.id.review_description);
-        mEditReviewRecommendedSides = (EditText) mRootView.findViewById(R.id.review_recommended_sides);
+        mEditReviewDescription = mRootView.findViewById(R.id.review_description);
+        mEditReviewRecommendedSides = mRootView.findViewById(R.id.review_recommended_sides);
         if (savedInstanceState != null) {
             mEditReviewDescription.setText(savedInstanceState.getString(STATE_REVIEW_DESCRIPTION));
             mEditReviewRecommendedSides.setText(savedInstanceState.getString(STATE_REVIEW_RECOMMENDED_SIDES));
         }
 
-        // TODO: onClick some dateAndTime-picker
-        // that seems to be the best option, but no ext lib - so: later :-p
-        // https://github.com/jjobes/SlideDateTimePicker
-        mEditReviewReadableDate = (EditText) mRootView.findViewById(R.id.review_readable_date);
+        mEditReviewReadableDate = mRootView.findViewById(R.id.review_readable_date);
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_READABLE_DATE)) {
             mEditReviewReadableDate.setText(savedInstanceState.getString(STATE_REVIEW_READABLE_DATE));
         } else if (!mEditValuesLoaded){ // TODO: needed variable
             mEditReviewReadableDate.setText(Utils.getCurrentLocalIso8601Time());
         }
 
-        mEditReviewReadableDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Date date;
-                if (mEditReviewReadableDate.getText() != null) {
-                    date = Utils.getDate(mEditReviewReadableDate.getText().toString());
-                } else {
-                    date = new Date();
-                }
-                new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
-                        .setListener(listener)
-                        .setInitialDate(date)
-                        .setIs24HourTime(true)
-                        //.setTheme(SlideDateTimePicker.HOLO_DARK)
-                        //.setIndicatorColor(Color.parseColor("#990000"))
-                        .build()
-                        .show();
+        mEditReviewReadableDate.setOnClickListener(view -> {
+            Date date;
+            if (mEditReviewReadableDate.getText() != null) {
+                date = Utils.getDate(mEditReviewReadableDate.getText().toString());
+            } else {
+                date = new Date();
             }
+            new SlideDateTimePicker.Builder(getActivity().getSupportFragmentManager())
+                    .setListener(listener)
+                    .setInitialDate(date)
+                    .setIs24HourTime(true)
+                    .build()
+                    .show();
         });
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -343,11 +350,11 @@ public class AddReviewFragment extends Fragment implements
             mMapFragment.getMapAsync(this);
         }
 
-        mEditReviewLocation = (LocationAutoCompleteTextView) mRootView.findViewById(R.id.review_location);
+        mEditReviewLocation = mRootView.findViewById(R.id.review_location);
         mLocationAdapter = new CompletionLocationAdapter(getActivity(), false);
         mEditReviewLocation.setThreshold(1);
         mEditReviewLocation.setAdapter(mLocationAdapter);
-        mEditReviewLocationDescription = (EditText) mRootView.findViewById(R.id.review_location_description);
+        mEditReviewLocationDescription = mRootView.findViewById(R.id.review_location_description);
 
         mEditReviewLocation.addTextChangedListener(new TextWatcher() {
             @Override
@@ -366,36 +373,25 @@ public class AddReviewFragment extends Fragment implements
                     mLocationId = null;
                     mLocationParcelable = null;
                 }
-
             }
         });
 
-        mEditReviewLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mEditReviewLocation.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor c = (Cursor) parent.getItemAtPosition(position);
+            mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
+            Log.v(LOG_TAG, "onItemClick Cursor with locationId=" + mLocationId);
 
-                Cursor c = (Cursor) parent.getItemAtPosition(position);
-                mLocationId = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_ID);
-                Log.v(LOG_TAG, "onItemClick Cursor with locationId=" + mLocationId);
-
-                if (mEditReviewLocationDescription.getText().toString().isEmpty()) {
-                    String description = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_DESCRIPTION);
-                    if (description != null && !description.isEmpty()) {
-                        mEditReviewLocationDescription.setText(description);
-                        mEditReviewLocationDescription.setEnabled(false);
-                    }
+            if (mEditReviewLocationDescription.getText().toString().isEmpty()) {
+                String description = c.getString(QueryColumns.LocationPart.CompletionQuery.COL_DESCRIPTION);
+                if (description != null && !description.isEmpty()) {
+                    mEditReviewLocationDescription.setText(description);
+                    mEditReviewLocationDescription.setEnabled(false);
                 }
-
             }
         });
-
-
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_REVIEW_LOCATION)) {
             editReviewLocationIgnoreTextChange(savedInstanceState.getString(STATE_REVIEW_LOCATION));
-
-        } else if (!mEditValuesLoaded){ // TODO??
-//            updateLocation();
         }
 
         if (mContentUri == null) {
@@ -419,51 +415,19 @@ public class AddReviewFragment extends Fragment implements
     public void onResume() {
         if (mContentUri != null) {
             Log.v(LOG_TAG, "onResume with contentUri - edit, hashCode=" + this.hashCode() + ", " + "");
-            getLoaderManager().initLoader(EDIT_REVIEW_LOADER_ID, null, this);
+            LoaderManager.getInstance(this).initLoader(EDIT_REVIEW_LOADER_ID, null, this);
         } else {
             Log.v(LOG_TAG, "onResume without contentUri - add, hashCode=" + this.hashCode() + ", " + "");
         }
         super.onResume();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-//        Log.v(LOG_TAG, "onSaveInstanceState, hashCode=" + this.hashCode() + ", " + "outState = [" + outState + "]");
-        outState.putInt(STATE_REVIEW_RATING_POSITION, mRatingPosition); //rating
-        outState.putString(STATE_REVIEW_DESCRIPTION, mEditReviewDescription.getText().toString().trim());
-        outState.putString(STATE_REVIEW_RECOMMENDED_SIDES, mEditReviewRecommendedSides.getText().toString().trim());
-        outState.putString(STATE_REVIEW_READABLE_DATE, mEditReviewReadableDate.getText().toString().trim());
-        outState.putString(STATE_REVIEW_LOCATION, mEditReviewLocation.getText().toString().trim());
-//        outState.putBoolean(STATE_GEOCODING_DONE, mGeocodingDone);
-//        outState.putBoolean(STATE_GEOCODING_RUNNING, mGeocodingRunning);
-
-        if (mDrinkId != null) {
-            outState.putString(STATE_DRINK_ID, mDrinkId);
-            outState.putString(STATE_DRINK_NAME, mDrinkName);
-            outState.putString(STATE_PRODUCER_NAME, mProducerName);
-        } else {
-            outState.putString(STATE_DRINK_NAME, mEditCompletionDrinkName.getText().toString().trim());
-        }
-
-        if (mUserId != null) {
-            outState.putString(STATE_USER_ID, mUserId);
-            outState.putString(STATE_USER_NAME, mUserName);
-        } else {
-            outState.putString(STATE_USER_NAME, mEditCompletionUserName.getText().toString().trim());
-        }
-
-        if (mContentUri != null) {
-            outState.putParcelable(STATE_CONTENT_URI, mContentUri);
-        }
-
-        super.onSaveInstanceState(outState);
-    }
 
     private void createToolbar() {
-        Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
         if (toolbar != null) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
-            activity.setSupportActionBar(toolbar);
+            Objects.requireNonNull(activity).setSupportActionBar(toolbar);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar == null) {
                 Log.e(LOG_TAG, "createToolbar - no actionbar found..., hashCode=" + this.hashCode() + ", " + "");
@@ -495,7 +459,7 @@ public class AddReviewFragment extends Fragment implements
     private void updateToolbar() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
-        if (activity.getSupportActionBar() != null) {
+        if (Objects.requireNonNull(activity).getSupportActionBar() != null) {
             if (mContentUri != null) {  // edit
                 ((TextView) mRootView.findViewById(R.id.action_bar_title)).setText(
                         getString(R.string.title_edit_review_activity,
@@ -537,17 +501,10 @@ public class AddReviewFragment extends Fragment implements
 
         if (mDrinkId == null || mDrinkName == null) {
             Snackbar.make(mRootView, R.string.msg_choose_existing_drink, Snackbar.LENGTH_SHORT).show();
-            return;
         } else if (getString(R.string.pre_filled_rating).equals(mSpinnerRating.getSelectedItem().toString())) {
             Snackbar.make(mRootView, R.string.msg_rate_drink, Snackbar.LENGTH_SHORT).show();
-            return;
         } else if (!Utils.checkTimeFormat(mEditReviewReadableDate.getText().toString().trim())) {
             Snackbar.make(mRootView, R.string.msg_invalid_review_date, Snackbar.LENGTH_SHORT).show();
-            return;
-            // review-location is optional - validate and warn later...
-//        } else if (!validateLocation()) {
-//            Snackbar.make(mRootView, R.string.msg_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
-//            return;
         } else {    //opt. async user check
             mUserName = mEditCompletionUserName.getText().toString();
             if (mUserName.length() < 1){
@@ -571,18 +528,11 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
         mUserId = userId;
-
         validateLocation();
     }
 
     private void validateLocation() {
         Log.v(LOG_TAG, "validateLocation, hashCode=" + this.hashCode() + ", " + "");
-//        return !mEditReviewLocation.getText().toString().startsWith(DatabaseContract.LocationEntry.GEOCODE_ME)
-//                || Utils.checkGeocodeAddressFormat(mEditReviewLocation.getText().toString());
-
-//            Snackbar.make(mRootView, R.string.msg_invalid_geocode_location, Snackbar.LENGTH_SHORT).show();
-
-        // TODO: valid location or insert location!
 
         // location validation
         // 1) real location with location id f.e. through nearby location -> fine
@@ -592,8 +542,6 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
         // 2) new location with valid latLng and no location nearby, geocoded or not -> fine
-        // TODO: still buggy? location with empty locationString was added in bayreuth => workaround added
-//        if (mLocationParcelable != null) {
         if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
             Log.v(LOG_TAG, "validateLocation with mLocationParcelable - geocode & new, hashCode=" + this.hashCode() + ", " + "");
 
@@ -607,58 +555,28 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
 
-        // 3) lastLocation exists, but geocoder not existing -> fine
-//        if (mLastLocation != null) {
-//            Log.v(LOG_TAG, "validateLocation with lastLocation - no geocode, hashCode=" + this.hashCode() + ", " + "");
-//            String input = Utils.getLocationInput(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//            new InsertLocationTask(getActivity(),
-//                    mRootView, mLocationInput, this).execute(
-//                    DatabaseHelper.buildLocationValues(
-//                            Utils.calcLocationId(input),
-//                            input, mLastLocation.getLatitude(),
-//                            mLastLocation.getLongitude(), "",
-//                            DatabaseContract.LocationEntry.GEOCODE_ME,
-//                            mEditReviewLocationDescription.getText().toString()));
-//            return;
-//        }
-
         // 4) no lastLocation (or resettet), and nothing found -> needs to search elsewhere...
         //  but: location is optional - so ask user if he want's
         // a) positive: search for location
         // b) negative: add location-input and geocode later
         // c) neutral:  ignore location and choose to not enter it for review (not recommended)
 
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // TODO: message from strings and 2 cases w/o add... (if ever happens...)
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setTitle("location unclear")
                 .setMessage("Do you want to SEARCH for the review-location, " +
                         "ADD a new locaction-stub based on your current input (and geocode it later) " +
                         "or IGNORE the review-location (not recommended)")
-                .setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        useAddLocation();   // WORKS!
-                    }
-                });
-        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {   // TODO: never happens?
-            builder.setNeutralButton("add", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    addLocation();  // WORKS!
-
-                }
+                .setPositiveButton("SEARCH", (dialog, which) -> startAddLocation());
+        if (mLocationParcelable != null && mLocationParcelable.isGeocodeable()) {
+            builder.setNeutralButton("add", (dialog, which) -> {
+                addLocation();  // WORKS!
             });
         }
 
-        builder.setNegativeButton("ignore", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mLocationId = null; // LEFT JOIN instead of INNER JOIN - WORKS!
-                insertReview();
-            }
+        builder.setNegativeButton("ignore", (dialog, which) -> {
+            mLocationId = null; // LEFT JOIN instead of INNER JOIN - WORKS!
+            insertReview();
         }).show();
-
     }
 
     private void addLocation() {
@@ -679,7 +597,6 @@ public class AddReviewFragment extends Fragment implements
         onLocationValidated();
     }
 
-
     private void onLocationValidated() {
         Log.v(LOG_TAG, "onLocationValidated, hashCode=" + this.hashCode() + ", " + "");
         if (mContentUri != null) {
@@ -688,7 +605,6 @@ public class AddReviewFragment extends Fragment implements
             insertReview();
         }
     }
-
 
     private void insertReview() {
         Log.v(LOG_TAG, "insertReview, hashCode=" + this.hashCode() + ", mLocationId=" + mLocationId);
@@ -716,19 +632,15 @@ public class AddReviewFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         Log.v(LOG_TAG, "onClick, hashCode=" + this.hashCode() + ", " + "v = [" + v + "]");
-        switch (v.getId()) {
-            case R.id.add_drink_button:
-                createDrink();
-                break;
-            case R.id.add_user_button:
-                validateNewUser();
-                break;
-            case R.id.search_review_location_button:
-                useAddLocation();
-                break;
-            case R.id.help_review_rating_button:
-                showHelp();
-                break;
+        int id = v.getId();
+        if (id == R.id.add_drink_button) {
+            createDrink();
+        } else if (id == R.id.add_user_button) {
+            validateNewUser();
+        } else if (id == R.id.search_review_location_button) {
+            startAddLocation();
+        } else if (id == R.id.help_review_rating_button) {
+            showHelp();
         }
     }
 
@@ -748,26 +660,18 @@ public class AddReviewFragment extends Fragment implements
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setMessage(getString(R.string.msg_add_new_user, userName))
                 .setCancelable(true)
                 .setPositiveButton(R.string.add_user_button,
-                    new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        createUser();
-                    }
-                }
+                        (dialog, which) -> createUser()
                 )
                 .setNegativeButton(R.string.do_not_add_button,
-                    new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), getString(R.string.msg_user_not_added,
-                                mEditCompletionUserName.getText().toString()), Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
+                        (dialog, which) -> Toast.makeText(getActivity(),
+                                getString(R.string.msg_user_not_added,
+                                mEditCompletionUserName.getText().toString()),
+                                Toast.LENGTH_SHORT).show()
+                );
         builder.show();
     }
 
@@ -791,15 +695,13 @@ public class AddReviewFragment extends Fragment implements
 
     private void createDrink() {
         Log.v(LOG_TAG, "createDrink, hashCode=" + this.hashCode() + ", " + "");
-        Bundle bundle = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // with shared element transition every transition is working ...
-            bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    getActivity(),
-                    mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
-            ).toBundle();
+        Bundle bundle;
+        // with shared element transition every transition is working ...
+        bundle = ActivityOptions.makeSceneTransitionAnimation(
+                getActivity(),
+                mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
+        ).toBundle();
 
-        }
         Intent intent = new Intent(getActivity(), AddDrinkActivity.class);
         intent.putExtra(AddDrinkActivity.PATTERN_EXTRA, mEditCompletionDrinkName.getText().toString().trim());
         startActivityForResult(intent, DRINK_ACTIVITY_REQUEST_CODE, bundle);
@@ -818,23 +720,12 @@ public class AddReviewFragment extends Fragment implements
         mEditCompletionDrinkName.dismissDropDown();
 
         updateToolbar();
-        // should be invoked on found after add and hopefully in completionHandler... TODO!!!
         queryNearbyProducer();
     }
 
 
-    // location via fragment handling
-
-    private void useAddLocation() {
-        Log.v(LOG_TAG, "useAddLocation, hashCode=" + this.hashCode() + ", " + "");
-//        Bundle bundle = null;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            // with shared element transition every transition is working ...
-//            bundle = ActivityOptions.makeSceneTransitionAnimation(
-//                    getActivity(),
-//                    mEditCompletionDrinkName, getString(R.string.shared_transition_add_drink_name)
-//            ).toBundle();
-//        }
+    private void startAddLocation() {
+        Log.v(LOG_TAG, "startAddLocation, hashCode=" + this.hashCode() + ", " + "");
         Intent intent = new Intent(getActivity(), AddLocationActivity.class);
         intent.putExtra(AddLocationActivity.LOCATION_INPUT_EXTRA, mEditReviewLocation.getText().toString().trim());
         intent.putExtra(AddLocationActivity.LOCATION_DESCRIPTION_EXTRA, mEditReviewLocationDescription.getText().toString().trim());
@@ -848,7 +739,6 @@ public class AddReviewFragment extends Fragment implements
         mLocationId = mLocationParcelable.getLocationId();
         editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
         mEditReviewLocation.dismissDropDown();
-//        if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null){
         if (mLocationParcelable.getDescription() != null && !mLocationParcelable.getDescription().isEmpty()){
             mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
             mEditReviewLocationDescription.setEnabled(false);
@@ -856,11 +746,9 @@ public class AddReviewFragment extends Fragment implements
     }
 
 
-    // GoogleApi-lastLocation
-
     private void getCurrentLocation() {
         Log.v(LOG_TAG, "getCurrentLocation, hashCode=" + this.hashCode() + ", " + "");
-        if (ActivityCompat.checkSelfPermission(getActivity(),
+        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -874,14 +762,14 @@ public class AddReviewFragment extends Fragment implements
         } else {
             Log.v(LOG_TAG, "getCurrentLocation - with permission");
         }
-        //        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (CustomApplication.isGoogleApiClientConnected()) {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(CustomApplication.getGoogleApiClient());
-            if (mLastLocation != null) {
-                queryNearbyProducer();
-//                startGeocodeServiceByPosition();
-                return;
-            }
+            LocationServices.getFusedLocationProviderClient(getActivity())
+                    .getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        mLastLocation = location;
+                        queryNearbyProducer();
+                    });
+            return;
         } else {
             Log.e(LOG_TAG, "getCurrentLocation - googleApiClient not connected!, hashCode=" + this.hashCode() + ", " + "");
         }
@@ -900,7 +788,6 @@ public class AddReviewFragment extends Fragment implements
                             < DatabaseContract.LocationEntry.DISTANCE_SQUARE_THRESHOLD){
                         Log.v(LOG_TAG, "queryNearbyProducer - at producer location, hashCode=" + this.hashCode() + ", " + "");
 
-                        // TODO: are both lines enough?
                         mLocationParcelable = mProducerLocationParcelable;
                         editReviewLocationIgnoreTextChange(mProducerLocationParcelable.getFormattedAddress());
 
@@ -919,7 +806,6 @@ public class AddReviewFragment extends Fragment implements
             } else {
                 // no need to check if mLastLocation failed or not yet ready - should always be ready...
                 // so no latLong - missing permissions
-                // TODO: something to show only once...?
                 Toast.makeText(AddReviewFragment.this.getActivity(), R.string.msg_no_location_provided, Toast.LENGTH_SHORT).show();
             }
         } else {    // else: ignore (not valid without a drink)
@@ -927,24 +813,11 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-    // successfully tested:
-    //      - states: inputText | inputLocation | geocoded (T|L|G)
-    //      producer    review  result
-    //         T            T
-    //         T            L
-    //         T            G   works
-    //         L            T
-    //         L            L
-    //         L            G
-    //         G            T
-    //         G            L
-    //         G            G
-
-    // TODO: test no nearby found - add new (geocoder / gps / nothing)
 
     @Override
     public void onNearbyLocationsFound(LocationParcelable[] locations) {
-        Log.v(LOG_TAG, "onNearbyLocationsFound, hashCode=" + this.hashCode() + ", " + "locations = [" + locations + "]");
+        Log.v(LOG_TAG, "onNearbyLocationsFound, hashCode=" + this.hashCode() + ", " + "locations = ["
+                + Arrays.toString(locations) + "]");
 
         MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
         for (LocationParcelable location : locations) {
@@ -970,15 +843,13 @@ public class AddReviewFragment extends Fragment implements
             mLocationParcelable = locations[0];
             Log.v(LOG_TAG, "onNearbyLocationsFound, hashCode=" + this.hashCode() + ", " + "location = [" + mLocationParcelable + "]");
             editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//            mEditReviewLocationIgnoreTextChange = true;
-//            mEditReviewLocation.setText(mLocationParcelable.getFormattedAddress());
             if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null) {
                 mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
             }
             mLocationId = mLocationParcelable.getLocationId();
             showMap();
             updateAndMoveToMarker();
-        } else if (locations.length > 1){    // more than one
+        } else if (locations.length > 1){
             mEditReviewLocation.setShowDropDown(true);
         }
     }
@@ -987,170 +858,99 @@ public class AddReviewFragment extends Fragment implements
     public void onNearbyLocationNotFound() {   // a.k.a. new location
         Log.v(LOG_TAG, "onNearbyLocationNotFound, mLastLocation=" + mLastLocation);
         if (mLastLocation != null) {
-            startGeocodeServiceByPosition();
+//            startGeocodeServiceByPosition();
+            startGeocodeWorker();
         }
     }
 
-
-    // init-order:
-    // ) getCurrentLocation worked?
-    // .Y) isProducerLocationNearby?
-    //   .Y) use it and producerName as description
-    //   .N) getNearbyLocations?
-    //     .Y) use other location and show in map => on change behave ... different :-p
-    //     .N) store mLastLoc for saving
-    // .N) let empty
-
-    // onChange
-    // searchLocationFormattedAndDescriptionWithPattern
-    // found: list
-    //  selected: show in map
-    // not in list/not found: TODO: Find/AddLocationActivity... (not that often) - adds onSave like Drink
-
-
     // Geocoder
 
-    private void startGeocodeServiceByPosition() {    // should not be called with an address string - extra activity
-        Log.v(LOG_TAG, "startGeocodeServiceByPosition, hashCode=" + this.hashCode() + ", " + "");
-//        if (mGeocodingDone || mGeocodingRunning) {
-//            Log.v(LOG_TAG, "startGeocodeServiceByPosition, geocoding already done");
-//            return;
-//        }
+    private void startGeocodeWorker() {
+        Log.v(LOG_TAG, "startGeocodeWorker, hashCode=" + this.hashCode() + ", " + "");
 
-        if (Utils.isNetworkUnavailable(getActivity())) {
-            // TODO: should be the matching bugfix 1
+        if (Utils.isNetworkUnavailable(Objects.requireNonNull(getActivity()))) {
             if (mLastLocation != null) {
                 Log.v(LOG_TAG, "startGeocodeServiceByPosition - TODO: call geocoder later..., hashCode=" + this.hashCode() + ", " + "");
                 mLocationParcelable = Utils.getLocationStubFromLastLocation(
                         mLastLocation, mEditReviewLocationDescription.getText().toString());
                 editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
             }
-
             Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-            return;
-        }
 
-        if (mResultReceiver == null) {
-            Log.e(LOG_TAG, "startGeocodeServiceByPosition - no resultReceiver found!, hashCode=" + this.hashCode() + ", " + "");
-            return;
+        } else {
+
+            OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(GeocodeWorker.class)
+                    .setInputData(
+                            new Data.Builder()
+                                    .putDouble(GeocodeWorker.INPUT_LATITUDE, mLastLocation.getLatitude())
+                                    .putDouble(GeocodeWorker.INPUT_LONGITUDE, mLastLocation.getLongitude())
+                                    .build())
+                    .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .build();
+            WorkManager.getInstance(Objects.requireNonNull(getContext()))
+                    .enqueueUniqueWork("ARF_GW", ExistingWorkPolicy.REPLACE, workRequest);
+            WorkManager.getInstance(getContext())
+                    .getWorkInfoByIdLiveData(workRequest.getId())
+                    .observe(getViewLifecycleOwner(), info -> {
+                        if (info != null && info.getState().isFinished()) {
+                            if (info.getState() == WorkInfo.State.SUCCEEDED) {
+                                Data outData = info.getOutputData();
+                                Log.d(LOG_TAG, "worker finished with "
+                                        + outData.getKeyValueMap().size()
+                                        + " results");
+                                if (outData.getKeyValueMap().size() > 4) {
+                                    updateAddressFromWorkerOutput(outData);
+                                }
+                            } else {
+                                if (info.getOutputData().getInt(GeocodeWorker.OUTPUT_ERROR_ID, -1) == GeocodeWorker.OUTPUT_ERROR_ID_SERVICE_NA){
+                                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
+                                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
+                                }
+                                Toast.makeText(getActivity(),
+                                        "GeocodeJob Failed: " + info.getOutputData().getString(GeocodeWorker.OUTPUT_ERROR),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
         }
-        Intent intent = new Intent(this.getActivity(), GeocodeIntentService.class);
-        intent.putExtra(GeocodeIntentService.RECEIVER, mResultReceiver);
-        intent.putExtra(GeocodeIntentService.EXTRA_LOCATION_LATLNG, mLastLocation);
-        getActivity().startService(intent);
-//        mGeocodingRunning = true;
     }
 
+    private void updateAddressFromWorkerOutput(Data outData) {
+        String origInput = outData.getString(GeocodeWorker.ORIG_INPUT);
+        String country = outData.getString("0" + GeocodeWorker.COUNTRY);
+        String countryCode = outData.getString("0" + GeocodeWorker.COUNTRY_CODE);
+        String formatted = outData.getString("0" + GeocodeWorker.FORMATTED);
+        double latitude = outData.getDouble("0" + GeocodeWorker.LATITUDE, GeocodeWorker.ILLEGAL_LAT_LONG);
+        double longitude = outData.getDouble("0" + GeocodeWorker.LONGITUDE, GeocodeWorker.ILLEGAL_LAT_LONG);
 
+        AddressData tmpAddress = new AddressData(latitude, longitude, countryCode, country, formatted, origInput);
+        mLocationParcelable = Utils.getLocationFromAddressData(tmpAddress, "");
 
+        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
+        dataCursor.addRow(new Object[]{
+                LocationParcelable.INVALID_ID,
+                mLocationParcelable.getLocationId(),
+                mLocationParcelable.getInput(),
+                mLocationParcelable.getFormattedAddress(),
+                mLocationParcelable.getCountry(),
+                mLocationParcelable.getLatitude(),
+                mLocationParcelable.getLongitude(),
+                null}
+        );
 
-    @SuppressLint("ParcelCreator")
-    class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
+        mLocationAdapter.swapCursor(dataCursor);
+        mLocationAdapter.notifyDataSetChanged();
 
-        /**
-         *  Receives data sent from GeocodeIntentService and updates the UI in MainActivity.
-         */
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            Log.v(LOG_TAG, "onReceiveResult, hashCode=" + this.hashCode() + ", " + "resultCode = [" + resultCode + "], resultData = [" + resultData + "]");
-            // Display the address string or an error message sent from the intent service.
-//            mGeocodingDone = true;
-            if (getActivity() == null) {    // if changes happen while saving - ignore them...
-                return;
-            }
-            if (GeocodeIntentService.SUCCESS_RESULT == resultCode) {
-                if (resultData.containsKey(GeocodeIntentService.RESULT_ADDRESS_KEY)) {
+        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
 
-
-                    Address address = resultData.getParcelable(GeocodeIntentService.RESULT_ADDRESS_KEY);
-                    if (address == null) {
-                        Log.e(LOG_TAG, "onReceiveResult: address result = NULL!!!");
-                    } else {
-                        // store as locationParcelable - good enough
-//                        mLocationInput = Utils.getLocationInput(address.getLatitude(), address.getLongitude());
-//                        mCurrentLocation = Utils.formatAddress(address);
-                        // TODO: working?
-                        mLocationParcelable = Utils.getLocationFromAddress(address,
-                                Utils.getLocationInput(address.getLatitude(), address.getLongitude()),
-                                null);
-//                        mLocationAdapter.swapData(new LocationParcelable[]{mLocationParcelable});
-                        MatrixCursor dataCursor = new MatrixCursor(QueryColumns.LocationPart.CompletionQuery.COLUMNS);
-                        dataCursor.addRow(new Object[]{
-                                LocationParcelable.INVALID_ID,
-                                mLocationParcelable.getLocationId(),
-                                mLocationParcelable.getInput(),
-                                mLocationParcelable.getFormattedAddress(),
-                                mLocationParcelable.getCountry(),
-                                mLocationParcelable.getLatitude(),
-                                mLocationParcelable.getLongitude(),
-                                ""} //?
-                        );
-
-
-                        mLocationAdapter.swapCursor(dataCursor);
-                        mLocationAdapter.notifyDataSetChanged();
-                        editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-//                        mEditReviewLocationIgnoreTextChange = true;
-//                        mEditReviewLocation.setText(mLocationParcelable.getFormattedAddress());
-                        if (mEditReviewLocationDescription.getText().toString().isEmpty() && mLocationParcelable.getDescription() != null) {
-                            mEditReviewLocationDescription.setText(mLocationParcelable.getDescription());
-                        }
-
-                        showMap();
-                        updateAndMoveToMarker();
-                    }
-
-                } else {
-                    Log.e(LOG_TAG, "onReceiveResult - SUCCESS without address - should never happen...");
-                }
-
-            } else {  // somehow failed
-
-                if (Utils.isNetworkUnavailable(getActivity())) {
-                    Toast.makeText(getActivity(), R.string.msg_service_network_not_available, Toast.LENGTH_LONG).show();
-//                    mCurrentLocation = Utils.formatLocationForGeocoder(mLastLocation);
-                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-                } else if (GeocodeIntentService.FAILURE_SERVICE_NOT_AVAILABLE == resultCode) {
-                    Toast.makeText(getActivity(), R.string.msg_service_not_available, Toast.LENGTH_LONG).show();
-//                    mCurrentLocation = Utils.formatLocationForGeocoder(mLastLocation);
-                    mLocationParcelable = Utils.getLocationStubFromLastLocation(mLastLocation, null);
-                    editReviewLocationIgnoreTextChange(mLocationParcelable.getFormattedAddress());
-                } else {
-                    int toastRes;
-                    switch (resultCode) {
-                        // ignore that one - TODO: just show it for "complete search" - how to detect...?
-//                        case GeocodeIntentService.FAILURE_NO_RESULT_FOUND:
-//                            toastRes = R.string.msg_no_address_found;
-//                            break;
-                        case GeocodeIntentService.FAILURE_INVALID_LAT_LONG_USED:
-                            toastRes = R.string.msg_invalid_lat_long;
-                            break;
-                        case GeocodeIntentService.FAILURE_NO_LOCATION_DATA_PROVIDED:
-                            toastRes = R.string.msg_no_location_provided;
-                            break;
-                        default:
-                            toastRes = R.string.msg_no_location_generic;
-                    }
-
-                    Toast.makeText(getActivity(), toastRes, Toast.LENGTH_LONG).show();
-                    mEditReviewLocation.setText("");
-                }
-            }
-//            mGeocodingRunning = false;
-
-        }
+        showMap();
+        updateAndMoveToMarker();
     }
 
 
     // permissions
 
     private void handlePermission() {
-        // src: FilePickerFragment
-        // https://developer.android.com/training/permissions/requesting.html
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION_CODE);
     }
@@ -1171,7 +971,7 @@ public class AddReviewFragment extends Fragment implements
     // map parts
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NotNull GoogleMap googleMap) {
         mMap = googleMap;
         updateAndMoveToMarker();
     }
@@ -1189,22 +989,6 @@ public class AddReviewFragment extends Fragment implements
         }
     }
 
-    private void focusOnMap() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", " + "");
-
-                NestedScrollView scrollView = (NestedScrollView) getActivity().findViewById(R.id.nested_scrollView);
-                if (scrollView != null) {
-                    Log.v(LOG_TAG, "focusOnMap-run, hashCode=" + this.hashCode() + ", position=" + scrollView.getBottom() + "");
-                    scrollView.smoothScrollTo(0, scrollView.getBottom());
-                } else {
-                    Log.v(LOG_TAG, "focusOnMap-run, scrollView == null");
-                }
-            }
-        });
-    }
 
     private void updateAndMoveToMarker() {
         if (mMap != null && mLocationParcelable != null) {
@@ -1217,94 +1001,91 @@ public class AddReviewFragment extends Fragment implements
                     .title(mLocationParcelable.getCountry())
                     .snippet(mLocationParcelable.getFormattedAddress())
                     .draggable(false));
-            mMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            mMap.animateCamera(
+                    CameraUpdateFactory
+                            .newCameraPosition(new CameraPosition.Builder()
+                                    .target(latLng)
+                                    .zoom(9)
+                                    .build()),
+                    2000, null);
         }
     }
 
 
     // edit - use loaders
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
-        switch (id) {
-            case EDIT_REVIEW_LOADER_ID:
-                if (mContentUri != null) {
-                    return new CursorLoader(
-                            getActivity(),
-                            mContentUri,
-                            QueryColumns.ReviewFragment.EditQuery.COLUMNS,
-                            null,
-                            null,
-                            null
-                    );
-                }
+        if (id == EDIT_REVIEW_LOADER_ID) {
+            if (mContentUri != null) {
+                return new CursorLoader(
+                        Objects.requireNonNull(getActivity()),
+                        mContentUri,
+                        QueryColumns.ReviewFragment.EditQuery.COLUMNS,
+                        null,
+                        null,
+                        null
+                );
+            }
         }
         return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case EDIT_REVIEW_LOADER_ID:
-                if (data != null && data.moveToFirst()) {
+        if (loader.getId() == EDIT_REVIEW_LOADER_ID) {
+            if (data != null && data.moveToFirst()) {
 
-                    mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
-                    mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
-                    // animation might work with separate textView in toolbar...
-                    mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
+                int mReview_Id = data.getInt(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW__ID);
+                mReviewId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_ID);
+                // animation might work with separate textView in toolbar...
+                mProducerName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_PRODUCER_NAME);
 
-                    mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
-                    mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
+                mDrinkName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_NAME);
+                mDrinkId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_ID);
 
-                    mUserName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_NAME);
-                    mUserId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_ID);
+                mUserName = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_NAME);
+                mUserId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_USER_ID);
 
-                    mLocationId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_ID);
+                mLocationId = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_ID);
 
-                    // later for a matching icon...
-//                    String drinkType = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_DRINK_TYPE);
-                    String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
+                String reviewDesc = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_DESCRIPTION);
 
-                    String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
-                    String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
+                String rating = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RATING);
+                String readableDate = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_READABLE_DATE);
 
-                    String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
+                String recommendedSides = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_RECOMMENDED_SIDES);
 
-                    String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_FORMATTED);
-                    String locationDescription = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_DESCRIPTION);
+                String location = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_FORMATTED);
+                String locationDescription = data.getString(QueryColumns.ReviewFragment.EditQuery.COL_REVIEW_LOCATION_DESCRIPTION);
 
-                    mEditCompletionDrinkName.setText(mDrinkName);
-                    mEditCompletionDrinkName.dismissDropDown();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        mEditCompletionDrinkName.setTransitionName(
-                                getString(R.string.shared_transition_review_drink) + mReview_Id);
-                    }
+                mEditCompletionDrinkName.setText(mDrinkName);
+                mEditCompletionDrinkName.dismissDropDown();
+                mEditCompletionDrinkName.setTransitionName(
+                        getString(R.string.shared_transition_review_drink) + mReview_Id);
 
-                    mEditCompletionUserName.setText(mUserName);
-                    mEditCompletionUserName.dismissDropDown();
+                mEditCompletionUserName.setText(mUserName);
+                mEditCompletionUserName.dismissDropDown();
 
-                    mRatingPosition = mRatingAdapter.getPosition(rating);
-                    setSpinner();
-                    mEditReviewDescription.setText(reviewDesc);
-                    mEditReviewRecommendedSides.setText(recommendedSides);
+                mRatingPosition = mRatingAdapter.getPosition(rating);
+                setSpinner();
+                mEditReviewDescription.setText(reviewDesc);
+                mEditReviewRecommendedSides.setText(recommendedSides);
 
-                    mEditReviewReadableDate.setText(readableDate);
-                    editReviewLocationIgnoreTextChange(location);
-//                    mEditReviewLocationIgnoreTextChange = true;
-//                    mEditReviewLocation.setText(location);
-                    mEditReviewLocation.dismissDropDown();
-                    mEditReviewLocationDescription.setText(locationDescription);
-                    mEditValuesLoaded = true;
-                    updateToolbar();
+                mEditReviewReadableDate.setText(readableDate);
+                editReviewLocationIgnoreTextChange(location);
 
-                    resumeActivityEnterTransition();    // from edit
-                }
-                break;
-            default:
-                Log.w(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
+                mEditReviewLocation.dismissDropDown();
+                mEditReviewLocationDescription.setText(locationDescription);
+                mEditValuesLoaded = true;
+                updateToolbar();
+
+                resumeActivityEnterTransition();    // from edit
+            }
+        } else {
+            Log.w(LOG_TAG, "onLoadFinished - other loader?, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         }
     }
 
@@ -1314,7 +1095,7 @@ public class AddReviewFragment extends Fragment implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
         // nothing
     }
 
@@ -1322,11 +1103,8 @@ public class AddReviewFragment extends Fragment implements
     private void resumeActivityEnterTransition() {
         Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ((AddReviewActivity) getActivity()).scheduleStartPostponedTransition(mEditReviewReadableDate);
-        }
+        ((AddReviewActivity) Objects.requireNonNull(getActivity())).scheduleStartPostponedTransition(mEditReviewReadableDate);
     }
-
 
     // save for edit
 
@@ -1340,7 +1118,6 @@ public class AddReviewFragment extends Fragment implements
                         mEditReviewReadableDate.getText().toString().trim(),
                         mEditReviewRecommendedSides.getText().toString().trim(),
                         mDrinkId,
-//                        mEditReviewLocation.getText().toString().trim(),
                         mLocationId,
                         mUserId));
     }

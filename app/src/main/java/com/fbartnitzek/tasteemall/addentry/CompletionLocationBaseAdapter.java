@@ -39,7 +39,7 @@ public abstract class CompletionLocationBaseAdapter extends CursorAdapter implem
     private static final String LOG_TAG = CompletionLocationBaseAdapter.class.getName();
 
     public CompletionLocationBaseAdapter(Activity mActivity) {
-        super(mActivity, null, 0);  //autorequery???
+        super(mActivity, null, 0);  //auto re-query???
         this.mActivity = mActivity;
     }
 
@@ -82,9 +82,8 @@ public abstract class CompletionLocationBaseAdapter extends CursorAdapter implem
     @Override
     public CharSequence convertToString(Cursor cursor) {
 
-        CharSequence result = cursorToString(cursor);
-//        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", result=" + result + "cursor = [" + cursor + "]");
-        return result;
+        //        Log.v(LOG_TAG, "convertToString, hashCode=" + this.hashCode() + ", result=" + result + "cursor = [" + cursor + "]");
+        return cursorToString(cursor);
     }
 
     public abstract Uri buildUri(String constraint);
@@ -107,8 +106,8 @@ public abstract class CompletionLocationBaseAdapter extends CursorAdapter implem
         final TextView locationView;
         final TextView descriptionView;
         ViewHolder(View view) {
-            this.locationView = (TextView) view.findViewById(R.id.list_item_location);
-            this.descriptionView = (TextView) view.findViewById(R.id.list_item_location_description);
+            this.locationView = view.findViewById(R.id.list_item_location);
+            this.descriptionView = view.findViewById(R.id.list_item_location_description);
         }
     }
 

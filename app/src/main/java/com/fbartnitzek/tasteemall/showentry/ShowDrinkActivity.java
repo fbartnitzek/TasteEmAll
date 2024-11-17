@@ -3,13 +3,10 @@ package com.fbartnitzek.tasteemall.showentry;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -17,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
@@ -81,16 +81,16 @@ public class ShowDrinkActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_edit:
-                startEditActivity();
-                return true;
-            case R.id.action_delete:
-                startDelete();
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_edit) {
+            startEditActivity();
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            startDelete();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -104,28 +104,20 @@ public class ShowDrinkActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 R.string.delete_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri deleteUri = Utils.calcSingleDrinkUri(mContentUri);
-                        // TODO: check for foreign keys ... generic seems unlikely...?
+                (dialog, which) -> {
+                    Uri deleteUri = Utils.calcSingleDrinkUri(mContentUri);
+                    // TODO: check for foreign keys ... generic seems unlikely...?
 //                        int id = DatabaseContract.getIdFromUri(deleteUri);
 //                        Uri checkUri = DatabaseContract.ReviewEntry.buildUriWithDrinkId(id);
-                        new DeleteEntryTask(
-                                ShowDrinkActivity.this,
-                                DatabaseContract.DrinkEntry.TABLE_NAME + "." + Drink.NAME)
-                                .execute(deleteUri);
-                    }
+                    new DeleteEntryTask(
+                            ShowDrinkActivity.this,
+                            DatabaseContract.DrinkEntry.TABLE_NAME + "." + Drink.NAME)
+                            .execute(deleteUri);
                 }
         );
         builder.setNegativeButton(
                 R.string.keep_button,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(ShowDrinkActivity.this, "keeping entry", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                (dialog, which) -> Toast.makeText(ShowDrinkActivity.this, "keeping entry", Toast.LENGTH_SHORT).show()
         );
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -135,34 +127,30 @@ public class ShowDrinkActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AddDrinkActivity.class);
         intent.setData(mContentUri);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            View rootView = findViewById(R.id.container_show_drink_fragment);
-            View drinkView = findViewById(R.id.drink_name);
-            View producerView = findViewById(R.id.producer_name);
-            int drink_Id = DatabaseContract.getIdFromUri(mContentUri);
+        //            View rootView = findViewById(R.id.container_show_drink_fragment);
+        View drinkView = findViewById(R.id.drink_name);
+        View producerView = findViewById(R.id.producer_name);
+        int drink_Id = DatabaseContract.getIdFromUri(mContentUri);
 
-            // Transitions only seem to work with shared element transitions working ...
-            // the other sometimes (really redeploy the app) work, but only on enter
+        // Transitions only seem to work with shared element transitions working ...
+        // the other sometimes (really redeploy the app) work, but only on enter
 //            Bundle bundle = ActivityOptions.makeScaleUpAnimation(
 //                    view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
 
-            // and the transitionsNames don't match, when used implicit:
-            // TODO: transitionName needs to be explicitly set - currently it returns anything ... - LATER
+        // and the transitionsNames don't match, when used implicit:
+        // TODO: transitionName needs to be explicitly set - currently it returns anything ... - LATER
 //            Log.v(LOG_TAG, "startEditActivity, ddd_explicit=" + getString(R.string.shared_transition_drink_drink) + drink_Id
 //                    + ", ddd_implicit=" + drinkView.getTransitionName());       // returns completely wrong strings...
 //            Log.v(LOG_TAG, "startEditActivity, dpd_explicit=" + getString(R.string.shared_transition_drink_producer) + drink_Id
 //                    + ", dpd_implicit=" + producerView.getTransitionName());    // returns completely wrong strings...
-            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                    this,
-                    new Pair<>(drinkView, //drinkView.getTransitionName()),
-                            getString(R.string.shared_transition_drink_drink) + drink_Id),
-                    new Pair<>(producerView, //producerView.getTransitionName())
-                            getString(R.string.shared_transition_drink_producer) + drink_Id)
-            ).toBundle();
-            startActivityForResult(intent, ShowDrinkActivity.EDIT_DRINK_REQUEST, bundle);
-        } else {
-            startActivityForResult(intent, ShowDrinkActivity.EDIT_DRINK_REQUEST);
-        }
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+                this,
+                new Pair<>(drinkView, //drinkView.getTransitionName()),
+                        getString(R.string.shared_transition_drink_drink) + drink_Id),
+                new Pair<>(producerView, //producerView.getTransitionName())
+                        getString(R.string.shared_transition_drink_producer) + drink_Id)
+        ).toBundle();
+        startActivityForResult(intent, ShowDrinkActivity.EDIT_DRINK_REQUEST, bundle);
 
     }
 
@@ -211,9 +199,7 @@ public class ShowDrinkActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

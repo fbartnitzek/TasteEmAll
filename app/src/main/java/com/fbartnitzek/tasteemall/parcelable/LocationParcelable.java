@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import com.fbartnitzek.tasteemall.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Copyright 2016.  Frank Bartnitzek
  *
@@ -121,6 +123,7 @@ public class LocationParcelable implements Parcelable {
         return Utils.isValidLatLong(latitude, longitude) || !TextUtils.isEmpty(input);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "LocationParcelable{" +

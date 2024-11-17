@@ -1,14 +1,7 @@
 package com.fbartnitzek.tasteemall.mainpager;
 
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +9,25 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fbartnitzek.tasteemall.MainActivity;
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns;
 import com.fbartnitzek.tasteemall.data.pojo.User;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -62,18 +64,14 @@ public class UserPagerFragment extends BasePagerFragment implements LoaderManage
         super.onCreateView(inflater, container, savedInstanceState);
 
         Log.v(LOG_TAG, "onCreateView, hashCode=" + this.hashCode() + ", " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
-        mUserAdapter = new UserAdapter(new UserAdapter.UserAdapterClickHandler() {
-            @Override
-            public void onClick(String userName, Uri contentUri, RecyclerView.ViewHolder viewHolder) {
-                Toast.makeText(getActivity(), userName + " was clicked", Toast.LENGTH_SHORT).show();
-            }
-        }, getActivity());
+        mUserAdapter = new UserAdapter((userName, contentUri, viewHolder) ->
+                Toast.makeText(getActivity(), userName + " was clicked", Toast.LENGTH_SHORT).show(), getActivity());
 
-        mUsersHeading = (TextView) mRootView.findViewById(R.id.heading_entities);
+        mUsersHeading = mRootView.findViewById(R.id.heading_entities);
         mUsersHeading.setText(
                 getString(R.string.label_list_entries_preview,
                         getString(R.string.label_users)));
-        RecyclerView reviewRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recyclerview_entities);
+        RecyclerView reviewRecyclerView = mRootView.findViewById(R.id.recyclerview_entities);
         reviewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         reviewRecyclerView.setAdapter(mUserAdapter);
 
@@ -87,63 +85,58 @@ public class UserPagerFragment extends BasePagerFragment implements LoaderManage
 
     @Override
     public void restartLoader() {
-        getLoaderManager().restartLoader(USER_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(USER_LOADER_ID, null, this);
     }
 
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case USER_LOADER_ID:
-                if (this.jsonUri == null) {
-                    Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
+        if (id == USER_LOADER_ID) {
+            if (this.jsonUri == null) {
+                Log.v(LOG_TAG, "onCreateLoader before jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
 
-                    String pattern = ((MainActivity) getActivity()).getSearchPattern();
-                    try {
-                        if (jsonTextFilter == null) {
-                            jsonTextFilter = new JSONObject().put(User.ENTITY, new JSONObject()
-                                    .put(User.NAME, new JSONObject()));
-                        }
-                        jsonTextFilter.getJSONObject(User.ENTITY).getJSONObject(User.NAME)
-                                .put(DatabaseContract.Operations.CONTAINS, DatabaseContract.encodeValue(pattern));
-                        jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
-                    } catch (JSONException | UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                        Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
-                        throw new RuntimeException("building jsonUri failed");
+                String pattern = ((MainActivity) Objects.requireNonNull(getActivity())).getSearchPattern();
+                try {
+                    if (jsonTextFilter == null) {
+                        jsonTextFilter = new JSONObject().put(User.ENTITY, new JSONObject()
+                                .put(User.NAME, new JSONObject()));
                     }
-                    Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
-
+                    jsonTextFilter.getJSONObject(User.ENTITY).getJSONObject(User.NAME)
+                            .put(DatabaseContract.Operations.CONTAINS, DatabaseContract.encodeValue(pattern));
+                    jsonUri = DatabaseContract.buildUriWithJson(jsonTextFilter);
+                } catch (JSONException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, "onCreateLoader building jsonUri failed, hashCode=" + this.hashCode() + ", " + "pattern= [" + pattern + "]");
+                    throw new RuntimeException("building jsonUri failed");
                 }
+                Log.v(LOG_TAG, "onCreateLoader after jsonCreation, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
 
-                return new CursorLoader(getActivity(), jsonUri,
-                        QueryColumns.MainFragment.UserQuery.COLUMNS,
-                        null, null, User.NAME);
-            default:
-                throw new RuntimeException("wrong loader_id in UserPagerFragment...");
+            }
+
+            return new CursorLoader(Objects.requireNonNull(getActivity()), jsonUri,
+                    QueryColumns.MainFragment.UserQuery.COLUMNS,
+                    null, null, User.NAME);
         }
+        throw new RuntimeException("wrong loader_id in UserPagerFragment...");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         //        Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
         String numberAppendix = data == null ? "" : getString(R.string.label_numberAppendix, data.getCount());
-        switch (loader.getId()) {
-            case USER_LOADER_ID:
-                mUserAdapter.swapCursor(data);
-                mUsersHeading.setText(
-                        getString(R.string.label_list_entries,
-                                getString(R.string.label_users),
-                                numberAppendix));
-                break;
+        if (loader.getId() == USER_LOADER_ID) {
+            mUserAdapter.swapCursor(data);
+            mUsersHeading.setText(
+                    getString(R.string.label_list_entries,
+                            getString(R.string.label_users),
+                            numberAppendix));
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        switch (loader.getId()) {
-            case USER_LOADER_ID:
-                mUserAdapter.swapCursor(null);
-                break;
+        if (loader.getId() == USER_LOADER_ID) {
+            mUserAdapter.swapCursor(null);
         }
     }
 

@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 public class DeleteEntryTask extends AsyncTask<Uri, Void, String> {
 
+    // todo: replace AsyncTasks with default-java/kotlin coroutines
+
     private static final String LOG_TAG = DeleteEntryTask.class.getName();
 
     private final Activity mActivity;

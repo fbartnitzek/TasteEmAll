@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,10 +133,10 @@ public class DatabaseContract {
         ATTRIBUTES.put(User.ENTITY, Arrays.asList(User.USER_ID, User.NAME));
 
         ASSOCIATIONS.put(Review.ENTITY, Arrays.asList(Location.ENTITY, User.ENTITY, Drink.ENTITY));
-        ASSOCIATIONS.put(Drink.ENTITY, Arrays.asList(Producer.ENTITY));
-        ASSOCIATIONS.put(Location.ENTITY, new ArrayList<String>());
-        ASSOCIATIONS.put(Producer.ENTITY, new ArrayList<String>());
-        ASSOCIATIONS.put(User.ENTITY, new ArrayList<String>());
+        ASSOCIATIONS.put(Drink.ENTITY, Collections.singletonList(Producer.ENTITY));
+        ASSOCIATIONS.put(Location.ENTITY, new ArrayList<>());
+        ASSOCIATIONS.put(Producer.ENTITY, new ArrayList<>());
+        ASSOCIATIONS.put(User.ENTITY, new ArrayList<>());
 
         ALIASES.put(Review.ENTITY, ReviewEntry.ALIAS);
         ALIASES.put(Drink.ENTITY, DrinkEntry.ALIAS);

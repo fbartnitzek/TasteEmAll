@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.fbartnitzek.tasteemall.R;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ import org.json.JSONObject;
 
 abstract public class BasePagerFragment extends Fragment {
 
-    private static final String LOG_TAG = BasePagerFragment.class.getName();
+//    private static final String LOG_TAG = BasePagerFragment.class.getName();
     private static final String STATE_JSON_FILTER = "STATE_JSON_FILTER";
 
 
@@ -67,7 +68,7 @@ abstract public class BasePagerFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_JSON_FILTER, jsonTextFilter.toString());
     }

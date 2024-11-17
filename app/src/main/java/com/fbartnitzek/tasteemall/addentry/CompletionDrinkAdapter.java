@@ -46,22 +46,19 @@ public class CompletionDrinkAdapter extends SimpleCursorAdapter {
     @Override
     public void setViewText(TextView v, String text) {
 //        Log.v(LOG_TAG, "setViewText, hashCode=" + this.hashCode() + ", " + "v = [" + v + "], text = [" + text + "]");
-        switch (v.getId()) {
-            case R.id.list_item_producer_name:
-                v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
-                v.setContentDescription(mActivity.getString(R.string.a11y_producer_name, text));
-                break;
-            case R.id.list_item_drink_name:
-                v.setText(text);
-                v.setContentDescription(mActivity.getString(R.string.a11y_drink_name, text));
-                break;
-            case R.id.list_item_drink_type:
-                v.setText(mActivity.getString(R.string.completion_prefix_formatting, text));
-                v.setContentDescription(mActivity.getString(R.string.a11y_drink_type,
-                        mActivity.getString(Utils.getReadableDrinkNameId(mContext, text))));
-                break;
-            default:
-                super.setViewText(v, text);
+        int id = v.getId();
+        if (id == R.id.list_item_producer_name) {
+            v.setText(mActivity.getString(R.string.completion_subentry_formatting, text));
+            v.setContentDescription(mActivity.getString(R.string.a11y_producer_name, text));
+        } else if (id == R.id.list_item_drink_name) {
+            v.setText(text);
+            v.setContentDescription(mActivity.getString(R.string.a11y_drink_name, text));
+        } else if (id == R.id.list_item_drink_type) {
+            v.setText(mActivity.getString(R.string.completion_prefix_formatting, text));
+            v.setContentDescription(mActivity.getString(R.string.a11y_drink_type,
+                    mActivity.getString(Utils.getReadableDrinkNameId(mActivity, text))));
+        } else {
+            super.setViewText(v, text);
         }
     }
 

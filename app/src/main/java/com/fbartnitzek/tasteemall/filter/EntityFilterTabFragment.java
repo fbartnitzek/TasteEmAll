@@ -4,16 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.data.BundleBuilder;
@@ -50,11 +51,9 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
 
     private String mName;
     private String mBaseEntity;
-    private List<String> mEntityArguments;
     private RecyclerView mAttributesRecycler;
-    private AttributeAdapter mAttributeAdapter;
     private int mPosition;
-    private ArrayList<Integer> mSelected = new ArrayList<>();
+    private final ArrayList<Integer> mSelected = new ArrayList<>();
 
 
     // TODO special attribute fragments later... (date, map) => later
@@ -76,7 +75,7 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
 
         mBaseEntity = bundle.getString(BASE_ENTITY);
         mName = bundle.getString(NAME, "no name");
-        mEntityArguments = DatabaseContract.ATTRIBUTES.get(mBaseEntity);
+        List<String> mEntityArguments = DatabaseContract.ATTRIBUTES.get(mBaseEntity);
         mPosition = bundle.getInt(ADAPTER_POSITION, 0);
 
         ((TextView)rootView.findViewById(R.id.name)).setText(this.mName);
@@ -88,9 +87,9 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
             mSelected.addAll(bundle.getIntegerArrayList(LIST_SELECTED));
         }
 
-        mAttributesRecycler = (RecyclerView) rootView.findViewById(R.id.recyclerview_attributes);
+        mAttributesRecycler = rootView.findViewById(R.id.recyclerview_attributes);
         mAttributesRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAttributeAdapter = new AttributeAdapter(mEntityArguments, this, getContext(), mSelected);
+        AttributeAdapter mAttributeAdapter = new AttributeAdapter(mEntityArguments, this, getContext(), mSelected);
         mAttributesRecycler.setAdapter(mAttributeAdapter);
 
         return rootView;
@@ -118,7 +117,7 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
         // open textfilterdialog
 //        Toast.makeText(getActivity(), attributeName + " was clicked", Toast.LENGTH_SHORT).show();
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
+        FragmentManager fm = getParentFragmentManager();
 
         // special fragments
         if (Review.ENTITY.equals(mBaseEntity) && Review.READABLE_DATE.equals(attributeName)) {
@@ -164,10 +163,14 @@ public class EntityFilterTabFragment extends Fragment implements AttributeAdapte
 
                 if (data.getBooleanExtra(EXTRA_ATTRIBUTE_FILTERED, false)) {
                     mSelected.add(mPosition);
-                    vh.itemView.setBackgroundColor(Color.GREEN);
+                    if (vh != null) {
+                        vh.itemView.setBackgroundColor(Color.GREEN);
+                    }
                 } else {
                     mSelected.remove((Integer) mPosition);
-                    vh.itemView.setBackgroundColor(Color.TRANSPARENT);
+                    if (vh != null) {
+                        vh.itemView.setBackgroundColor(Color.TRANSPARENT);
+                    }
                 }
             }
 

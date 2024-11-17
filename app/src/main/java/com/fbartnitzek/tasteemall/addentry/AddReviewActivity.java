@@ -31,22 +31,17 @@ public class AddReviewActivity extends AppCompatActivity {
                 return;
             }
 
-            // edit or add
             supportPostponeEnterTransition();   // wait until Fragment-Views are done
 
             AddReviewFragment fragment = getFragment();
             if (fragment == null) {
-
                 fragment = new AddReviewFragment();
                 if (getIntent().getData() != null) {
                     fragment.setmContentUri(getIntent().getData());
                 }
-
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container_add_review_fragment, fragment, ADD_REVIEW_FRAGMENT_TAG)
                         .commit();
-            } else {
-//                Log.v(LOG_TAG, "onCreate - old fragment exists, hashCode=" + this.hashCode()  + "]");
             }
 
         } else {
@@ -70,17 +65,16 @@ public class AddReviewActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 //        Log.v(LOG_TAG, "onOptionsItemSelected, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_save:
-                AddReviewFragment fragment = getFragment();
-                if (fragment != null) {
-                    fragment.saveData();
-                }
-                return true;
-            default:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_save) {
+            AddReviewFragment fragment = getFragment();
+            if (fragment != null) {
+                fragment.saveData();
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -115,14 +109,11 @@ public class AddReviewActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });
         }
     }
-
 
 }

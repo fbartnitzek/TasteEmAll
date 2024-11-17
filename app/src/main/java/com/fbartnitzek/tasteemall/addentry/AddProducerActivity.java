@@ -37,7 +37,7 @@ public class AddProducerActivity extends AppCompatActivity {
 
             AddProducerFragment fragment = getFragment();
 
-            // use name from calling activity
+            // use name from calling activity or contentUri for edit
             if (fragment == null) {
                 fragment = new AddProducerFragment();
                 if (getIntent().hasExtra(PRODUCER_NAME_EXTRA)) {
@@ -74,19 +74,19 @@ public class AddProducerActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-            case R.id.action_save:
-                AddProducerFragment fragment = getFragment();
-                if (fragment != null) {
-                    Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
-                    fragment.saveData();
-                }
-                return true;
-            default:
-                Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
+        } else if (itemId == R.id.action_save) {
+            AddProducerFragment fragment = getFragment();
+            if (fragment != null) {
+                Log.v(LOG_TAG, "onOptionsItemSelected - calling fragment for saving, hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
+                fragment.saveData();
+            }
+            return true;
+        } else {
+            Log.e(LOG_TAG, "onOptionsItemSelected - pressed something unusual..., hashCode=" + this.hashCode() + ", " + "item = [" + item + "]");
         }
 
         return super.onOptionsItemSelected(item);
@@ -122,9 +122,7 @@ public class AddProducerActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreDraw() {
                             view.getViewTreeObserver().removeOnPreDrawListener(this);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                supportStartPostponedEnterTransition();
-                            }
+                            supportStartPostponedEnterTransition();
                             return true;
                         }
                     });

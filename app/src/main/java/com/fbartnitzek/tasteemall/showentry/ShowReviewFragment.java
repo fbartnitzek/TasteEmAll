@@ -4,14 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -19,10 +12,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
 import com.fbartnitzek.tasteemall.R;
 import com.fbartnitzek.tasteemall.Utils;
 import com.fbartnitzek.tasteemall.data.DatabaseContract;
 import com.fbartnitzek.tasteemall.data.QueryColumns.ReviewFragment.ShowQuery;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Copyright 2016.  Frank Bartnitzek
@@ -100,28 +105,28 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
             }
         }
 
-        mProducerLabelView = (TextView) mRootView.findViewById(R.id.heading_choose_drink);
-        mProducerNameView = (TextView) mRootView.findViewById(R.id.producer_name);
-        mProducerNameLabelView = (TextView) mRootView.findViewById(R.id.label_producer_name);
-        mProducerLocationView = (TextView) mRootView.findViewById(R.id.producer_location);
+        mProducerLabelView = mRootView.findViewById(R.id.heading_choose_drink);
+        mProducerNameView = mRootView.findViewById(R.id.producer_name);
+        mProducerNameLabelView = mRootView.findViewById(R.id.label_producer_name);
+        mProducerLocationView = mRootView.findViewById(R.id.producer_location);
 
-        mDrinkLabelView = (TextView) mRootView.findViewById(R.id.label_drink);
-        mDrinkNameView = (TextView) mRootView.findViewById(R.id.drink_name);
-        mDrinkNameLabelView = (TextView) mRootView.findViewById(R.id.label_drink_name);
-        mDrinkTypeView = (TextView) mRootView.findViewById(R.id.drink_type);
-        mDrinkStyleView = (TextView) mRootView.findViewById(R.id.drink_style);
-        mDrinkSpecificsView = (TextView) mRootView.findViewById(R.id.drink_specifics);
-        mDrinkIngredientsView = (TextView) mRootView.findViewById(R.id.drink_ingredients);
+        mDrinkLabelView = mRootView.findViewById(R.id.label_drink);
+        mDrinkNameView = mRootView.findViewById(R.id.drink_name);
+        mDrinkNameLabelView = mRootView.findViewById(R.id.label_drink_name);
+        mDrinkTypeView = mRootView.findViewById(R.id.drink_type);
+        mDrinkStyleView = mRootView.findViewById(R.id.drink_style);
+        mDrinkSpecificsView = mRootView.findViewById(R.id.drink_specifics);
+        mDrinkIngredientsView = mRootView.findViewById(R.id.drink_ingredients);
 
-        mReviewUserView = (TextView) mRootView.findViewById(R.id.review_user_name);
-        mReviewRatingView = (TextView) mRootView.findViewById(R.id.review_rating);
-        mReviewDescriptionView = (TextView) mRootView.findViewById(R.id.review_description);
-        mReviewReadableDateView = (TextView) mRootView.findViewById(R.id.review_readable_date);
-        mReviewLocationView = (TextView) mRootView.findViewById(R.id.review_location);
-        mReviewLocationDescriptionView = (TextView) mRootView.findViewById(R.id.review_location_description);
-        mReviewRecommendedSidesView = (TextView) mRootView.findViewById(R.id.review_recommended_sides);
+        mReviewUserView = mRootView.findViewById(R.id.review_user_name);
+        mReviewRatingView = mRootView.findViewById(R.id.review_rating);
+        mReviewDescriptionView = mRootView.findViewById(R.id.review_description);
+        mReviewReadableDateView = mRootView.findViewById(R.id.review_readable_date);
+        mReviewLocationView = mRootView.findViewById(R.id.review_location);
+        mReviewLocationDescriptionView = mRootView.findViewById(R.id.review_location_description);
+        mReviewRecommendedSidesView = mRootView.findViewById(R.id.review_recommended_sides);
 
-        FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab_share);
+        FloatingActionButton fab = mRootView.findViewById(R.id.fab_share);
         fab.setOnClickListener(this);
 
         createToolbar(mRootView, LOG_TAG);
@@ -133,7 +138,7 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     void updateToolbar() {
         Log.v(LOG_TAG, "updateToolbar, hashCode=" + this.hashCode() + ", " + "");
 
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar();
         if (actionBar != null) {
 
             String drinkName = mDrinkNameView.getText().toString();
@@ -148,8 +153,8 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     @Override
     public void onResume() {
         Log.v(LOG_TAG, "onResume, hashCode=" + this.hashCode() + ", " + "");
-//        getLoaderManager().initLoader(SHOW_REVIEW_LOADER_ID, null, this);
-        getLoaderManager().restartLoader(SHOW_REVIEW_LOADER_ID, null, this);    //overkill, but init wont change the views... TODO
+        //overkill, but init wont change the views... TODO
+        LoaderManager.getInstance(this).restartLoader(SHOW_REVIEW_LOADER_ID, null, this);
         super.onResume();
     }
 
@@ -158,15 +163,18 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
         Log.v(LOG_TAG, "updateFragment, hashCode=" + this.hashCode() + ", " + "reviewUri = [" + reviewUri + "]");
         mUri = reviewUri;
         calcCompleteUri();
-        getLoaderManager().restartLoader(SHOW_REVIEW_LOADER_ID, null, this);
+        LoaderManager.getInstance(this).restartLoader(SHOW_REVIEW_LOADER_ID, null, this);
     }
 
+    // todo: later use alternative to loader: https://developer.android.com/guide/components/loaders
+
+    @NotNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "onCreateLoader, hashCode=" + this.hashCode() + ", " + "id = [" + id + "], args = [" + args + "]");
         if (mUri != null) {
             return new CursorLoader(
-                    getActivity(),
+                    Objects.requireNonNull(getActivity()),
                     mUri,
                     ShowQuery.COLUMNS,
                     null,
@@ -177,13 +185,13 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NotNull Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
             Log.v(LOG_TAG, "onLoadFinished, hashCode=" + this.hashCode() + ", " + "loader = [" + loader + "], data = [" + data + "]");
 
             // each value has its label before - a11y should work that way...
             String drinkType = data.getString(ShowQuery.COL_DRINK_TYPE);
-            int drinkTypeIndex = Utils.getDrinkTypeId(getActivity(), drinkType);
+            int drinkTypeIndex = Utils.getDrinkTypeId(Objects.requireNonNull(getActivity()), drinkType);
             mDrinkTypeView.setText(drinkType);
 
             int readableProducerTypeIndex = Utils.getReadableProducerNameId(getActivity(), drinkTypeIndex);
@@ -205,10 +213,9 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
 
             int reviewId = DatabaseContract.getIdFromUri(mUri);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {    //shared element transition
-                mProducerNameView.setTransitionName(getString(R.string.shared_transition_review_producer) + reviewId);
-                mDrinkNameView.setTransitionName(getString(R.string.shared_transition_review_drink) + reviewId);
-            }
+            //shared element transition
+            mProducerNameView.setTransitionName(getString(R.string.shared_transition_review_producer) + reviewId);
+            mDrinkNameView.setTransitionName(getString(R.string.shared_transition_review_drink) + reviewId);
 
             String producerName = data.getString(ShowQuery.COL_PRODUCER_NAME);
             String drinkName = data.getString(ShowQuery.COL_DRINK_NAME);
@@ -247,14 +254,12 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     private void resumeActivityEnterTransition() {
         Log.v(LOG_TAG, "resumeActivityEnterTransition, hashCode=" + this.hashCode() + ", " + "");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // not that important which one - but is lowest :-)
-            ((ShowReviewActivity) getActivity()).scheduleStartPostponedTransition(mDrinkNameView);
-        }
+        // not that important which one - but is lowest :-)
+        ((ShowReviewActivity) Objects.requireNonNull(getActivity())).scheduleStartPostponedTransition(mDrinkNameView);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NotNull Loader<Cursor> loader) {
         //nothing
     }
 
@@ -262,28 +267,24 @@ public class ShowReviewFragment extends ShowBaseFragment implements View.OnClick
     public void onClick(View v) {
 //        Log.v(LOG_TAG, "onClick, mProducer_Id=" + mProducer_Id + ", mDrink_Id=" + mDrink_Id + ", mLocation_Id=" + mLocation_Id);
         if (v.getId() == R.id.producer_name && mProducer_Id > -1) {  // open producer
-            Bundle bundle = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                bundle = ActivityOptions.makeSceneTransitionAnimation(
-                        getActivity(),
-                        new Pair<View, String>(mProducerNameView,
-                                getString(R.string.shared_transition_producer_producer) + mProducer_Id)
-                ).toBundle();
-            }
+            Bundle bundle;
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    new Pair<>(mProducerNameView,
+                            getString(R.string.shared_transition_producer_producer) + mProducer_Id)
+            ).toBundle();
             startActivity(
                     new Intent(getActivity(), ShowProducerActivity.class)
                         .setData(DatabaseContract.ProducerEntry.buildUri(mProducer_Id)), bundle);
         } else if (v.getId() == R.id.drink_name && mDrink_Id > -1) {    // open drink
-            Bundle bundle = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                bundle = ActivityOptions.makeSceneTransitionAnimation(
-                        getActivity(),
-                        new Pair<View, String>(mProducerNameView,
-                                getString(R.string.shared_transition_drink_producer) + mDrink_Id),
-                        new Pair<View, String>(mDrinkNameView,
-                                getString(R.string.shared_transition_drink_drink) + mDrink_Id)
-                ).toBundle();
-            }
+            Bundle bundle;
+            bundle = ActivityOptions.makeSceneTransitionAnimation(
+                    getActivity(),
+                    new Pair<>(mProducerNameView,
+                            getString(R.string.shared_transition_drink_producer) + mDrink_Id),
+                    new Pair<>(mDrinkNameView,
+                            getString(R.string.shared_transition_drink_drink) + mDrink_Id)
+            ).toBundle();
             startActivity(
                     new Intent(getActivity(), ShowDrinkActivity.class)
                             .setData(DatabaseContract.DrinkEntry.buildUri(mDrink_Id)), bundle);
