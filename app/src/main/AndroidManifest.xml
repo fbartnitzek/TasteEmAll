@@ -111,10 +111,13 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/stats_widget_info"/>
+                android:resource="@xml/stats_widget_info" />
         </receiver>
 
-        <service android:name=".widget.StatsWidgetIntentService"/>
+        <service
+            android:name=".widget.StatsWidgetIntentService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
 
         <activity android:name=".showentry.ShowLocationActivity">
         </activity>
