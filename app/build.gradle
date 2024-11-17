@@ -11,15 +11,10 @@ android {
 //            storePassword RELEASE_STORE_PASSWORD
 //        }
 //    }
-//    compileSdkVersion 34
 
     defaultConfig {
         compileSdk 35
     }
-//    dexOptions {
-//        maxProcessCount 2
-//        javaMaxHeapSize "2g"
-//    }
 
     // THE multidexing solution: http://stackoverflow.com/questions/27698287/noclassdeffounderror-with-android-studio-on-android-4/27709640#27709640
     defaultConfig {
