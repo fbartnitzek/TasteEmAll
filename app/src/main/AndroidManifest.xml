@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<!--    android.permission.WRITE_EXTERNAL_STORAGE not needed anymore...?-->
 
     <!-- Google Maps: app needs OpenGL_v2 to display app (for play store) -->
     <uses-feature
@@ -28,7 +28,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GoogleMapsApiKey"/>
 
-        <activity android:name=".MainActivity" android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity" android:theme="@style/AppTheme" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -38,7 +38,8 @@
 
         <provider
             android:name=".data.DatabaseProvider"
-            android:authorities="fbartnitzek.tasteemall"/>
+            android:authorities="fbartnitzek.tasteemall"
+            android:exported="false" />
 
         <!-- bugfix for editText hides nestedScrollView: -->
         <!-- android:windowSoftInputMode="adjustResize" -->
@@ -101,7 +102,8 @@
 
         <receiver
             android:name=".widget.StatsWidgetProvider"
-            android:label="@string/widget_heading_statistics">
+            android:label="@string/widget_heading_statistics"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="com.fbartnitzek.tasteemall.tasks.ACTION_DATA_CHANGED"/>
@@ -109,10 +111,13 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/stats_widget_info"/>
+                android:resource="@xml/stats_widget_info" />
         </receiver>
 
-        <service android:name=".widget.StatsWidgetIntentService"/>
+        <service
+            android:name=".widget.StatsWidgetIntentService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
 
         <activity android:name=".showentry.ShowLocationActivity">
         </activity>
