@@ -24,7 +24,6 @@
             <!--layout="@layout/fragment_page_entity_detail"/>-->
 
         <androidx.viewpager.widget.ViewPager
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
